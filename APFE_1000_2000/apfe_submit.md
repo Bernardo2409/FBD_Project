@@ -1,8 +1,8 @@
 # BD: Trabalho Prático APFE
 
-**Grupo**: PXGY
-- António Fictício, MEC: 1000
-- João Inventado, MEC: 2000
+**Grupo**: P3G1
+- Bernardo Mota Coelho, MEC: 125059
+- Tiago Francisco Crespo do Vale, MEC: 125913
 
 ## Introdução / Introduction
  
@@ -10,7 +10,7 @@ Escreva uma pequena introdução sobre o trabalho.
 Write a simple introduction about your project.
 
 ## ​Análise de Requi\sitos / Requirements
-f
+
 
 ## DER
 
