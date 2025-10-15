@@ -64,6 +64,18 @@ O sistema deve calcular automaticamente a pontuação total da equipa;
 
 Requisitos não Funcionais
 
+Desempenho
+O sistema deve permitir que os utilizadores utilizem a plataforma sem interrupções;
+
+O sistema deve garantir que não ocorrem sobrecargas do servidor;
+
+Os sistema de ser fácil de usar e apresentar uma interface intuitiva.
+
+
+Segurança
+
+O sistema deve garantir integridade e consistência dos dados.
+
 ## DER
 
 
