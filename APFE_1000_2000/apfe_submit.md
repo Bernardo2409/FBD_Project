@@ -20,7 +20,42 @@ Se um destes jogadores estiver na equipa do utilizador a equipa também ganha po
 
 ## ​Análise de Requi\sitos / Requirements
 
-Requisitos Funcionais
+Requisitos Funcionais:
+
+Utilizador
+
+O sistema deve permitir o registo na plataforma;
+O sistema deve permitir o login e logout;
+O sistema deve permitir ao utilizador criar apenas uma equipa;
+
+Gestão da Equipa
+
+O sistema deve permitir ao utilizador escolher o nome da equipa;
+O sistema deve permitir ao utilizador escolher os jogadores dentro do orçamento;
+O sistema deve permitir substituir jogadores;
+O sistema deve permitir calcular automaticamente a pontuação da equipa;
+O sistema deve permitir ao utilizador ver a pontuação total da equipa e pontuação por jornada;
+
+Gestão dos Jogadores
+
+O sistema de permitir pesquisar os jogadores pela posição(Guarda-redes, Defesa, Médio, Avançado);
+O sistema deve registar as estatsticas dos jogadores por jornada (Golos marcados, Golos sofridos, Assistências, Cartões, Tempo de Jogo);
+O sistema deve calcular a pontuação de cada jogador por jornada;
+
+
+Gestão Liga
+
+O sistema deve permitir a criação de ligas privada, entrar em ligas privadas e entrar em ligas públicas;
+O sistema permite ver as ligas em que o utilizador participa;
+O sistema permite ver a classificação de todos os utilizador a participar na liga;
+
+Pontuações Classificações
+
+O sistema deve calcular automaticamente a pontuação dos jogadores na jornada;
+O sistema deve calcular automaticamente a pontuação da equipa na jornada;
+O sistema deve calcular automaticamente a pontuação total da equipa;
+
+
 
 
 
