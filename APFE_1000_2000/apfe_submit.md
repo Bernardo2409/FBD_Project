@@ -66,11 +66,6 @@ O sistema deve registar Jogos automaticamente na Jornada correta.
 
 
 
-
-
-
-
-
 Requisitos não Funcionais
 
 Desempenho ====
