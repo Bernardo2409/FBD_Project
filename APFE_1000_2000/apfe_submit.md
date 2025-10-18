@@ -50,7 +50,6 @@ Gestão Liga ====
 O sistema deve permitir a criação de ligas privada, entrar em ligas privadas e entrar em ligas públicas;
 O sistema deve gerar um código de convite para possibilitar a entrada de utilizadores em ligas privadas;
 O sistema deve permitir a pesquisa de Ligas por código;
-O sistema permite ao utilizador abandonar a Liga; - ???
 O sistema permite ver as ligas em que o utilizador participa;
 O sistema permite ver a classificação de todos os utilizador a participar na liga;
 
@@ -86,14 +85,11 @@ Segurança ====
 
 O sistema deve garantir integridade e consistência dos dados;
 O sistema deve aceitar apenas palavras-passe fortes (min 8 caracteres, letras maiusculas e minusculas, simbolos e números);
-O sistema deve terminar a sessão do utilizador após 1 hora de inatividade; - ???
 
 Usabilidade e Acessibilidade ====
 
 O sistema deve dispor de uma interface responsiva;
 O sistema deve dispor de uma interface simples e clara;
-
-
 
 ## DER
 
