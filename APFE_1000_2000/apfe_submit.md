@@ -5,9 +5,6 @@
 - Tiago Francisco Crespo do Vale, MEC: 125913
 
 ## Introdução / Introduction
- 
-Escreva uma pequena introdução sobre o trabalho.
-Write a simple introduction about your project.
 
 Com este projeto, pretendemos melhorar a experiência dos adeptos de futebol, proporcionando uma dinâmica interativa, divertida e competitiva de acompanhar o desempenho dos jogadores favoritos de cada utilizador. Tudo isto, através da criação de uma fantasy, a FantasyChamp.
 
