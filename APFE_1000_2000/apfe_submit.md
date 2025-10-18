@@ -36,7 +36,7 @@ O sistema deve permitir ao utilizador escolher os jogadores dentro do orçamento
 O sistema deve permitir substituir jogadores;
 O sistema deve permitir calcular automaticamente a pontuação da equipa;
 O sistema deve permitir ao utilizador ver a pontuação total da equipa e pontuação por jornada;
-O sistema deve limitar a escolha de jogadores ao utilizador (11 titulares + 4 banco).
+O sistema deve limitar a escolha de jogadores ao utilizador (11 titulares + 4 suplentes).
 
 Gestão dos Jogadores ====
 
