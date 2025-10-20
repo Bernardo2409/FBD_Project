@@ -1,8 +1,8 @@
 # BD: Trabalho Prático APF-T
 
-**Grupo**: PXGY
-- António Fictício, MEC: 1000
-- João Inventado, MEC: 2000
+**Grupo**: P3G1
+- Bernardo Coelho, MEC: 125059
+- Tiago Vale, MEC: 125913
 
 # Instructions - TO REMOVE
 
