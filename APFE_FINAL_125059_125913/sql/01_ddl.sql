@@ -126,3 +126,19 @@ CREATE TABLE Jogo (
 	FOREIGN KEY (ID_jornada)
 		REFERENCES Jornada(ID)
 )
+
+CREATE TABLE Pertence (
+    ID_Jogador VARCHAR(8) NOT NULL,
+    ID_Equipa VARCHAR(8) NOT NULL,
+    PRIMARY KEY (ID_Jogador, ID_Equipa),
+    FOREIGN KEY (ID_Jogador) REFERENCES Jogador(ID),
+    FOREIGN KEY (ID_Equipa) REFERENCES Equipa(ID)
+);
+
+CREATE TABLE Participa (
+    ID_Utilizador VARCHAR(8) NOT NULL,
+    ID_Liga VARCHAR(8) NOT NULL,
+    PRIMARY KEY (ID_Utilizador, ID_Liga),
+    FOREIGN KEY (ID_Utilizador) REFERENCES Utilizador(ID),
+    FOREIGN KEY (ID_Liga) REFERENCES Liga(ID)
+);
