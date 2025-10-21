@@ -11,7 +11,7 @@ CREATE TABLE Utilizador (
 
 CREATE TABLE Equipa (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
-	Or�amento VARCHAR(16) NOT NULL,
+	Or�amento Float(16) NOT NULL,
 	Nome VARCHAR(16) NOT NULL,
 	Pontua��oTotal VARCHAR(16) NOT NULL,
 	ID_utilizador VARCHAR(8) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE Equipa (
 CREATE TABLE Clube (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Nome VARCHAR(16) NOT NULL,
-	País VARCHAR(16) NOT NULL,
+	País VARCHAR(16) NOT NULL
 );
 
 CREATE TABLE Jogador (
@@ -31,7 +31,7 @@ CREATE TABLE Jogador (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Nome VARCHAR(16) NOT NULL,
 	Posição VARCHAR(16) NOT NULL,
-	Preço VARCHAR(16) NOT NULL,
+	Preço Float(16) NOT NULL,
 	ID_clube VARCHAR(8) NOT NULL,
 	ID_Estado_Jogador VARCHAR(8) NOT NULL,
 
@@ -51,7 +51,7 @@ CREATE TABLE Jornada (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Data_Inicio VARCHAR(16) NOT NULL,
 	Data_Fim VARCHAR(16) NOT NULL,
-	Numero VARCHAR(16) NOT NULL,
+	Numero INT(16) NOT NULL,
 	ID_liga VARCHAR(8) NOT NULL,
 
 	FOREIGN KEY (ID_liga)
@@ -59,28 +59,31 @@ CREATE TABLE Jornada (
 
 );
 
+CREATE TABLE Tipo_Liga (
+	ID VARCHAR(8) NOT NULL PRIMARY KEY,
+	Tipo VARCHAR(16) NOT NULL
+);
+
 CREATE TABLE Liga (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
-	Nome VARCHAR(16) NOT NULL
+	Nome VARCHAR(16) NOT NULL,
 	Data_Inicio VARCHAR(16) NOT NULL,
 	Data_Fim VARCHAR(16) NOT NULL,
 	ID_tipoLiga VARCHAR(8) NOT NULL,
 	ID_criador VARCHAR(8) NOT NULL,
 
 	FOREIGN KEY (ID_criador)
-		REFERENCES Utilizador(ID)
+		REFERENCES Utilizador(ID),
+    FOREIGN KEY (ID_tipoLiga)
+        REFERENCES Tipo_Liga(ID)
 );
 
-CREATE TABLE Tipo_Liga (
-	ID VARCHAR(8) NOT NULL PRIMARY KEY,
-	Tipo VARCHAR(16) NOT NULL
-);
 
-CREATE TABLE Pontuação_Equipa (jornada) (
+CREATE TABLE Pontuação_Equipa (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	ID_equipa VARCHAR(8) NOT NULL,
 	ID_jornada VARCHAR(8) NOT NULL,
-	Pontuação_Jornada VARCHAR(16) NOT NULL,
+	Pontuação_Jornada INT(16) NOT NULL,
 
 	FOREIGN KEY (ID_equipa)
 		REFERENCES Equipa(ID),
@@ -89,16 +92,16 @@ CREATE TABLE Pontuação_Equipa (jornada) (
 		REFERENCES Jornada(ID)
 )
 
-CREATE TABLE Pontuação_Jogador (jornada) (
+CREATE TABLE Pontuação_Jogador (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	ID_jogador VARCHAR(8) NOT NULL,
 	ID_jornada VARCHAR(8) NOT NULL,
-	TempoJogo VARCHAR(16) NOT NULL,
-	GolosSofridos VARCHAR(16) NOT NULL,
-	Pontuação_Jornada VARCHAR(16) NOT NULL,
-	Assistências VARCHAR(16) NOT NULL,
-	CartõesAmarelos VARCHAR(16) NOT NULL,
-	CartõesVermelhos VARCHAR(16) NOT NULL,
+	TempoJogo INT NOT NULL,
+    GolosSofridos INT DEFAULT 0,
+    Pontuacao_Jornada INT NOT NULL,
+    Assistencias INT DEFAULT 0,
+    CartoesAmarelos INT DEFAULT 0,
+    CartoesVermelhos INT DEFAULT 0,
 
 	FOREIGN KEY (ID_jogador)
 		REFERENCES Jogador(ID),
