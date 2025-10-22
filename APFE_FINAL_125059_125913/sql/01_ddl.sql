@@ -4,16 +4,16 @@ CREATE TABLE Utilizador (
 	Apelido VARCHAR(16) NOT NULL,
 	Email VARCHAR(16) NOT NULL,
 	Senha VARCHAR(16) NOT NULL,
-	Pa�s VARCHAR(16) NOT NULL,
+	País VARCHAR(16) NOT NULL,
 	Nacionalidade VARCHAR(16) NOT NULL,
 	DataDeNascimento VARCHAR(16) NOT NULL
 );
 
 CREATE TABLE Equipa (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
-	Or�amento Float(16) NOT NULL,
+	Orçamento Float(16) NOT NULL,
 	Nome VARCHAR(16) NOT NULL,
-	Pontua��oTotal VARCHAR(16) NOT NULL,
+	PontuaçãoTotal VARCHAR(16) NOT NULL,
 	ID_utilizador VARCHAR(8) NOT NULL,
 
 	FOREIGN KEY (ID_utilizador)
@@ -26,6 +26,11 @@ CREATE TABLE Clube (
 	País VARCHAR(16) NOT NULL
 );
 
+CREATE TABLE Estado_Jogador (
+	ID VARCHAR(8) NOT NULL PRIMARY KEY,
+	Estado VARCHAR(16) NOT NULL
+);
+
 CREATE TABLE Jogador (
 
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
@@ -36,27 +41,10 @@ CREATE TABLE Jogador (
 	ID_Estado_Jogador VARCHAR(8) NOT NULL,
 
 	FOREIGN KEY (ID_clube)
-		REFERENCES Clube(ID)
+		REFERENCES Clube(ID),
 
 	FOREIGN KEY (ID_Estado_Jogador)
 		REFERENCES Estado_Jogador(ID)
-);
-
-CREATE TABLE Estado_Jogador (
-	ID VARCHAR(8) NOT NULL PRIMARY KEY,
-	Estado VARCHAR(16) NOT NULL
-);
-
-CREATE TABLE Jornada (
-	ID VARCHAR(8) NOT NULL PRIMARY KEY,
-	Data_Inicio VARCHAR(16) NOT NULL,
-	Data_Fim VARCHAR(16) NOT NULL,
-	Numero INT(16) NOT NULL,
-	ID_liga VARCHAR(8) NOT NULL,
-
-	FOREIGN KEY (ID_liga)
-		REFERENCES Liga(ID)
-
 );
 
 CREATE TABLE Tipo_Liga (
@@ -78,12 +66,23 @@ CREATE TABLE Liga (
         REFERENCES Tipo_Liga(ID)
 );
 
+CREATE TABLE Jornada (
+	ID VARCHAR(8) NOT NULL PRIMARY KEY,
+	Data_Inicio VARCHAR(16) NOT NULL,
+	Data_Fim VARCHAR(16) NOT NULL,
+	Numero INT NOT NULL,
+	ID_liga VARCHAR(8) NOT NULL,
+
+	FOREIGN KEY (ID_liga)
+		REFERENCES Liga(ID)
+
+);
 
 CREATE TABLE Pontuação_Equipa (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	ID_equipa VARCHAR(8) NOT NULL,
 	ID_jornada VARCHAR(8) NOT NULL,
-	Pontuação_Jornada INT(16) NOT NULL,
+	Pontuação_Jornada INT NOT NULL,
 
 	FOREIGN KEY (ID_equipa)
 		REFERENCES Equipa(ID),
