@@ -23,8 +23,9 @@ Se um destes jogadores estiver na equipa do utilizador a equipa também ganha po
 
 ### Melhorias/Improvements 
 
-Descreva sumariamente as melhorias sobre a entrega anterior.
-Describe briefly the improvements made since the previous delivery.
+Na tabela Tipo_liga, o código passou se a chamar código_convite
+A tabela Jogo está ligada à tabela Pontuação_Jogador
+Melhor especificação do confronto entre 2 clubes
 
 ## ER - Esquema Relacional/Relational Schema
 
@@ -34,8 +35,8 @@ Describe briefly the improvements made since the previous delivery.
 
 ### Melhorias/Improvements
 
-Descreva sumariamente as melhorias sobre a entrega anterior.
-Describe briefly the improvements made since the previous delivery.
+Na tabela Tipo_liga, o código passou se a chamar código_convite
+ID_Clube1 e ID_Clube2 passaram da tabela Jogo para o Enfrenta
 
 ## ​SQL DDL - Data Definition Language
 
