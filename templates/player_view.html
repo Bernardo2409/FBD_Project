@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Detalhes do Jogador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
-<body>
+<body class="bg-gray-100 text-gray-900">
 
-    <h1>Detalhes do Jogador</h1>
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6 text-center">Detalhes do Jogador</h1>
 
-    <p><strong>ID:</strong> {{ jogador_id }}</p>
-    <p><strong>Nome:</strong> {{ jogador.nome }}</p>
-    <p><strong>Posição:</strong> {{ jogador.posicao }}</p>
-    <p><strong>Preço:</strong> {{ jogador.preco }}</p>
-    <p><strong>Clube:</strong> {{ jogador.id_clube }}</p> <!-- Agora mostra o nome do clube -->
-    <p><strong>Estado:</strong> {{ jogador.id_estado }}</p>
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <p class="text-lg mb-2"><strong>ID:</strong> {{ jogador_id }}</p>
+            <p class="text-lg mb-2"><strong>Nome:</strong> {{ jogador.nome }}</p>
+            <p class="text-lg mb-2"><strong>Posição:</strong> {{ jogador.posicao }}</p>
+            <p class="text-lg mb-2"><strong>Preço:</strong> {{ jogador.preco }}</p>
+            <p class="text-lg mb-2"><strong>Clube:</strong> {{ jogador.id_clube }}</p> <!-- Agora mostra o nome do clube -->
+            <p class="text-lg mb-6"><strong>Estado:</strong> {{ jogador.id_estado }}</p>
 
-    <br>
-    <a href="{{ url_for('base') }}">← Voltar à lista</a>
+            <a href="{{ url_for('base') }}" class="btn btn-outline btn-primary">← Voltar à lista</a>
+        </div>
+    </div>
 
 </body>
 </html>

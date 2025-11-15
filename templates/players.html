@@ -3,36 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>Jogadores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
-<body>
+<body class="bg-gray-100 text-gray-900">
 
-    <h1>Lista de Jogadores</h1>
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6 text-center">Lista de Jogadores</h1>
 
-    <table border="1" cellpadding="6">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Posição</th>
-                <th>Preço</th>
-                <th>Detalhes</th>
-            </tr>
-        </thead>
-
-        <tbody>
-        {% for jogador in jogadores %}
-            <tr>
-                <td>{{ jogador.id }}</td>
-                <td>{{ jogador.nome }}</td>
-                <td>{{ jogador.posicao }}</td>
-                <td>{{ jogador.preco }}</td>
-                <td>
-                    <a href="/players/{{ jogador.id }}">Ver</a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full border-separate border-spacing-2">
+                <thead class="bg-blue-600 text-white">
+                    <tr>
+                        <th class="px-4 py-2">ID</th>
+                        <th class="px-4 py-2">Nome</th>
+                        <th class="px-4 py-2">Posição</th>
+                        <th class="px-4 py-2">Preço</th>
+                        <th class="px-4 py-2">Detalhes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for jogador in jogadores %}
+                    <tr class="bg-white hover:bg-gray-50">
+                        <td class="px-4 py-2">{{ jogador.id }}</td>
+                        <td class="px-4 py-2">{{ jogador.nome }}</td>
+                        <td class="px-4 py-2">{{ jogador.posicao }}</td>
+                        <td class="px-4 py-2">{{ jogador.preco }}</td>
+                        <td class="px-4 py-2">
+                            <a href="/players/{{ jogador.id }}" class="btn btn-primary">Ver</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 </body>
 </html>
