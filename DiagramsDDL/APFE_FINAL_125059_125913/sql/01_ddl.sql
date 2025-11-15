@@ -1,37 +1,37 @@
-CREATE TABLE Utilizador (
+CREATE TABLE FC_Utilizador (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	PrimeiroNome VARCHAR(16) NOT NULL,
 	Apelido VARCHAR(16) NOT NULL,
 	Email VARCHAR(16) NOT NULL,
 	Senha VARCHAR(16) NOT NULL,
-	País VARCHAR(16) NOT NULL,
+	País VARCHAR(16),
 	Nacionalidade VARCHAR(16) NOT NULL,
-	DataDeNascimento VARCHAR(16) NOT NULL
+	DataDeNascimento VARCHAR(16)
 );
 
-CREATE TABLE Equipa (
+CREATE TABLE FC_Equipa (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
-	Orçamento Float(16) NOT NULL,
+	Orçamento FLOAT(16) NOT NULL DEFAULT 100,
 	Nome VARCHAR(16) NOT NULL,
-	PontuaçãoTotal VARCHAR(16) NOT NULL,
+	PontuaçãoTotal INT NOT NULL DEFAULT 0,
 	ID_utilizador VARCHAR(8) NOT NULL,
 
 	FOREIGN KEY (ID_utilizador)
-		REFERENCES Utilizador(ID)
+		REFERENCES FC_Utilizador(ID)
 );
 
-CREATE TABLE Clube (
+CREATE TABLE FC_Clube (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Nome VARCHAR(16) NOT NULL,
 	País VARCHAR(16) NOT NULL
 );
 
-CREATE TABLE Estado_Jogador (
+CREATE TABLE FC_Estado_Jogador (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Estado VARCHAR(16) NOT NULL
 );
 
-CREATE TABLE Jogador (
+CREATE TABLE FC_Jogador (
 
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Nome VARCHAR(16) NOT NULL,
@@ -41,62 +41,62 @@ CREATE TABLE Jogador (
 	ID_Estado_Jogador VARCHAR(8) NOT NULL,
 
 	FOREIGN KEY (ID_clube)
-		REFERENCES Clube(ID),
+		REFERENCES FC_Clube(ID),
 
 	FOREIGN KEY (ID_Estado_Jogador)
-		REFERENCES Estado_Jogador(ID)
+		REFERENCES FC_Estado_Jogador(ID)
 );
 
-CREATE TABLE Tipo_Liga (
+CREATE TABLE FC_Tipo_Liga (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Tipo VARCHAR(16) NOT NULL,
 	Código VARCHAR(8) NOT NULL
 );
 
-CREATE TABLE Liga (
+CREATE TABLE FC_Liga (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Nome VARCHAR(16) NOT NULL,
-	Data_Inicio VARCHAR(16) NOT NULL,
-	Data_Fim VARCHAR(16) NOT NULL,
+	Data_Inicio DATE NOT NULL,
+	Data_Fim DATE NOT NULL,
 	ID_tipoLiga VARCHAR(8) NOT NULL,
 	ID_criador VARCHAR(8) NOT NULL,
 
 	FOREIGN KEY (ID_criador)
-		REFERENCES Utilizador(ID),
+		REFERENCES FC_Utilizador(ID),
     FOREIGN KEY (ID_tipoLiga)
-        REFERENCES Tipo_Liga(ID)
+        REFERENCES FC_Tipo_Liga(ID)
 );
 
-CREATE TABLE Jornada (
+CREATE TABLE FC_Jornada (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
-	Data_Inicio VARCHAR(16) NOT NULL,
-	Data_Fim VARCHAR(16) NOT NULL,
+	Data_Inicio DATE NOT NULL,
+	Data_Fim DATE NOT NULL,
 	Numero INT NOT NULL,
 	ID_liga VARCHAR(8) NOT NULL,
 
 	FOREIGN KEY (ID_liga)
-		REFERENCES Liga(ID)
+		REFERENCES FC_Liga(ID)
 
 );
 
-CREATE TABLE Pontuação_Equipa (
+CREATE TABLE FC_Pontuação_Equipa (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	ID_equipa VARCHAR(8) NOT NULL,
 	ID_jornada VARCHAR(8) NOT NULL,
 	Pontuação_Jornada INT NOT NULL,
 
 	FOREIGN KEY (ID_equipa)
-		REFERENCES Equipa(ID),
+		REFERENCES FC_Equipa(ID),
 
 	FOREIGN KEY (ID_jornada)
-		REFERENCES Jornada(ID)
+		REFERENCES FC_Jornada(ID)
 )
 
-CREATE TABLE Pontuação_Jogador (
+CREATE TABLE FC_Pontuação_Jogador (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	ID_jogador VARCHAR(8) NOT NULL,
 	ID_jornada VARCHAR(8) NOT NULL,
-	TempoJogo INT NOT NULL,
+	TempoJogo INT NOT NULL DEFAULT 0,
     GolosSofridos INT DEFAULT 0,
     Pontuacao_Jornada INT NOT NULL,
     Assistencias INT DEFAULT 0,
@@ -104,56 +104,56 @@ CREATE TABLE Pontuação_Jogador (
     CartoesVermelhos INT DEFAULT 0,
 
 	FOREIGN KEY (ID_jogador)
-		REFERENCES Jogador(ID),
+		REFERENCES FC_Jogador(ID),
 
 	FOREIGN KEY (ID_jornada)
-		REFERENCES Jornada(ID)
+		REFERENCES FC_Jornada(ID)
 )
 
-CREATE TABLE Jogo (
+CREATE TABLE FC_Jogo (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
-	[Data] VARCHAR(16) NOT NULL,
+	[Data] DATE NOT NULL,
 	ID_Clube1 VARCHAR(8) NOT NULL,
 	ID_CLube2 VARCHAR(8) NOT NULL,
 	ID_jornada VARCHAR(8) NOT NULL,
 
 	FOREIGN KEY (ID_Clube1)
-		REFERENCES Clube(ID),
+		REFERENCES FC_Clube(ID),
 
 	FOREIGN KEY (ID_Clube2)
-		REFERENCES Clube(ID),
+		REFERENCES FC_Clube(ID),
 
 	FOREIGN KEY (ID_jornada)
-		REFERENCES Jornada(ID)
+		REFERENCES FC_Jornada(ID)
 )
 
-CREATE TABLE Pertence (
+CREATE TABLE FC_Pertence (
     ID_Jogador VARCHAR(8) NOT NULL,
     ID_Equipa VARCHAR(8) NOT NULL,
     PRIMARY KEY (ID_Jogador, ID_Equipa),
-    FOREIGN KEY (ID_Jogador) REFERENCES Jogador(ID),
-    FOREIGN KEY (ID_Equipa) REFERENCES Equipa(ID)
+    FOREIGN KEY (ID_Jogador) REFERENCES FC_Jogador(ID),
+    FOREIGN KEY (ID_Equipa) REFERENCES FC_Equipa(ID)
 );
 
-CREATE TABLE Participa (
+CREATE TABLE FC_Participa (
     ID_Utilizador VARCHAR(8) NOT NULL,
     ID_Liga VARCHAR(8) NOT NULL,
     PRIMARY KEY (ID_Utilizador, ID_Liga),
-    FOREIGN KEY (ID_Utilizador) REFERENCES Utilizador(ID),
-    FOREIGN KEY (ID_Liga) REFERENCES Liga(ID)
+    FOREIGN KEY (ID_Utilizador) REFERENCES FC_Utilizador(ID),
+    FOREIGN KEY (ID_Liga) REFERENCES FC_Liga(ID)
 );
 
-CREATE TABLE Enfrenta (
+CREATE TABLE FC_Enfrenta (
 	ID_Jogo VARCHAR(8) NOT NULL,
 	ID_Clube1 VARCHAR(8) NOT NULL,
 	ID_Clube2 VARCHAR(8) NOT NULL
 
 	FOREIGN KEY (ID_JOGO)
-		REFERENCES Jogo(ID),
+		REFERENCES FC_Jogo(ID),
 
 	FOREIGN KEY (ID_Clube1)
-		REFERENCES Clube(ID),
+		REFERENCES FC_Clube(ID),
 
 	FOREIGN KEY (ID_CLube2)
-		REFERENCES Clube(ID)
+		REFERENCES FC_Clube(ID)
 )
