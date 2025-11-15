@@ -44,14 +44,16 @@ def list_all() -> list[PlayerDescriptor]:
 
 def read(j_id: str):
     """
-    Lê todos os detalhes de um Player específico.
+    Lê todos os detalhes de um jogador específico, incluindo o nome do clube.
     """
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT *
-            FROM FC_Jogador
-            WHERE ID = ?;
+            SELECT J.ID, J.Nome, J.Posição, J.Preço, C.Nome AS Clube, E.Estado
+            FROM FC_Jogador J
+            JOIN FC_Clube C ON J.ID_clube = C.ID
+            JOIN FC_Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
+            WHERE J.ID = ?;
         """, j_id)
 
         row = cursor.fetchone()
@@ -62,9 +64,10 @@ def read(j_id: str):
             row.Nome,
             row.Posição,
             row.Preço,
-            row.ID_clube,
-            row.ID_Estado_Jogador
+            row.Clube,  # Agora o nome do clube
+            row.Estado  # Estado do jogador
         )
+
 
 
 def create(jogador: PlayerDetails):

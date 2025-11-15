@@ -12,11 +12,11 @@
     <p><strong>Nome:</strong> {{ jogador.nome }}</p>
     <p><strong>Posição:</strong> {{ jogador.posicao }}</p>
     <p><strong>Preço:</strong> {{ jogador.preco }}</p>
-    <p><strong>ID Clube:</strong> {{ jogador.id_clube }}</p>
+    <p><strong>Clube:</strong> {{ jogador.id_clube }}</p> <!-- Agora mostra o nome do clube -->
     <p><strong>Estado:</strong> {{ jogador.id_estado }}</p>
 
     <br>
-    <a href="/">← Voltar à lista</a>
+    <a href="{{ url_for('base') }}">← Voltar à lista</a>
 
 </body>
 </html>
