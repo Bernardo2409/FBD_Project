@@ -4,28 +4,38 @@
     <meta charset="UTF-8">
     <title>Fantasy Champ – Início</title>
 
-    <!-- TailwindCSS + DaisyUI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/daisyui@3.0.0/dist/full.js"></script>
+    <style>
+        /* Define o tema principal como corporate, mas pode ser mudado */
+        :root {
+            --fallback-p: 18 100% 70%;
+            --p: 219 89% 56%;
+        }
+    </style>
 </head>
 
-<body class="bg-base-200 min-h-screen flex items-center justify-center">
+<body class="bg-gray-50 min-h-screen flex items-center justify-center" data-theme="corporate">
 
-    <div class="card w-96 bg-base-100 shadow-xl p-6">
-        <h1 class="text-3xl font-bold text-center mb-4">Fantasy Champ</h1>
+    <div class="hero min-h-screen bg-base-200">
+        <div class="hero-content text-center pt-20"> 
+            <div class="max-w-md">
+                <h1 class="text-5xl font-extrabold text-primary mb-4">🏆 Fantasy Champ</h1>
+                <p class="py-6 text-lg">
+                    A sua plataforma definitiva para gerir e acompanhar clubes e jogadores de futebol.
+                </p>
 
-        <p class="text-center mb-6">Escolhe o que queres ver:</p>
-
-        <div class="flex flex-col gap-4">
-
-            <a href="/players" class="btn btn-primary w-full">
-                Ver Jogadores
-            </a>
-
-            <a href="/clubs" class="btn btn-secondary w-full">
-                Ver Clubes
-            </a>
-
+                <h2 class="text-2xl font-semibold mb-6">Escolha o que deseja ver:</h2>
+                
+                <div class="flex flex-col gap-4">
+                    <a href="/players" class="btn btn-primary btn-lg shadow-md hover:shadow-lg transition duration-300">
+                        ⚽ Ver Jogadores
+                    </a>
+                    <a href="/clubs" class="btn btn-secondary btn-lg shadow-md hover:shadow-lg transition duration-300">
+                        🛡️ Ver Clubes
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 

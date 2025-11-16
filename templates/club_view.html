@@ -8,68 +8,65 @@
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
 
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gray-100 text-gray-900" data-theme="corporate">
 
     <div class="container mx-auto p-6">
 
-        <!-- TÍTULO -->
-        <h1 class="text-4xl font-bold mb-6 text-center">{{ clube.nome }}</h1>
+        <h1 class="text-4xl font-extrabold mb-8 text-center text-primary">Detalhes: {{ clube.nome }}</h1>
 
-        <!-- CARTÃO COM DETALHES DO CLUBE -->
-        <div class="bg-white shadow-lg rounded-lg p-6 mb-10 max-w-xl mx-auto">
+        <div class="card bg-white shadow-xl max-w-lg mx-auto mb-12 p-6 border-t-4 border-primary">
 
-            <div class="flex flex-col items-center">
-                <!-- Imagem -->
+            <div class="card-body items-center text-center">
                 {% if clube.imagem %}
-                    <img src="{{ clube.imagem }}" 
-                         alt="Logo {{ clube.nome }}" 
-                         class="w-32 h-32 object-cover rounded mb-4 shadow">
+                    <figure class="mb-4 p-4 lg:p-0 flex justify-center items-center">
+                        <img src="{{ clube.imagem }}" 
+                             alt="Logo {{ clube.nome }}" 
+                             class="w-32 h-32 object-cover rounded-full mask mask-hexagon shadow-lg border-4 border-base-200">
+                    </figure>
                 {% else %}
-                    <div class="w-32 h-32 bg-gray-300 rounded mb-4 flex items-center justify-center">
-                        <span class="opacity-60 text-xs">Sem imagem</span>
+                    <div class="w-32 h-32 bg-gray-300 rounded-full mb-4 flex items-center justify-center mask mask-hexagon">
+                        <span class="opacity-60 text-sm font-bold">Sem imagem</span>
                     </div>
                 {% endif %}
 
-                <!-- Nome e País -->
-                <h2 class="text-2xl font-semibold">{{ clube.nome }}</h2>
-                <p class="text-lg text-gray-600">{{ clube.pais }}</p>
+                <h2 class="card-title text-3xl font-bold text-gray-800">{{ clube.nome }}</h2>
+                <p class="text-xl text-gray-600">{{ clube.pais }}</p>
             </div>
-
         </div>
 
-        <!-- LISTA DE JOGADORES -->
-        <h2 class="text-2xl font-bold mt-12 mb-4 text-center">Jogadores do Clube</h2>
+        <h2 class="text-3xl font-bold mt-12 mb-6 text-center text-secondary">⚽ Jogadores do Clube</h2>
 
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full border-separate border-spacing-2">
+        <div class="overflow-x-auto bg-white shadow-xl rounded-box p-4">
+            <table class="table table-zebra w-full">
 
-                <thead class="bg-blue-600 text-white">
+                <thead class="bg-secondary text-secondary-content">
                     <tr>
-                        <th class="px-4 py-2">Imagem</th>
-                        <th class="px-4 py-2">Nome</th>
-                        <th class="px-4 py-2">Posição</th>
-                        <th class="px-4 py-2">Preço</th>
-                        <th class="px-4 py-2">Detalhes</th>
+                        <th class="py-3 px-4 rounded-tl-lg text-center">Imagem</th>
+                        <th class="py-3 px-4 text-center">Nome</th>
+                        <th class="py-3 px-4 text-center">Posição</th>
+                        <th class="py-3 px-4 text-center">Preço</th>
+                        <th class="py-3 px-4 rounded-tr-lg text-center">Detalhes</th>
                     </tr>
                 </thead>
 
                 <tbody>
                 {% for jogador in clube.jogadores %}
-                    <tr class="bg-white hover:bg-gray-50">
+                    <tr class="hover:bg-base-200 transition duration-150">
 
-                        <!-- Imagem -->
-                        <td class="px-4 py-2">
-                            <img src="{{ jogador.imagem }}" 
-                                 alt="{{ jogador.nome }}" 
-                                 class="w-16 h-16 object-cover rounded">
+                        <td class="py-3 px-4 text-center">
+                            <div class="flex justify-center">
+                                <img src="{{ jogador.imagem }}" 
+                                     alt="{{ jogador.nome }}" 
+                                     class="w-10 h-10 object-cover rounded-full mask mask-squircle">
+                            </div>
                         </td>
 
-                        <td class="px-4 py-2">{{ jogador.nome }}</td>
-                        <td class="px-4 py-2">{{ jogador.posicao }}</td>
-                        <td class="px-4 py-2">{{ jogador.preco }}</td>
+                        <td class="py-3 px-4 font-semibold text-center">{{ jogador.nome }}</td>
+                        <td class="py-3 px-4 text-primary font-medium text-center">{{ jogador.posicao }}</td>
+                        <td class="py-3 px-4 font-mono text-center">{{ jogador.preco }}</td>
 
-                        <td class="px-4 py-2">
-                            <a href="/players/{{ jogador.id }}" class="btn btn-primary">Ver</a>
+                        <td class="py-3 px-4 text-center">
+                            <a href="/players/{{ jogador.id }}" class="btn btn-sm btn-secondary btn-outline">Ver</a>
                         </td>
 
                     </tr>
@@ -79,8 +76,8 @@
             </table>
         </div>
 
-        <div class="mt-6 text-center">
-            <a href="/clubs" class="btn btn-secondary">Voltar aos Clubes</a>
+        <div class="mt-10 text-center">
+            <a href="/clubs" class="btn btn-primary px-8">← Voltar aos Clubes</a>
         </div>
 
     </div>

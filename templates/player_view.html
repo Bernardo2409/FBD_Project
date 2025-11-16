@@ -6,35 +6,46 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gray-100 text-gray-900" data-theme="corporate">
 
     <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold mb-6 text-center">Detalhes do Jogador</h1>
+        <h1 class="text-4xl font-bold mb-8 text-center text-primary">Detalhes do Jogador</h1>
 
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <p class="text-lg mb-2"><strong>ID:</strong> {{ jogador.id }}</p> <!-- Agora acessando o ID -->
-            <p class="text-lg mb-2"><strong>Nome:</strong> {{ jogador.nome }}</p>
-            <div class="mb-4">
-                <strong>Imagem do Jogador:</strong>
-                <img src="{{ jogador.jogador_imagem }}" alt="Imagem do Clube" class="w-48 h-48 object-cover rounded-lg mb-4" />
-            </div>
-            <p class="text-lg mb-2"><strong>Posição:</strong> {{ jogador.posicao }}</p>
-            <p class="text-lg mb-2"><strong>Preço:</strong> {{ jogador.preco }}</p>
-            <p class="text-lg mb-6"><strong>Estado:</strong> {{ jogador.id_estado }}</p>
-            <p class="text-lg mb-2"><strong>Clube:</strong> {{ jogador.nome_clube }}</p>
+        <div class="card lg:card-side bg-white shadow-xl max-w-4xl mx-auto p-6 border-t-4 border-primary">
+            
+            <figure class="p-4 lg:p-0 flex justify-center items-center">
+                <img src="{{ jogador.jogador_imagem }}" 
+                     alt="Imagem do Jogador" 
+                     class="w-64 h-64 object-cover rounded-box shadow-lg border-4 border-base-200 mask mask-squircle" />
+            </figure>
 
-             <a href="/clubs/{{ jogador.Clube_id }}" 
-                class="btn btn-primary font-semibold text-blue-900">
-                Detalhes do Clube
-            </a>
-            <div class="mb-4">
-                <strong>Imagem do Clube:</strong>
-                <img src="{{ jogador.clube_imagem }}" alt="Imagem do Clube" class="w-48 h-48 object-cover rounded-lg mb-4" />
+            <div class="card-body p-4 lg:p-8">
+                <h2 class="card-title text-3xl font-extrabold text-gray-800 mb-4 justify-center lg:justify-start">{{ jogador.nome }}</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-lg text-center md:text-left">
+                    <p><strong>ID:</strong> <span class="font-mono">{{ jogador.id }}</span></p>
+                    <p><strong>Posição:</strong> <span class="font-semibold text-primary">{{ jogador.posicao }}</span></p>
+                    <p><strong>Preço:</strong> <span class="font-bold text-accent">{{ jogador.preco }}</span></p>
+                    <p><strong>Estado:</strong> <span class="font-semibold text-warning">{{ jogador.id_estado }}</span></p>
+                    <p class="md:col-span-2"><strong>Clube:</strong> <span class="font-semibold">{{ jogador.nome_clube }}</span></p>
+                </div>
+
+                <div class="divider"></div> 
+
+                <div class="flex flex-col md:flex-row items-center gap-4 justify-center md:justify-start">
+                    <a href="/clubs/{{ jogador.Clube_id }}" 
+                        class="btn btn-primary btn-outline font-semibold">
+                        🛡️ Detalhes do Clube
+                    </a>
+                    <img src="{{ jogador.clube_imagem }}" 
+                         alt="Imagem do Clube" 
+                         class="w-16 h-16 object-cover rounded-full mask mask-squircle shadow-md" />
+                </div>
             </div>
-            <p></p>
-            <a href="{{ url_for('players_list') }}" class="btn btn-outline btn-primary">← Voltar à lista</a>
+        </div>
+        <div class="mt-10 text-center">
+            <a href="/clubs" class="btn btn-primary px-8">← Voltar aos Clubes</a>
         </div>
     </div>
-
 </body>
 </html>
