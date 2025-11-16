@@ -19,6 +19,7 @@
                         <th class="px-4 py-2">Nome</th>
                         <th class="px-4 py-2">Posição</th>
                         <th class="px-4 py-2">Preço</th>
+                        <th class="px-4 py-2">Imagem</th>
                         <th class="px-4 py-2">Detalhes</th>
                     </tr>
                 </thead>
@@ -29,6 +30,9 @@
                         <td class="px-4 py-2">{{ jogador.nome }}</td>
                         <td class="px-4 py-2">{{ jogador.posicao }}</td>
                         <td class="px-4 py-2">{{ jogador.preco }}</td>
+                        <td class="px-4 py-2">
+                            <img src="{{ jogador.jogador_imagem }}" alt="{{ jogador.nome }}" class="w-16 h-16 object-cover rounded">
+                        </td>
                         <td class="px-4 py-2">
                             <a href="/players/{{ jogador.id }}" class="btn btn-primary">Ver</a>
                         </td>

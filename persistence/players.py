@@ -13,14 +13,18 @@ class PlayerDescriptor(NamedTuple):
     nome: str
     posicao: str
     preco: float
+    jogador_imagem: str
 
 
 class PlayerDetails(NamedTuple):
+    id: str
     nome: str
     posicao: str
     preco: float
     id_clube: str
     id_estado: str
+    clube_imagem: str
+    jogador_imagem: str
 
 
 # --- CRUD FUNCTIONS ---
@@ -32,24 +36,25 @@ def list_all() -> list[PlayerDescriptor]:
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT ID, Nome, Posição, Preço
+            SELECT ID, Nome, Posição, Preço, jogador_imagem
             FROM FC_Jogador;
         """)
 
         return list(map(
-            lambda row: PlayerDescriptor(row.ID, row.Nome, row.Posição, row.Preço),
+            lambda row: PlayerDescriptor(row.ID, row.Nome, row.Posição, row.Preço, row.jogador_imagem if row.jogador_imagem else '/static/images/Image-not-found.png'),
             cursor
         ))
 
 
 def read(j_id: str):
     """
-    Lê todos os detalhes de um jogador específico, incluindo o nome do clube.
+    Lê todos os detalhes de um jogador específico, incluindo o nome do clube e a imagem do clube.
+    Se a imagem do clube for NULL, será usada uma imagem padrão.
     """
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT J.ID, J.Nome, J.Posição, J.Preço, C.Nome AS Clube, E.Estado
+            SELECT J.ID, J.Nome, J.Posição, J.Preço, J.jogador_imagem, C.Nome AS Clube, C.clube_imagem, E.Estado
             FROM FC_Jogador J
             JOIN FC_Clube C ON J.ID_clube = C.ID
             JOIN FC_Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
@@ -60,12 +65,21 @@ def read(j_id: str):
         if not row:
             return None
 
-        return row.ID, PlayerDetails(
+        # Se a imagem do clube for NULL, define uma imagem padrão
+        clube_imagem = row.clube_imagem if row.clube_imagem else '/static/images/Image-not-found.png'
+        jogador_imagem = row.jogador_imagem if row.jogador_imagem else '/static/images/Image-not-found.png'
+
+        print(f"Imagem do clube: {clube_imagem}")
+
+        return PlayerDetails(
+            row.ID,
             row.Nome,
             row.Posição,
             row.Preço,
-            row.Clube,  # Agora o nome do clube
-            row.Estado  # Estado do jogador
+            row.Clube, 
+            row.Estado,
+            clube_imagem,
+            jogador_imagem
         )
 
 

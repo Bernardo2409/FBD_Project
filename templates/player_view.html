@@ -12,12 +12,22 @@
         <h1 class="text-3xl font-bold mb-6 text-center">Detalhes do Jogador</h1>
 
         <div class="bg-white p-6 rounded-lg shadow-lg">
-            <p class="text-lg mb-2"><strong>ID:</strong> {{ jogador_id }}</p>
+            <p class="text-lg mb-2"><strong>ID:</strong> {{ jogador.id }}</p> <!-- Agora acessando o ID -->
             <p class="text-lg mb-2"><strong>Nome:</strong> {{ jogador.nome }}</p>
+            <div class="mb-4">
+                <strong>Imagem do Jogador:</strong>
+                <img src="{{ jogador.jogador_imagem }}" alt="Imagem do Clube" class="w-48 h-48 object-cover rounded-lg mb-4" />
+            </div>
             <p class="text-lg mb-2"><strong>Posição:</strong> {{ jogador.posicao }}</p>
             <p class="text-lg mb-2"><strong>Preço:</strong> {{ jogador.preco }}</p>
-            <p class="text-lg mb-2"><strong>Clube:</strong> {{ jogador.id_clube }}</p> 
+            <p class="text-lg mb-2"><strong>Clube:</strong> {{ jogador.id_clube }}</p>
             <p class="text-lg mb-6"><strong>Estado:</strong> {{ jogador.id_estado }}</p>
+
+            <!-- Exibindo a imagem do clube -->
+            <div class="mb-4">
+                <strong>Imagem do Clube:</strong>
+                <img src="{{ jogador.clube_imagem }}" alt="Imagem do Clube" class="w-48 h-48 object-cover rounded-lg mb-4" />
+            </div>
 
             <a href="{{ url_for('base') }}" class="btn btn-outline btn-primary">← Voltar à lista</a>
         </div>

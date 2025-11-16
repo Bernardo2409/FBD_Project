@@ -12,9 +12,11 @@ def base():
 
 @app.route("/players/<j_id>")
 def player_view(j_id):
-    jogador_id, jogador = read(j_id)
+    jogador = read(j_id)  # Agora, read retorna diretamente o objeto PlayerDetails
 
-    return render_template("player_view.html", jogador_id=jogador_id, jogador=jogador)
-
+    if jogador:
+        return render_template("player_view.html", jogador=jogador)
+    else:
+        return "Jogador não encontrado", 404
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
