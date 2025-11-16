@@ -20,15 +20,18 @@
             </div>
             <p class="text-lg mb-2"><strong>Posição:</strong> {{ jogador.posicao }}</p>
             <p class="text-lg mb-2"><strong>Preço:</strong> {{ jogador.preco }}</p>
-            <p class="text-lg mb-2"><strong>Clube:</strong> {{ jogador.id_clube }}</p>
             <p class="text-lg mb-6"><strong>Estado:</strong> {{ jogador.id_estado }}</p>
+            <p class="text-lg mb-2"><strong>Clube:</strong> {{ jogador.nome_clube }}</p>
 
-            <!-- Exibindo a imagem do clube -->
+             <a href="/clubs/{{ jogador.Clube_id }}" 
+                class="btn btn-primary font-semibold text-blue-900">
+                Detalhes do Clube
+            </a>
             <div class="mb-4">
                 <strong>Imagem do Clube:</strong>
                 <img src="{{ jogador.clube_imagem }}" alt="Imagem do Clube" class="w-48 h-48 object-cover rounded-lg mb-4" />
             </div>
-
+            <p></p>
             <a href="{{ url_for('players_list') }}" class="btn btn-outline btn-primary">← Voltar à lista</a>
         </div>
     </div>

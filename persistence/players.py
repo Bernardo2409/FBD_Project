@@ -21,8 +21,9 @@ class PlayerDetails(NamedTuple):
     nome: str
     posicao: str
     preco: float
-    id_clube: str
+    nome_clube: str
     id_estado: str
+    Clube_id: str
     clube_imagem: str
     jogador_imagem: str
 
@@ -54,7 +55,7 @@ def read(j_id: str):
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT J.ID, J.Nome, J.Posição, J.Preço, J.jogador_imagem, C.Nome AS Clube, C.clube_imagem, E.Estado
+            SELECT J.ID, J.Nome, J.Posição, J.Preço, J.jogador_imagem, C.Nome AS Clube, C.clube_imagem, C.ID AS Clube_id, E.Estado
             FROM FC_Jogador J
             JOIN FC_Clube C ON J.ID_clube = C.ID
             JOIN FC_Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
@@ -78,6 +79,7 @@ def read(j_id: str):
             row.Preço,
             row.Clube, 
             row.Estado,
+            row.Clube_id,
             clube_imagem,
             jogador_imagem
         )
