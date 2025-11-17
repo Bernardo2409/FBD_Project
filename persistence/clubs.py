@@ -13,8 +13,8 @@ def list_all_clubs():
                P.País AS Pais_Nome,
                P.país_imagem AS Pais_Imagem,
                C.clube_imagem
-        FROM FC_Clube C
-        JOIN FC_País P ON C.ID_Pais = P.ID
+        FROM FantasyChamp.FC_Clube C
+        JOIN FantasyChamp.FC_País P ON C.ID_Pais = P.ID
         ORDER BY C.Nome
     """
 
@@ -49,8 +49,8 @@ def read_club(club_id):
                P.País AS Pais_Nome,
                P.país_imagem AS Pais_Imagem,
                C.clube_imagem
-        FROM FC_Clube C
-        JOIN FC_País P ON C.ID_Pais = P.ID
+        FROM FantasyChamp.FC_Clube C
+        JOIN FantasyChamp.FC_País P ON C.ID_Pais = P.ID
         WHERE C.ID = ?
     """
 
@@ -70,8 +70,8 @@ def read_club(club_id):
                P.Posição AS Posicao,
                J.Preço,
                J.jogador_imagem
-        FROM FC_Jogador J
-        JOIN FC_Posição P ON J.ID_Posição = P.ID
+        FROM FantasyChamp.FC_Jogador J
+        JOIN FantasyChamp.FC_Posição P ON J.ID_Posição = P.ID
         WHERE J.ID_clube = ?
         ORDER BY J.Nome
     """
