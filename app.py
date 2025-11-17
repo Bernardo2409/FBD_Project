@@ -1,14 +1,49 @@
-from flask import Flask, render_template
-from persistence.session import create_connection
+from flask import Flask, render_template, request, redirect, jsonify, url_for
+
 from persistence.players import list_all, read
-from persistence.clubs import list_all_clubs, read_club   # <-- quando criares
+from persistence.clubs import list_all_clubs, read_club
+from persistence.users import create_user, login_user, get_users
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["GET"])
+def login_page():
+    return render_template("login.html")
+
+@app.route("/login", methods=["POST"])
+def login_submit():
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    user = login_user(email, password)
+
+    if user:
+        # Se login tiver sucesso → ir para index
+        return redirect("/index")
+
+    return render_template("login.html", error="Email ou palavra-passe incorretos")
+
+@app.route("/signup", methods=["GET"])
+def signup_page():
+    return render_template("signup.html")
+
+@app.route("/signup", methods=["POST"])
+def signup_submit():
+    first = request.form.get("first")
+    last = request.form.get("last")
+    email = request.form.get("email")
+    password = request.form.get("password")
+    country = request.form.get("country")
+    nationality = request.form.get("nationality")
+    birthdate = request.form.get("birthdate")
+
+    create_user(first, last, email, password, country, nationality, birthdate)
+
+    return redirect("/")
+
+@app.route("/index")
 def index():
     return render_template("index.html")
-
 
 @app.route("/players")
 def players_list():

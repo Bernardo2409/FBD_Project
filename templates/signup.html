@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Conta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" rel="stylesheet" />
+</head>
+
+<body class="bg-base-200 min-h-screen flex items-center justify-center">
+
+    <div class="card w-[450px] bg-base-100 shadow-xl p-8">
+        <h1 class="text-3xl font-bold text-center mb-6">Criar Conta</h1>
+
+        <form class="flex flex-col gap-4" action="/signup" method="POST">
+
+            <div class="flex gap-3">
+                <input name="first" placeholder="Primeiro Nome" class="input input-bordered w-1/2" required>
+                <input name="last" placeholder="Apelido" class="input input-bordered w-1/2" required>
+            </div>
+
+            <input type="email" name="email" placeholder="Email" class="input input-bordered w-full" required>
+            <input type="password" name="password" placeholder="Palavra-passe" class="input input-bordered w-full" required>
+            <input name="country" placeholder="País" class="input input-bordered w-full" required>
+            <input name="nationality" placeholder="Nacionalidade" class="input input-bordered w-full" required>
+
+            <label class="font-semibold">Data de nascimento</label>
+            <input type="date" name="birthdate" class="input input-bordered w-full" required>
+
+            <button class="btn btn-success w-full" type="submit">Criar Conta</button>
+        </form>
+
+        <p class="text-center mt-4">
+            Já tens conta? <a href="/login" class="link link-primary">Entrar</a>
+        </p>
+    </div>
+
+</body>
+</html>

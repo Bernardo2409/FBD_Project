@@ -14,6 +14,7 @@ def get_users():
                 U.País AS Pais,
                 U.Nacionalidade,
                 U.DataDeNascimento AS BirthDate
+        FROM FantasyChamp.FC_Utilizador U
     """
 
     cursor.execute(query)
@@ -32,3 +33,39 @@ def get_users():
         })
     
     return users
+
+def login_user(email, password):
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    query = """
+        SELECT ID, PrimeiroNome, Apelido, Email
+        FROM FantasyChamp.FC_Utilizador
+        WHERE Email = ? AND Senha = ?
+    """
+
+    cursor.execute(query, (email, password))
+    row = cursor.fetchone()
+
+    if row:
+        return {
+            "id": row.ID,
+            "first": row.PrimeiroNome,
+            "last": row.Apelido,
+            "email": row.Email
+        }
+
+    return None
+
+def create_user(first, last, email, password, country, nationality, birthdate):
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    query = """
+        INSERT INTO FantasyChamp.FC_Utilizador
+        (ID, PrimeiroNome, Apelido, Email, Senha, País, Nacionalidade, DataDeNascimento)
+        VALUES (NEWID(), ?, ?, ?, ?, ?, ?, ?)
+    """
+
+    cursor.execute(query, (first, last, email, password, country, nationality, birthdate))
+    conn.commit()
