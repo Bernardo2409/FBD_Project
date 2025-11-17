@@ -2,14 +2,14 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Detalhes do Jogador</title>
+    <title>Player Details</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-900" data-theme="corporate">
 
     <div class="container mx-auto p-6">
-        <h1 class="text-4xl font-bold mb-8 text-center text-primary">Detalhes do Jogador</h1>
+        <h1 class="text-4xl font-bold mb-8 text-center text-primary">Player Details</h1>
 
         <div class="card lg:card-side bg-white shadow-xl max-w-4xl mx-auto p-6 border-t-4 border-primary">
             
@@ -27,7 +27,7 @@
                     <p><strong>Posição:</strong> <span class="font-semibold text-primary">{{ jogador.posicao }}</span></p>
                     <p><strong>Preço:</strong> <span class="font-bold text-accent">{{ jogador.preco }}</span></p>
                     <p><strong>Estado:</strong> <span class="font-semibold text-warning">{{ jogador.id_estado }}</span></p>
-                    <p class="md:col-span-2"><strong>Clube:</strong> <span class="font-semibold">{{ jogador.nome_clube }}</span></p>
+                    <p class="md:col-span-2"><strong>Club:</strong> <span class="font-semibold">{{ jogador.nome_clube }}</span></p>
                 </div>
 
                 <div class="divider"></div> 
@@ -35,7 +35,7 @@
                 <div class="flex flex-col md:flex-row items-center gap-4 justify-center md:justify-start">
                     <a href="/clubs/{{ jogador.Clube_id }}" 
                         class="btn btn-primary btn-outline font-semibold">
-                        🛡️ Detalhes do Clube
+                        Club Details
                     </a>
                     <img src="{{ jogador.clube_imagem }}" 
                          alt="Imagem do Clube" 
@@ -44,7 +44,7 @@
             </div>
         </div>
         <div class="mt-10 text-center">
-            <a href="/players" class="btn btn-primary px-8">← Voltar aos Jogadores</a>
+            <a href="/players" class="btn btn-primary px-8">← Back to Players</a>
         </div>
     </div>
 </body>

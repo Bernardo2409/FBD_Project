@@ -9,18 +9,18 @@
 <body class="bg-gray-100 text-gray-900" data-theme="corporate">
 
     <div class="container mx-auto p-6">
-        <h1 class="text-4xl font-bold mb-8 text-center text-primary">⚽ Lista de Jogadores</h1>
+        <h1 class="text-4xl font-bold mb-8 text-center text-primary">Players List</h1>
 
         <div class="overflow-x-auto bg-white shadow-xl rounded-box p-4">
             <table class="table table-zebra w-full">
                 <thead class="bg-primary text-primary-content">
                     <tr>
                         <th class="py-3 px-4 rounded-tl-lg text-center">ID</th>
-                        <th class="py-3 px-4 text-center">Nome</th>
-                        <th class="py-3 px-4 text-center">Posição</th>
-                        <th class="py-3 px-4 text-center">Preço</th>
-                        <th class="py-3 px-4 text-center">Imagem</th>
-                        <th class="py-3 px-4 rounded-tr-lg text-center">Detalhes</th>
+                        <th class="py-3 px-4 text-center">Name</th>
+                        <th class="py-3 px-4 text-center">Position</th>
+                        <th class="py-3 px-4 text-center">Price</th>
+                        <th class="py-3 px-4 text-center">Image</th>
+                        <th class="py-3 px-4 rounded-tr-lg text-center">Details</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,7 +40,7 @@
                         </td>
 
                         <td class="py-3 px-4 text-center">
-                            <a href="/players/{{ jogador.id }}" class="btn btn-sm btn-primary btn-outline">Ver</a>
+                            <a href="/players/{{ jogador.id }}" class="btn btn-sm btn-primary btn-outline">See</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -48,7 +48,7 @@
             </table>
         </div>
         <div class="mt-10 text-center">
-            <a href="/" class="btn btn-secondary px-8">← Voltar ao Início</a>
+            <a href="/" class="btn btn-secondary px-8">← Back to Index </a>
         </div>
     </div>
 

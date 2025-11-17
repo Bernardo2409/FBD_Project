@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Clubes</title>
+    <title>Clubs</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
@@ -10,17 +10,17 @@
 <body class="bg-gray-100 text-gray-900" data-theme="corporate">
 
     <div class="container mx-auto p-6">
-        <h1 class="text-4xl font-bold mb-8 text-center text-primary">🛡️ Lista de Clubes</h1>
+        <h1 class="text-4xl font-bold mb-8 text-center text-primary"> Clubs List</h1>
 
         <div class="overflow-x-auto bg-white shadow-xl rounded-box p-4">
             <table class="table table-zebra w-full">
                 <thead class="bg-primary text-primary-content">
                     <tr>
                         <th class="py-3 px-4 rounded-tl-lg text-center">ID</th>
-                        <th class="py-3 px-4 text-center">Nome</th>
-                        <th class="py-3 px-4 text-center">País</th>
-                        <th class="py-3 px-4 text-center">Imagem</th>
-                        <th class="py-3 px-4 rounded-tr-lg text-center">Detalhes</th>
+                        <th class="py-3 px-4 text-center">Name</th>
+                        <th class="py-3 px-4 text-center">Country</th>
+                        <th class="py-3 px-4 text-center">Image</th>
+                        <th class="py-3 px-4 rounded-tr-lg text-center">Details</th>
                     </tr>
                 </thead>
 
@@ -39,14 +39,14 @@
                                         class="w-10 h-10 object-cover rounded-full mask mask-squircle">
                                 {% else %}
                                     <div class="w-10 h-10 bg-gray-300 rounded-full mask mask-squircle flex items-center justify-center text-xs">
-                                        <span>Sem img</span>
+                                        <span>Without image</span>
                                     </div>
                                 {% endif %}
                             </div>
                         </td>
 
                         <td class="py-3 px-4 text-center">
-                            <a href="/clubs/{{ clube.id }}" class="btn btn-sm btn-primary btn-outline">Ver</a>
+                            <a href="/clubs/{{ clube.id }}" class="btn btn-sm btn-primary btn-outline">See</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -56,7 +56,7 @@
         </div>
         
         <div class="mt-10 text-center">
-            <a href="/" class="btn btn-secondary px-8">← Voltar ao Início</a>
+            <a href="/" class="btn btn-secondary px-8">← Back to Index</a>
         </div>
     </div>
 

@@ -12,7 +12,7 @@
 
     <div class="container mx-auto p-6">
 
-        <h1 class="text-4xl font-extrabold mb-8 text-center text-primary">Detalhes: {{ clube.nome }}</h1>
+        <h1 class="text-4xl font-extrabold mb-8 text-center text-primary">Details: {{ clube.nome }}</h1>
 
         <div class="card bg-white shadow-xl max-w-lg mx-auto mb-12 p-6 border-t-4 border-primary">
 
@@ -25,7 +25,7 @@
                     </figure>
                 {% else %}
                     <div class="w-32 h-32 bg-gray-300 rounded-full mb-4 flex items-center justify-center mask mask-hexagon">
-                        <span class="opacity-60 text-sm font-bold">Sem imagem</span>
+                        <span class="opacity-60 text-sm font-bold">Without Photo</span>
                     </div>
                 {% endif %}
 
@@ -47,18 +47,18 @@
             </div>
         </div>
 
-        <h2 class="text-3xl font-bold mt-12 mb-6 text-center text-secondary">⚽ Jogadores do Clube</h2>
+        <h2 class="text-3xl font-bold mt-12 mb-6 text-center text-secondary">Players</h2>
 
         <div class="overflow-x-auto bg-white shadow-xl rounded-box p-4">
             <table class="table table-zebra w-full">
 
                 <thead class="bg-secondary text-secondary-content">
                     <tr>
-                        <th class="py-3 px-4 rounded-tl-lg text-center">Imagem</th>
-                        <th class="py-3 px-4 text-center">Nome</th>
-                        <th class="py-3 px-4 text-center">Posição</th>
-                        <th class="py-3 px-4 text-center">Preço</th>
-                        <th class="py-3 px-4 rounded-tr-lg text-center">Detalhes</th>
+                        <th class="py-3 px-4 rounded-tl-lg text-center">Image</th>
+                        <th class="py-3 px-4 text-center">Name</th>
+                        <th class="py-3 px-4 text-center">Position</th>
+                        <th class="py-3 px-4 text-center">Price</th>
+                        <th class="py-3 px-4 rounded-tr-lg text-center">Details</th>
                     </tr>
                 </thead>
 
@@ -79,7 +79,7 @@
                         <td class="py-3 px-4 font-mono text-center">{{ jogador.preco }}</td>
 
                         <td class="py-3 px-4 text-center">
-                            <a href="/players/{{ jogador.id }}" class="btn btn-sm btn-secondary btn-outline">Ver</a>
+                            <a href="/players/{{ jogador.id }}" class="btn btn-sm btn-secondary btn-outline">See</a>
                         </td>
 
                     </tr>
@@ -90,7 +90,7 @@
         </div>
 
         <div class="mt-10 text-center">
-            <a href="/clubs" class="btn btn-primary px-8">← Voltar aos Clubes</a>
+            <a href="/clubs" class="btn btn-primary px-8">← Back to Clubs</a>
         </div>
 
     </div>
