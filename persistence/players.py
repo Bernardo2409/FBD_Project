@@ -90,8 +90,3 @@ def read(j_id: str):
             row.clube_imagem if row.clube_imagem else '/static/images/Image-not-found.png',
             row.jogador_imagem if row.jogador_imagem else '/static/images/Image-not-found.png'
         )
-
-
-
-
-
