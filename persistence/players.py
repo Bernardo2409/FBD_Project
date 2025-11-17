@@ -35,8 +35,8 @@ def list_all() -> list[PlayerDescriptor]:
         cursor = conn.cursor()
         cursor.execute("""
             SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem
-            FROM FC_Jogador J
-            JOIN FC_Posição P ON J.ID_Posição = P.ID;
+            FROM FantasyChamp.FC_Jogador J
+            JOIN FantasyChamp.FC_Posição P ON J.ID_Posição = P.ID;
         """)
 
         return list(map(
@@ -68,10 +68,10 @@ def read(j_id: str):
                 C.clube_imagem,
                 C.ID AS Clube_id,
                 E.Estado
-            FROM FC_Jogador J
-            JOIN FC_Clube C ON J.ID_clube = C.ID
-            JOIN FC_Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
-            JOIN FC_Posição P ON J.ID_Posição = P.ID
+            FROM FantasyChamp.FC_Jogador J
+            JOIN FantasyChamp.FC_Clube C ON J.ID_clube = C.ID
+            JOIN FantasyChamp.FC_Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
+            JOIN FantasyChamp.FC_Posição P ON J.ID_Posição = P.ID
             WHERE J.ID = ?;
         """, j_id)
 
@@ -90,8 +90,3 @@ def read(j_id: str):
             row.clube_imagem if row.clube_imagem else '/static/images/Image-not-found.png',
             row.jogador_imagem if row.jogador_imagem else '/static/images/Image-not-found.png'
         )
-
-
-
-
-
