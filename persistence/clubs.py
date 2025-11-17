@@ -8,9 +8,14 @@ def list_all_clubs():
     cursor = conn.cursor()
 
     query = """
-        SELECT ID, Nome, País, clube_imagem
-        FROM FC_Clube
-        ORDER BY Nome
+        SELECT C.ID,
+               C.Nome,
+               P.País AS Pais_Nome,
+               P.país_imagem AS Pais_Imagem,
+               C.clube_imagem
+        FROM FC_Clube C
+        JOIN FC_País P ON C.ID_Pais = P.ID
+        ORDER BY C.Nome
     """
 
     cursor.execute(query)
@@ -18,16 +23,19 @@ def list_all_clubs():
 
     clubes = []
     for row in rows:
-        imagem = row.clube_imagem if row.clube_imagem else DEFAULT_IMAGE
+        imagem_clube = row.clube_imagem if row.clube_imagem else DEFAULT_IMAGE
+        imagem_pais = row.Pais_Imagem if row.Pais_Imagem else DEFAULT_IMAGE
 
         clubes.append({
             "id": row.ID,
             "nome": row.Nome,
-            "pais": row.País,
-            "imagem": imagem
+            "pais": row.Pais_Nome,
+            "pais_imagem": imagem_pais,
+            "imagem": imagem_clube
         })
 
     return clubes
+
 
 
 def read_club(club_id):
@@ -36,9 +44,14 @@ def read_club(club_id):
 
     # ---- info do clube ----
     query_club = """
-        SELECT ID, Nome, País, clube_imagem
-        FROM FC_Clube
-        WHERE ID = ?
+        SELECT C.ID,
+               C.Nome,
+               P.País AS Pais_Nome,
+               P.país_imagem AS Pais_Imagem,
+               C.clube_imagem
+        FROM FC_Clube C
+        JOIN FC_País P ON C.ID_Pais = P.ID
+        WHERE C.ID = ?
     """
 
     cursor.execute(query_club, club_id)
@@ -48,13 +61,19 @@ def read_club(club_id):
         return None
 
     club_image = row.clube_imagem if row.clube_imagem else DEFAULT_IMAGE
+    pais_image = row.Pais_Imagem if row.Pais_Imagem else DEFAULT_IMAGE
 
     # ---- jogadores deste clube ----
     query_players = """
-        SELECT ID, Nome, Posição, Preço, jogador_imagem
-        FROM FC_Jogador
-        WHERE ID_clube = ?
-        ORDER BY Nome
+        SELECT J.ID,
+               J.Nome,
+               P.Posição AS Posicao,
+               J.Preço,
+               J.jogador_imagem
+        FROM FC_Jogador J
+        JOIN FC_Posição P ON J.ID_Posição = P.ID
+        WHERE J.ID_clube = ?
+        ORDER BY J.Nome
     """
 
     cursor.execute(query_players, club_id)
@@ -67,7 +86,7 @@ def read_club(club_id):
         jogadores.append({
             "id": p.ID,
             "nome": p.Nome,
-            "posicao": p.Posição,
+            "posicao": p.Posicao,
             "preco": p.Preço,
             "imagem": jogador_img
         })
@@ -75,7 +94,8 @@ def read_club(club_id):
     return {
         "id": row.ID,
         "nome": row.Nome,
-        "pais": row.País,
+        "pais": row.Pais_Nome,
+        "pais_imagem": pais_image,
         "imagem": club_image,
         "jogadores": jogadores
     }

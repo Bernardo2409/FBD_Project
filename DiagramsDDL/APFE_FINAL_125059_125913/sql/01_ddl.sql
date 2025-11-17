@@ -20,10 +20,21 @@ CREATE TABLE FC_Equipa (
 		REFERENCES FC_Utilizador(ID)
 );
 
+-- NOVO
+
+CREATE TABLE FC_País (
+    ID varchar(8) NOT NULL PRIMARY KEY,
+    País varchar(30) NOT NULL,
+    país_imagem varchar(100)
+);
+
 CREATE TABLE FC_Clube (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Nome VARCHAR(16) NOT NULL,
-	País VARCHAR(16) NOT NULL
+	ID_País VARCHAR(16) NOT NULL,
+
+	FOREIGN KEY (ID_País)
+		REFERENCES FC_País(ID)
 );
 
 CREATE TABLE FC_Estado_Jogador (
@@ -31,11 +42,18 @@ CREATE TABLE FC_Estado_Jogador (
 	Estado VARCHAR(16) NOT NULL
 );
 
+-- NOVO
+
+CREATE TABLE FC_Posição (
+    ID varchar(8) NOT NULL PRIMARY KEY,
+    Posição varchar(20) NOT NULL
+);
+
 CREATE TABLE FC_Jogador (
 
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Nome VARCHAR(16) NOT NULL,
-	Posição VARCHAR(16) NOT NULL,
+	ID_Posição VARCHAR(8) NOT NULL,
 	Preço Float(16) NOT NULL,
 	ID_clube VARCHAR(8) NOT NULL,
 	ID_Estado_Jogador VARCHAR(8) NOT NULL,
@@ -44,7 +62,10 @@ CREATE TABLE FC_Jogador (
 		REFERENCES FC_Clube(ID),
 
 	FOREIGN KEY (ID_Estado_Jogador)
-		REFERENCES FC_Estado_Jogador(ID)
+		REFERENCES FC_Estado_Jogador(ID),
+
+	FOREIGN KEY (ID_Posição)
+		REFERENCES FC_Posiçãço(ID)
 );
 
 CREATE TABLE FC_Tipo_Liga (
