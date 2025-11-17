@@ -14,7 +14,7 @@ def get_users():
                 U.País AS Pais,
                 U.Nacionalidade,
                 U.DataDeNascimento AS BirthDate
-        FROM FantasyChamp.FC_Utilizador U
+        FROM FantasyChamp.Utilizador U
     """
 
     cursor.execute(query)
@@ -40,7 +40,7 @@ def login_user(email, password):
 
     query = """
         SELECT ID, PrimeiroNome, Apelido, Email
-        FROM FantasyChamp.FC_Utilizador
+        FROM FantasyChamp.Utilizador
         WHERE Email = ? AND Senha = ?
     """
 
@@ -62,7 +62,7 @@ def create_user(first, last, email, password, country, nationality, birthdate):
     cursor = conn.cursor()
 
     query = """
-        INSERT INTO FantasyChamp.FC_Utilizador
+        INSERT INTO FantasyChamp.Utilizador
         (ID, PrimeiroNome, Apelido, Email, Senha, País, Nacionalidade, DataDeNascimento)
         VALUES (NEWID(), ?, ?, ?, ?, ?, ?, ?)
     """

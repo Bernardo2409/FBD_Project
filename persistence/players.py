@@ -33,8 +33,8 @@ def list_all() -> list[PlayerDescriptor]:
         cursor = conn.cursor()
         cursor.execute("""
             SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem
-            FROM FantasyChamp.FC_Jogador J
-            JOIN FantasyChamp.FC_Posição P ON J.ID_Posição = P.ID;
+            FROM FantasyChamp.Jogador J
+            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID;
         """)
 
         return list(map(
@@ -66,10 +66,10 @@ def read(j_id: str):
                 C.clube_imagem,
                 C.ID AS Clube_id,
                 E.Estado
-            FROM FantasyChamp.FC_Jogador J
-            JOIN FantasyChamp.FC_Clube C ON J.ID_clube = C.ID
-            JOIN FantasyChamp.FC_Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
-            JOIN FantasyChamp.FC_Posição P ON J.ID_Posição = P.ID
+            FROM FantasyChamp.Jogador J
+            JOIN FantasyChamp.Clube C ON J.ID_clube = C.ID
+            JOIN FantasyChamp.Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
+            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
             WHERE J.ID = ?;
         """, j_id)
 
