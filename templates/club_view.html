@@ -30,7 +30,20 @@
                 {% endif %}
 
                 <h2 class="card-title text-3xl font-bold text-gray-800">{{ clube.nome }}</h2>
-                <p class="text-xl text-gray-600">{{ clube.pais }}</p>
+                <div class="flex items-center justify-center gap-3 mt-2">
+                    <span class="text-xl text-gray-600 font-medium">{{ clube.pais }}</span>
+
+                    {% if clube.pais_imagem %}
+                        <img src="{{ clube.pais_imagem }}" 
+                            alt="Bandeira de {{ clube.pais }}" 
+                            class="w-8 h-8 rounded-md shadow-sm border border-base-200 object-cover">
+                    {% else %}
+                        <img src="/static/images/Image-not-found.png"
+                            alt="Sem imagem"
+                            class="w-8 h-8 rounded-md opacity-60">
+                    {% endif %}
+                </div>
+
             </div>
         </div>
 
