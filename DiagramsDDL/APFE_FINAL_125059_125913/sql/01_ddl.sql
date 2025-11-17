@@ -31,7 +31,7 @@ CREATE TABLE FantasyChamp.País (
 CREATE TABLE FantasyChamp.Clube (
 	ID VARCHAR(8) NOT NULL PRIMARY KEY,
 	Nome VARCHAR(16) NOT NULL,
-	ID_País VARCHAR(16) NOT NULL,
+	ID_País VARCHAR(8) NOT NULL,
 
 	FOREIGN KEY (ID_País)
 		REFERENCES FantasyChamp.País(ID)
@@ -65,7 +65,7 @@ CREATE TABLE FantasyChamp.Jogador (
 		REFERENCES FantasyChamp.Estado_Jogador(ID),
 
 	FOREIGN KEY (ID_Posição)
-		REFERENCES FantasyChamp.Posiçãço(ID)
+		REFERENCES FantasyChamp.Posição(ID)
 );
 
 CREATE TABLE FantasyChamp.Tipo_Liga (
