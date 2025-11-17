@@ -52,11 +52,11 @@ def players_list():
 
 
 @app.route("/players/<j_id>")
-def player_view(j_id):
+def player_details(j_id):
     jogador = read(j_id)
 
     if jogador:
-        return render_template("player_view.html", jogador=jogador)
+        return render_template("player_details.html", jogador=jogador)
     else:
         return "Jogador não encontrado", 404
 
@@ -68,11 +68,11 @@ def clubs_list():
 
 
 @app.route("/clubs/<c_id>")
-def club_view(c_id):
+def club_details(c_id):
     clube = read_club(c_id)     # função que vais criar
 
     if clube:
-        return render_template("club_view.html", clube=clube)
+        return render_template("club_details.html", clube=clube)
     else:
         return "Clube não encontrado", 404
 

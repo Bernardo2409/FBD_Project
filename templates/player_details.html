@@ -24,9 +24,9 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-lg text-center md:text-left">
                     <p><strong>ID:</strong> <span class="font-mono">{{ jogador.id }}</span></p>
-                    <p><strong>Posição:</strong> <span class="font-semibold text-primary">{{ jogador.posicao }}</span></p>
-                    <p><strong>Preço:</strong> <span class="font-bold text-accent">{{ jogador.preco }}</span></p>
-                    <p><strong>Estado:</strong> <span class="font-semibold text-warning">{{ jogador.id_estado }}</span></p>
+                    <p><strong>Position:</strong> <span class="font-semibold text-primary">{{ jogador.posicao }}</span></p>
+                    <p><strong>Price:</strong> <span class="font-bold text-accent">{{ "%.1f"|format(jogador.preco)}} €</span></p>
+                    <p><strong>State:</strong> <span class="font-semibold text-warning">{{ jogador.id_estado }}</span></p>
                     <p class="md:col-span-2"><strong>Club:</strong> <span class="font-semibold">{{ jogador.nome_clube }}</span></p>
                 </div>
 
