@@ -81,28 +81,25 @@ def club_details(c_id):
 
     
 POSICOES = {
-    "Goal-Keeper": "GR",
-    "Defender": "DF",
-    "Midfielder": "MD",
-    "Forward": "AV"
+    "POS01": "Goalkeeper",
+    "POS02": "Defender",
+    "POS03": "Midfielder",
+    "POS04": "Forward"
 }
 
 @app.route("/equipa")
 def equipa():
     jogadores = list_all()
 
-    # adicionar atributo posicao_nome (GR/DF/MD/AV)
-    for j in jogadores:
-        j.posicao_nome = POSICOES.get(j.posicao, "???")
-
     # separar as posições
-    guarda_redes = [j for j in jogadores if j.posicao == "Goal-Keeper"]
+    guarda_redes = [j for j in jogadores if j.posicao == "Goalkeeper"]
     defesas      = [j for j in jogadores if j.posicao == "Defender"]
     medios       = [j for j in jogadores if j.posicao == "Midfielder"]
     avancados    = [j for j in jogadores if j.posicao == "Forward"]
 
     # validar quantidade
     if len(guarda_redes) < 2 or len(defesas) < 5 or len(medios) < 5 or len(avancados) < 3:
+        print([j.posicao for j in jogadores])
         return "Jogadores insuficientes para criar equipa automaticamente", 500
 
     equipa_auto = {

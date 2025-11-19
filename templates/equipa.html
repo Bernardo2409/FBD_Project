@@ -7,87 +7,104 @@
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
 
-<body class="bg-gray-100 text-gray-900" data-theme="corporate">
+<body
+    class="text-gray-900 bg-cover bg-center bg-no-repeat min-h-screen"
+    data-theme="corporate"
+    style="background-image: url('/static/images/stadium2.jpg');">
+
 
 <div class="container mx-auto p-6">
 
-    <h1 class="text-4xl font-bold text-center text-primary mb-10">
-        A tua Equipa Fantasy
+    <h1 class="text-4xl font-bold text-center text-primary mb-10 text-white">
+        Equipa Banger
     </h1>
 
-    <!-- SECÇÃO: GUARDA-REDES -->
-    <h2 class="text-2xl font-bold mb-4 text-secondary">Guarda-Redes (2)</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        {% for j in equipa.gr %}
-        <div class="card bg-white shadow-xl p-4">
-            <div class="flex items-center gap-4">
-                <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
-                <div>
-                    <div class="font-bold text-lg">{{ j.Nome }}</div>
-                    <div class="badge badge-primary badge-outline">{{ j.posicao_nome }}</div>
-                    <div class="text-sm text-gray-500">{{ j.Preço }}€</div>
+    <!-- SECÇÃO: AVANÇADOS -->
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Avançados (3)</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 place-items-center">
+        {% for j in equipa.avancados %}
+        <a href="/players/{{ j.id }}">
+            <div class="card bg-white shadow-xl p-4">
+                <div class="flex items-center gap-4">
+                    <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <div class="font-bold text-lg">{{ j.nome }}</div>
+                        <div class="badge badge-primary badge-outline">{{ j.posicao }}</div>
+                        <div class="text-sm text-gray-500">{{ j.preco }}€</div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
         {% endfor %}
     </div>
 
 
-    <!-- SECÇÃO: DEFESAS -->
-    <h2 class="text-2xl font-bold mb-4 text-secondary">Defesas (5)</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10">
-        {% for j in equipa.defesas %}
-        <div class="card bg-white shadow-xl p-4">
-            <div class="flex items-center gap-4">
-                <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
-                <div>
-                    <div class="font-bold text-lg">{{ j.Nome }}</div>
-                    <div class="badge badge-primary badge-outline">{{ j.posicao_nome }}</div>
-                    <div class="text-sm text-gray-500">{{ j.Preço }}€</div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+
 
 
     <!-- SECÇÃO: MÉDIOS -->
-    <h2 class="text-2xl font-bold mb-4 text-secondary">Médios (5)</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10">
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Médios (5)</h2>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
         {% for j in equipa.medios %}
-        <div class="card bg-white shadow-xl p-4">
-            <div class="flex items-center gap-4">
-                <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
-                <div>
-                    <div class="font-bold text-lg">{{ j.Nome }}</div>
-                    <div class="badge badge-primary badge-outline">{{ j.posicao_nome }}</div>
-                    <div class="text-sm text-gray-500">{{ j.Preço }}€</div>
+        <a href="/players/{{ j.id }}">
+            <div class="card bg-white shadow-xl p-4">
+                <div class="flex items-center gap-4">
+                    <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <div class="font-bold text-lg">{{ j.nome }}</div>
+                        <div class="badge badge-primary badge-outline">{{ j.posicao }}</div>
+                        <div class="text-sm text-gray-500">{{ j.preco }}€</div>
+                    </div>
                 </div>
             </div>
-        </div>
+
+        </a>
         {% endfor %}
     </div>
 
 
-    <!-- SECÇÃO: AVANÇADOS -->
-    <h2 class="text-2xl font-bold mb-4 text-secondary">Avançados (3)</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10">
-        {% for j in equipa.avancados %}
-        <div class="card bg-white shadow-xl p-4">
-            <div class="flex items-center gap-4">
-                <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
-                <div>
-                    <div class="font-bold text-lg">{{ j.Nome }}</div>
-                    <div class="badge badge-primary badge-outline">{{ j.posicao_nome }}</div>
-                    <div class="text-sm text-gray-500">{{ j.Preço }}€</div>
+
+    <!-- SECÇÃO: DEFESAS -->
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Defesas (5)</h2>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
+        {% for j in equipa.defesas %}
+        <a href="/players/{{ j.id }}">
+            <div class="card bg-white shadow-xl p-4">
+                <div class="flex items-center gap-4">
+                    <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <div class="font-bold text-lg">{{ j.nome }}</div>
+                        <div class="badge badge-primary badge-outline">{{ j.posicao }}</div>
+                        <div class="text-sm text-gray-500">{{ j.preco }}€</div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
+        {% endfor %}
+    </div>
+
+
+     <!-- SECÇÃO: GUARDA-REDES -->
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Guarda-Redes (2)</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 place-items-center">
+        {% for j in equipa.gr %}
+        <a href="/players/{{ j.id }}">
+            <div class="card bg-white shadow-xl p-4">
+                <div class="flex items-center gap-4">
+                    <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <div class="font-bold text-lg">{{ j.nome }}</div>
+                        <div class="badge badge-primary badge-outline">{{ j.posicao }}</div>
+                        <div class="text-sm text-gray-500">{{ j.preco }}€</div>
+                    </div>
+                </div>
+            </div>
+        </a>
         {% endfor %}
     </div>
 
     <div class="mt-12 text-center">
-        <a href="/index" class="btn btn-secondary px-8">← Voltar</a>
+        <a href="/index" class="btn btn-secondary px-8 text-white">← Voltar</a>
     </div>
 
 </div>
