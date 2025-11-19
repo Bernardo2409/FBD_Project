@@ -4,6 +4,8 @@ from persistence.players import list_all, read
 from persistence.clubs import list_all_clubs, read_club
 from persistence.users import create_user, login_user, get_users
 
+import random
+
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
@@ -75,6 +77,46 @@ def club_details(c_id):
         return render_template("club_details.html", clube=clube)
     else:
         return "Clube não encontrado", 404
+    
+
+    
+POSICOES = {
+    "Goal-Keeper": "GR",
+    "Defender": "DF",
+    "Midfielder": "MD",
+    "Forward": "AV"
+}
+
+@app.route("/equipa")
+def equipa():
+    jogadores = list_all()
+
+    # adicionar atributo posicao_nome (GR/DF/MD/AV)
+    for j in jogadores:
+        j.posicao_nome = POSICOES.get(j.posicao, "???")
+
+    # separar as posições
+    guarda_redes = [j for j in jogadores if j.posicao == "Goal-Keeper"]
+    defesas      = [j for j in jogadores if j.posicao == "Defender"]
+    medios       = [j for j in jogadores if j.posicao == "Midfielder"]
+    avancados    = [j for j in jogadores if j.posicao == "Forward"]
+
+    # validar quantidade
+    if len(guarda_redes) < 2 or len(defesas) < 5 or len(medios) < 5 or len(avancados) < 3:
+        return "Jogadores insuficientes para criar equipa automaticamente", 500
+
+    equipa_auto = {
+        "gr": random.sample(guarda_redes, 2),
+        "defesas": random.sample(defesas, 5),
+        "medios": random.sample(medios, 5),
+        "avancados": random.sample(avancados, 3)
+    }
+
+    return render_template("equipa.html", equipa=equipa_auto)
+
+
+
+
 
 
 if __name__ == "__main__":
