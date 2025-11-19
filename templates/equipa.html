@@ -24,7 +24,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 place-items-center">
         {% for j in equipa.avancados %}
         <a href="/players/{{ j.id }}">
-            <div class="card bg-white shadow-xl p-4">
+            <div class="card bg-white shadow-xl p-4 w-64 h-32 flex items-center">
                 <div class="flex items-center gap-4">
                     <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
@@ -47,7 +47,7 @@
     <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
         {% for j in equipa.medios %}
         <a href="/players/{{ j.id }}">
-            <div class="card bg-white shadow-xl p-4">
+            <div class="card bg-white shadow-xl p-4 w-54 h-32 flex items-center">
                 <div class="flex items-center gap-4">
                     <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
@@ -69,7 +69,7 @@
     <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
         {% for j in equipa.defesas %}
         <a href="/players/{{ j.id }}">
-            <div class="card bg-white shadow-xl p-4">
+            <div class="card bg-white shadow-xl p-4 w-54 h-32 flex items-center">
                 <div class="flex items-center gap-4">
                     <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
@@ -89,7 +89,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 place-items-center">
         {% for j in equipa.gr %}
         <a href="/players/{{ j.id }}">
-            <div class="card bg-white shadow-xl p-4">
+            <div class="card bg-white shadow-xl p-4 w-64 h-32 flex items-center">
                 <div class="flex items-center gap-4">
                     <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
