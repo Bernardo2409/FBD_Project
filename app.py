@@ -3,7 +3,7 @@ import secrets
 
 from flask import Flask, render_template, request, redirect, jsonify, session, url_for
 
-from persistence.equipa import adicionar_jogador_equipa, criar_equipa, obter_equipa_por_utilizador, obter_jogadores_equipa, remover_jogador_equipa
+from persistence.equipa import adicionar_jogador_equipa, criar_equipa, obter_equipa_por_utilizador, obter_jogadores_equipa, remover_jogador_equipa, verificar_limites_equipa
 from persistence.players import list_all, list_paginated, read
 from persistence.clubs import list_all_clubs, list_paginated_clubs, read_club
 from persistence.users import create_user, login_user, get_users
@@ -193,10 +193,24 @@ def adicionar_jogador_equipa_route(posicao, jogador_id):
     
     if equipa_user:
         try:
-            adicionar_jogador_equipa(equipa_user.id, jogador_id)
+            # Verificar limites antes de adicionar
+            limites = verificar_limites_equipa(equipa_user.id)
+            
+            # Verificar se pode adicionar mais jogadores nesta posição
+            if posicao == 'gr' and not limites['pode_adicionar_gr']:
+                session['error'] = "Já tens 2 guarda-redes! Remove um primeiro."
+            elif posicao == 'defesas' and not limites['pode_adicionar_defesa']:
+                session['error'] = "Já tens 5 defesas! Remove um primeiro."
+            elif posicao == 'medios' and not limites['pode_adicionar_medio']:
+                session['error'] = "Já tens 5 médios! Remove um primeiro."
+            elif posicao == 'avancados' and not limites['pode_adicionar_avancado']:
+                session['error'] = "Já tens 3 avançados! Remove um primeiro."
+            else:
+                adicionar_jogador_equipa(equipa_user.id, jogador_id)
+                session['message'] = "Jogador adicionado com sucesso!"
+                
         except Exception as e:
-            # Tratar erro (jogador já na equipa, etc.)
-            pass
+            session['error'] = str(e)
     
     return redirect("/equipa")
 
@@ -209,7 +223,11 @@ def remover_jogador_equipa_route(jogador_id):
     equipa_user = obter_equipa_por_utilizador(user_id)
     
     if equipa_user:
-        remover_jogador_equipa(equipa_user.id, jogador_id)
+        try:
+            remover_jogador_equipa(equipa_user.id, jogador_id)
+            session['message'] = "Jogador removido com sucesso!"
+        except Exception as e:
+            session['error'] = f"Erro ao remover jogador: {str(e)}"
     
     return redirect("/equipa")
 

@@ -25,16 +25,39 @@ def criar_equipa(nome: str, id_utilizador: str) -> str:
         cursor.execute("SELECT NEWID()")
         equipa_id = cursor.fetchone()[0]
         
-        # Inserir equipa
+        # Inserir equipa com orçamento inicial de 100
         cursor.execute("""
             INSERT INTO FantasyChamp.Equipa (ID, Nome, Orçamento, PontuaçãoTotal, ID_Utilizador)
-            VALUES (?, ?, 100, 0, ?)
+            VALUES (?, ?, 100.00, 0, ?)
         """, equipa_id, nome, id_utilizador)
         
         conn.commit()
         return equipa_id
 
 
+def obter_preco_jogador(id_jogador: str) -> float:
+    """Obter o preço de um jogador"""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT Preço FROM FantasyChamp.Jogador WHERE ID = ?
+        """, id_jogador)
+        
+        row = cursor.fetchone()
+        return row.Preço if row else 0
+
+def verificar_orcamento_suficiente(id_equipa: str, preco_jogador: float) -> bool:
+    """Verificar se a equipa tem orçamento suficiente"""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT Orçamento FROM FantasyChamp.Equipa WHERE ID = ?
+        """, id_equipa)
+        
+        row = cursor.fetchone()
+        orcamento_atual = row.Orçamento if row else 0
+        return orcamento_atual >= preco_jogador
+    
 def obter_equipa_por_utilizador(id_utilizador: str) -> Optional[Equipa]:
     with create_connection() as conn:
         cursor = conn.cursor()
@@ -93,7 +116,14 @@ def adicionar_jogador_equipa(id_equipa: str, id_jogador: str):
         """, id_equipa, id_jogador)
         
         if cursor.fetchone():
-            raise IntegrityError("Jogador já está na equipa")
+            raise Exception("Jogador já está na equipa")
+        
+        # Obter preço do jogador
+        preco_jogador = obter_preco_jogador(id_jogador)
+        
+        # Verificar se tem orçamento suficiente
+        if not verificar_orcamento_suficiente(id_equipa, preco_jogador):
+            raise Exception("Orçamento insuficiente para adicionar este jogador")
         
         # Inserir relação
         cursor.execute("""
@@ -101,24 +131,23 @@ def adicionar_jogador_equipa(id_equipa: str, id_jogador: str):
             VALUES (?, ?)
         """, id_equipa, id_jogador)
         
-        # Atualizar orçamento da equipa
+        # Subtrair o preço do jogador ao orçamento
         cursor.execute("""
             UPDATE FantasyChamp.Equipa
-            SET Orçamento = (
-                SELECT SUM(J.Preço)
-                FROM FantasyChamp.Jogador J
-                JOIN FantasyChamp.Pertence PE ON J.ID = PE.ID_Jogador
-                WHERE PE.ID_Equipa = ?
-            )
+            SET Orçamento = Orçamento - ?
             WHERE ID = ?
-        """, id_equipa, id_equipa)
+        """, preco_jogador, id_equipa)
         
         conn.commit()
+
 
 
 def remover_jogador_equipa(id_equipa: str, id_jogador: str):
     with create_connection() as conn:
         cursor = conn.cursor()
+        
+        # Obter preço do jogador antes de remover
+        preco_jogador = obter_preco_jogador(id_jogador)
         
         # Remover relação
         cursor.execute("""
@@ -126,25 +155,22 @@ def remover_jogador_equipa(id_equipa: str, id_jogador: str):
             WHERE ID_Equipa = ? AND ID_Jogador = ?
         """, id_equipa, id_jogador)
         
-        # Atualizar orçamento
+        # Devolver o preço ao orçamento
         cursor.execute("""
             UPDATE FantasyChamp.Equipa
-            SET Orçamento = (
-                SELECT SUM(J.Preço)
-                FROM FantasyChamp.Jogador J
-                JOIN FantasyChamp.Pertence PE ON J.ID = PE.ID_Jogador
-                WHERE PE.ID_Equipa = ?
-            )
+            SET Orçamento = Orçamento + ?
             WHERE ID = ?
-        """, id_equipa, id_equipa)
+        """, preco_jogador, id_equipa)
         
         conn.commit()
 
 
 def verificar_limites_equipa(id_equipa: str) -> dict:
-    """Verifica quantos jogadores de cada posição a equipa tem"""
+    """Verifica quantos jogadores de cada posição a equipa tem e se pode adicionar mais"""
     with create_connection() as conn:
         cursor = conn.cursor()
+        
+        # Contar jogadores por posição
         cursor.execute("""
             SELECT P.Posição, COUNT(*) as count
             FROM FantasyChamp.Jogador J
@@ -158,4 +184,16 @@ def verificar_limites_equipa(id_equipa: str) -> dict:
         for row in cursor:
             contagem[row.Posição] = row.count
         
-        return contagem
+        # Obter orçamento atual
+        cursor.execute("SELECT Orçamento FROM FantasyChamp.Equipa WHERE ID = ?", id_equipa)
+        row = cursor.fetchone()
+        orcamento_atual = row.Orçamento if row else 0
+        
+        return {
+            'contagem': contagem,
+            'orcamento': orcamento_atual,
+            'pode_adicionar_gr': contagem['Goalkeeper'] < 2,
+            'pode_adicionar_defesa': contagem['Defender'] < 5,
+            'pode_adicionar_medio': contagem['Midfielder'] < 5,
+            'pode_adicionar_avancado': contagem['Forward'] < 3
+        }
