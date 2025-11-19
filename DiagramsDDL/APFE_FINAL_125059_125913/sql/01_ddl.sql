@@ -10,7 +10,7 @@ CREATE TABLE FantasyChamp.Utilizador (
 );
 
 CREATE TABLE FantasyChamp.Equipa (
-    ID VARCHAR(16) NOT NULL PRIMARY KEY,
+    ID UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
     Orçamento FLOAT NOT NULL DEFAULT 100,
     Nome VARCHAR(50) NOT NULL,
     PontuaçãoTotal INT NOT NULL DEFAULT 0,
@@ -103,7 +103,7 @@ CREATE TABLE FantasyChamp.Jornada (
 
 CREATE TABLE FantasyChamp.Pontuação_Equipa (
     ID VARCHAR(16) NOT NULL PRIMARY KEY,
-    ID_equipa VARCHAR(16) NOT NULL,
+    ID_equipa UNIQUEIDENTIFIER NOT NULL,
     ID_jornada VARCHAR(16) NOT NULL,
     Pontuação_Jornada INT NOT NULL,
 
@@ -149,7 +149,7 @@ CREATE TABLE FantasyChamp.Jogo (
 
 CREATE TABLE FantasyChamp.Pertence (
     ID_Jogador VARCHAR(16) NOT NULL,
-    ID_Equipa VARCHAR(16) NOT NULL,
+    ID_Equipa UNIQUEIDENTIFIER NOT NULL,
     PRIMARY KEY (ID_Jogador, ID_Equipa),
     FOREIGN KEY (ID_Jogador) 
 		REFERENCES FantasyChamp.Jogador(ID),

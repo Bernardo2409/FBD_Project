@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Equipa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="card bg-white shadow-2xl p-8 w-full max-w-md">
+        <h1 class="text-3xl font-bold text-center text-primary mb-6">
+            Criar Nova Equipa
+        </h1>
+        
+        <form method="POST" class="space-y-6">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text font-semibold">Nome da Equipa</span>
+                </label>
+                <input 
+                    type="text" 
+                    name="nome_equipa" 
+                    placeholder="Ex: Os Campeões" 
+                    class="input input-bordered w-full"
+                    required
+                >
+            </div>
+            
+            <div class="text-center text-sm text-gray-600">
+                <p>Vais poder adicionar jogadores depois de criares a equipa!</p>
+            </div>
+            
+            <div class="form-control mt-6">
+                <button type="submit" class="btn btn-primary w-full">
+                    🏆 Criar Equipa
+                </button>
+            </div>
+        </form>
+        
+        <div class="text-center mt-4">
+            <a href="/index" class="text-sm text-gray-500 hover:text-gray-700">
+                ← Voltar ao Início
+            </a>
+        </div>
+    </div>
+</body>
+</html>

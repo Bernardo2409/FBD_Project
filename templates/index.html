@@ -21,25 +21,47 @@
             <div class="max-w-md">
                 <h1 class="text-5xl font-extrabold text-primary mb-4"> Fantasy Champ</h1>
                 <p class="py-6 text-lg">
-                    Testing...
+                    Bem-vindo ao Fantasy Champ!
                 </p>
 
-                <h2 class="text-2xl font-semibold mb-6">Options: </h2>
+                <h2 class="text-2xl font-semibold mb-6">Opções: </h2>
                 
                 <div class="flex flex-col gap-4">
                     <a href="/players" class="btn btn-primary btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        Players
+                        Jogadores
                     </a>
                     <a href="/clubs" class="btn btn-secondary btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        Clubs
+                        Clubes
                     </a>
-                    <a href="/equipa" class="btn btn-primary">
-                        Ver Equipa
+                    
+                    {% if user_has_team %}
+                    <!-- Se TEM equipa, mostra apenas "Ver Equipa" -->
+                    <a href="/equipa" class="btn btn-accent btn-lg shadow-md hover:shadow-lg transition duration-300">
+                        Ver Minha Equipa
                     </a>
+                    {% else %}
+                    <!-- Se NÃO TEM equipa, mostra apenas "Criar Equipa" -->
+                    <a href="/criar-equipa" class="btn btn-success btn-lg shadow-md hover:shadow-lg transition duration-300">
+                        Criar Nova Equipa
+                    </a>
+                    {% endif %}
                 </div>
+
+                <!-- Mostrar informação do utilizador se estiver logado -->
+                {% if session.user_name %}
+                <div class="mt-8 p-4 bg-white rounded-lg shadow">
+                    <p class="text-sm text-gray-600">Logado como: <strong>{{ session.user_name }}</strong></p>
+                    <p class="text-sm text-gray-600">
+                        {% if user_has_team %}
+                        Tens uma equipa criada
+                        {% else %}
+                        Ainda não tens equipa
+                        {% endif %}
+                    </p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
-
 </body>
 </html>
