@@ -9,48 +9,78 @@
 <body class="bg-gray-100 text-gray-900" data-theme="corporate">
 
     <div class="container mx-auto p-6">
-        <h1 class="text-4xl font-bold mb-8 text-center text-primary">Players List</h1>
+    <h1 class="text-4xl font-bold mb-8 text-center text-primary">Players List</h1>
 
-        <div class="overflow-x-auto bg-white shadow-xl rounded-box p-4">
-            <table class="table table-zebra w-full">
-                <thead class="bg-primary text-primary-content">
-                    <tr>
-                        <th class="py-3 px-4 rounded-tl-lg text-center">ID</th>
-                        <th class="py-3 px-4 text-center">Name</th>
-                        <th class="py-3 px-4 text-center">Position</th>
-                        <th class="py-3 px-4 text-center">Price</th>
-                        <th class="py-3 px-4 text-center">Image</th>
-                        <th class="py-3 px-4 rounded-tr-lg text-center">Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for jogador in jogadores %}
-                    <tr class="hover:bg-base-200 transition duration-150">
-                        <td class="py-3 px-4 font-mono text-center">{{ jogador.id }}</td>
-                        <td class="py-3 px-4 font-semibold text-center">{{ jogador.nome }}</td>
-                        <td class="py-3 px-4 text-accent font-medium text-center">{{ jogador.posicao }}</td>
-                        <td class="py-3 px-4 font-mono text-center">{{ "%.1f"|format(jogador.preco)}}€</td>
-                        
-                        <td class="py-3 px-4 text-center">
-                            <div class="flex justify-center">
-                                <img src="{{ jogador.jogador_imagem }}" 
-                                     alt="{{ jogador.nome }}" 
-                                     class="w-10 h-10 object-cover rounded-full mask mask-squircle">
-                            </div>
-                        </td>
+    <div class="overflow-x-auto bg-white shadow-xl rounded-box p-4">
+        <table class="table table-zebra w-full">
+            <thead class="bg-primary text-primary-content">
+                <tr>
+                    <th class="py-3 px-4 rounded-tl-lg text-center">ID</th>
+                    <th class="py-3 px-4 text-center">Name</th>
+                    <th class="py-3 px-4 text-center">Position</th>
+                    <th class="py-3 px-4 text-center">Price</th>
+                    <th class="py-3 px-4 text-center">Image</th>
+                    <th class="py-3 px-4 rounded-tr-lg text-center">Details</th>
+                </tr>
+            </thead>
 
-                        <td class="py-3 px-4 text-center">
-                            <a href="/players/{{ jogador.id }}" class="btn btn-sm btn-primary btn-outline">See</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="mt-10 text-center">
-            <a href="/index" class="btn btn-secondary px-8">← Back to Index </a>
-        </div>
+            <tbody>
+            {% for jogador in jogadores %}
+                <tr class="hover:bg-base-200 transition duration-150">
+                    <td class="py-3 px-4 font-mono text-center">{{ jogador.id }}</td>
+                    <td class="py-3 px-4 font-semibold text-center">{{ jogador.nome }}</td>
+                    <td class="py-3 px-4 text-accent font-medium text-center">{{ jogador.posicao }}</td>
+                    <td class="py-3 px-4 font-mono text-center">{{ "%.1f"|format(jogador.preco)}}€</td>
+                    
+                    <td class="py-3 px-4 text-center">
+                        <div class="flex justify-center">
+                            <img src="{{ jogador.jogador_imagem }}" 
+                                 alt="{{ jogador.nome }}" 
+                                 class="w-10 h-10 object-cover rounded-full mask mask-squircle">
+                        </div>
+                    </td>
+
+                    <td class="py-3 px-4 text-center">
+                        <a href="/players/{{ jogador.id }}" class="btn btn-sm btn-primary btn-outline">See</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
     </div>
+
+    <!-- PAGINATION -->
+    <div class="mt-8 flex justify-center items-center gap-4">
+
+        {% if page > 1 %}
+            <a href="/players?page={{ page - 1 }}" class="btn btn-outline">
+                ← Previous
+            </a>
+        {% else %}
+            <button class="btn btn-outline btn-disabled">← Previous</button>
+        {% endif %}
+
+        <span class="font-bold">
+            Page {{ page }} of {{ total_pages }}
+        </span>
+
+        {% if page < total_pages %}
+            <a href="/players?page={{ page + 1 }}" class="btn btn-outline">
+                Next →
+            </a>
+        {% else %}
+            <button class="btn btn-outline btn-disabled">Next →</button>
+        {% endif %}
+
+    </div>
+
+    <div class="mt-10 text-center">
+        <a href="/index" class="btn btn-secondary px-8">← Back to Index </a>
+    </div>
+
+    </div>
+
 
 </body>
 </html>

@@ -88,3 +88,36 @@ def read(j_id: str):
             row.clube_imagem if row.clube_imagem else '/static/images/Image-not-found.png',
             row.jogador_imagem if row.jogador_imagem else '/static/images/Image-not-found.png'
         )
+
+def list_paginated(page: int, per_page: int) -> tuple[list[PlayerDescriptor], int]:
+    offset = (page - 1) * per_page
+
+    with create_connection() as conn:
+        cursor = conn.cursor()
+
+        # total de jogadores
+        cursor.execute("SELECT COUNT(*) FROM FantasyChamp.Jogador;")
+        total = cursor.fetchone()[0]
+
+        # query paginada
+        cursor.execute(f"""
+            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem
+            FROM FantasyChamp.Jogador J
+            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+            ORDER BY J.Nome
+            OFFSET {offset} ROWS FETCH NEXT {per_page} ROWS ONLY;
+        """)
+
+        jogadores = list(map(
+            lambda row: PlayerDescriptor(
+                row.ID,
+                row.Nome,
+                row.Posicao,
+                row.Preço,
+                row.jogador_imagem if row.jogador_imagem
+                else '/static/images/Image-not-found.png'
+            ),
+            cursor
+        ))
+
+    return jogadores, total

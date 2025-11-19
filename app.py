@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for
 
-from persistence.players import list_all, read
-from persistence.clubs import list_all_clubs, read_club
+from persistence.players import list_all, list_paginated, read
+from persistence.clubs import list_all_clubs, list_paginated_clubs, read_club
 from persistence.users import create_user, login_user, get_users
 
 import random
@@ -49,9 +49,18 @@ def index():
 
 @app.route("/players")
 def players_list():
-    jogadores = list_all()
-    return render_template("players.html", jogadores=jogadores)
+    page = int(request.args.get("page", 1))
+    per_page = 10
 
+    jogadores, total = list_paginated(page, per_page)
+    total_pages = (total + per_page - 1) // per_page
+
+    return render_template(
+        "players.html",
+        jogadores=jogadores,
+        page=page,
+        total_pages=total_pages
+    )
 
 @app.route("/players/<j_id>")
 def player_details(j_id):
@@ -65,8 +74,18 @@ def player_details(j_id):
 
 @app.route("/clubs")
 def clubs_list():
-    clubes = list_all_clubs()   # função que vais criar
-    return render_template("clubs.html", clubes=clubes)
+    page = int(request.args.get("page", 1))
+    per_page = 10
+
+    clubes, total = list_paginated_clubs(page, per_page)
+    total_pages = (total + per_page - 1) // per_page
+
+    return render_template(
+        "clubs.html",
+        clubes=clubes,
+        page=page,
+        total_pages=total_pages
+    )
 
 
 @app.route("/clubs/<c_id>")

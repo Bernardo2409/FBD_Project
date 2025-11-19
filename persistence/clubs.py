@@ -99,3 +99,44 @@ def read_club(club_id):
         "imagem": club_image,
         "jogadores": jogadores
     }
+
+def list_paginated_clubs(page: int, per_page: int):
+    offset = (page - 1) * per_page
+
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    # Total de clubes
+    cursor.execute("SELECT COUNT(*) FROM FantasyChamp.Clube;")
+    total = cursor.fetchone()[0]
+
+    # Query paginada
+    query = f"""
+        SELECT C.ID,
+               C.Nome,
+               P.País AS Pais_Nome,
+               P.país_imagem AS Pais_Imagem,
+               C.clube_imagem
+        FROM FantasyChamp.Clube C
+        JOIN FantasyChamp.País P ON C.ID_País = P.ID
+        ORDER BY C.Nome
+        OFFSET {offset} ROWS FETCH NEXT {per_page} ROWS ONLY;
+    """
+
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    clubes = []
+    for row in rows:
+        imagem_clube = row.clube_imagem if row.clube_imagem else DEFAULT_IMAGE
+        imagem_pais = row.Pais_Imagem if row.Pais_Imagem else DEFAULT_IMAGE
+
+        clubes.append({
+            "id": row.ID,
+            "nome": row.Nome,
+            "pais": row.Pais_Nome,
+            "pais_imagem": imagem_pais,
+            "imagem": imagem_clube
+        })
+
+    return clubes, total
