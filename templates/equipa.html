@@ -61,7 +61,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 place-items-center" id="avancados-container">
     {% for j in equipa.avancados %}
     <div class="card shadow-xl p-4 w-64 h-32 flex items-center relative
-        {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Bench' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}">
+        {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}">
         
         <!-- Botão de remover -->
         <a href="/equipa/remover/{{ j.id }}"
@@ -121,7 +121,10 @@
 
     <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center" id="medios-container">
         {% for j in equipa.medios %}
-        <div class="card bg-white shadow-xl p-4 w-54 h-32 flex items-center relative">
+            <div class="card shadow-xl p-4 w-64 h-32 flex items-center relative
+
+            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}">
+
             <a href="/equipa/remover/{{ j.id }}"
                 class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100">
                     ✕
@@ -179,7 +182,9 @@
 
     <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center" id="defesas-container">
         {% for j in equipa.defesas %}
-        <div class="card bg-white shadow-xl p-4 w-54 h-32 flex items-center relative">
+            <div class="card shadow-xl p-4 w-64 h-32 flex items-center relative
+            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}">
+
             <a href="/equipa/remover/{{ j.id }}"
                 class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100">
                     ✕
@@ -192,6 +197,8 @@
                         <div class="font-bold text-lg">{{ j.nome }}</div>
                         <div class="badge badge-primary badge-outline">{{ j.posicao }}</div>
                         <div class="text-sm text-gray-500">{{ j.preco }}€</div>
+                        <div class="text-sm text-gray-500">Estado: {{ j.estado }}</div>
+
                     </div>
                 </div>
             </a>
@@ -235,7 +242,8 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 place-items-center" id="gr-container">
         {% for j in equipa.gr %}
-        <div class="card bg-white shadow-xl p-4 w-64 h-32 flex items-center relative">
+         <div class="card shadow-xl p-4 w-64 h-32 flex items-center relative
+            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}">
             <a href="/equipa/remover/{{ j.id }}"
                 class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100">
                     ✕
@@ -248,6 +256,7 @@
                         <div class="font-bold text-lg">{{ j.nome }}</div>
                         <div class="badge badge-primary badge-outline">{{ j.posicao }}</div>
                         <div class="text-sm text-gray-500">{{ j.preco }}€</div>
+                        <div class="text-sm text-gray-500">Estado: {{ j.estado }}</div>
                     </div>
                 </div>
             </a>
