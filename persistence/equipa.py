@@ -84,9 +84,10 @@ def obter_jogadores_equipa(id_equipa: str):
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem
+            SELECT J.ID, J.Nome, P.Posição AS Posicao, E.Estado AS Estado, J.Preço, J.jogador_imagem
             FROM FantasyChamp.Jogador J
             JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+            JOIN FantasyChamp.Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
             JOIN FantasyChamp.Pertence PE ON J.ID = PE.ID_Jogador
             WHERE PE.ID_Equipa = ?
         """, id_equipa)
@@ -97,6 +98,7 @@ def obter_jogadores_equipa(id_equipa: str):
                 'id': row.ID,
                 'nome': row.Nome,
                 'posicao': row.Posicao,
+                'estado': row.Estado,
                 'preco': row.Preço,
                 'jogador_imagem': row.jogador_imagem if row.jogador_imagem 
                           else '/static/images/Image-not-found.png'
