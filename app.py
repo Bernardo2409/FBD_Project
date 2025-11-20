@@ -59,13 +59,15 @@ def logout():
 
 @app.route("/index")
 def index():
+    
     user_has_team = False
     if 'user_id' in session:
         user_id = session['user_id']
         equipa_user = obter_equipa_por_utilizador(user_id)
         user_has_team = equipa_user is not None
-    
-    return render_template("index.html", user_has_team=user_has_team)
+        return render_template("index.html", user_has_team=user_has_team)
+    else:
+        return redirect("/")
 
 @app.route("/players")
 def players_list():
