@@ -71,6 +71,8 @@ def index():
 
 @app.route("/players")
 def players_list():
+    if 'user_id' not in session:
+        return redirect("/")
     page = int(request.args.get("page", 1))
     per_page = 10
 
@@ -96,6 +98,9 @@ def player_details(j_id):
 
 @app.route("/clubs")
 def clubs_list():
+    if 'user_id' not in session:
+        return redirect("/")
+    
     page = int(request.args.get("page", 1))
     per_page = 10
 
