@@ -104,8 +104,9 @@ def list_paginated(page: int, per_page: int) -> tuple[list[PlayerDescriptor], in
 
         # query paginada
         cursor.execute(f"""
-            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem
+            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem, E.Estado
             FROM FantasyChamp.Jogador J
+            JOIN FantasyChamp.Estado_Jogador E ON J.ID_Estado_Jogador = E.ID 
             JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
             ORDER BY J.Nome
             OFFSET {offset} ROWS FETCH NEXT {per_page} ROWS ONLY;
@@ -118,7 +119,8 @@ def list_paginated(page: int, per_page: int) -> tuple[list[PlayerDescriptor], in
                 row.Posicao,
                 row.Preço,
                 row.jogador_imagem if row.jogador_imagem
-                else '/static/images/Image-not-found.png'
+                else '/static/images/Image-not-found.png',
+                row.Estado
             ),
             cursor
         ))
