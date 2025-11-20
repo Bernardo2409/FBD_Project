@@ -59,27 +59,30 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 place-items-center" id="avancados-container">
-        {% for j in equipa.avancados %}
-        <div class="card bg-white shadow-xl p-4 w-64 h-32 flex items-center relative">
-            <!-- Botão de remover -->
-            <a href="/equipa/remover/{{ j.id }}"
-                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100">
-                    ✕
-            </a>
-            
-            <a href="/players/{{ j.id }}">
-                <div class="flex items-center gap-4">
-                    <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
-                    <div>
-                        <div class="font-bold text-lg">{{ j.nome }}</div>
-                        <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                        <div class="text-sm text-gray-500">{{ j.preco }}€</div>
-                    </div>
+    {% for j in equipa.avancados %}
+    <div class="card shadow-xl p-4 w-64 h-32 flex items-center relative
+        {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Bench' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}">
+        
+        <!-- Botão de remover -->
+        <a href="/equipa/remover/{{ j.id }}"
+            class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100">
+                ✕
+        </a>
+        
+        <a href="/players/{{ j.id }}">
+            <div class="flex items-center gap-4">
+                <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                <div>
+                    <div class="font-bold text-lg">{{ j.nome }}</div>
+                    <div class="text-sm text-gray-500">{{ j.preco }}€</div>
+                    <div class="text-sm text-gray-500">{{ j.estado }}</div>
                 </div>
-            </a>
-        </div>
-        {% endfor %}
+            </div>
+        </a>
     </div>
+    {% endfor %}
+</div>
+
 
     <!-- SECÇÃO: MÉDIOS -->
     <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Médios (5)</h2>
@@ -130,6 +133,8 @@
                         <div class="font-bold text-lg">{{ j.nome }}</div>
                         <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
                         <div class="text-sm text-gray-500">{{ j.preco }}€</div>
+                        <div class="text-sm text-gray-500">{{ j.estado }}</div>
+
                     </div>
                 </div>
             </a>
