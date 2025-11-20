@@ -44,7 +44,7 @@
                                 <div class="font-bold {% if avancado.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %}">
                                     {{ avancado.nome }}
                                 </div>
-                                <div class="font-bold text-xs text-black-500">{{ avancado.preco }}€</div>
+                                <div class="text-xs text-white">{{ avancado.preco }}€ {{ avancado.estado }}</div>
                                 {% if avancado.preco > equipa.info.orcamento %}
                                 <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
                                 {% endif %}
@@ -103,7 +103,7 @@
                                 <div class="font-bold {% if medio.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %}">
                                     {{ medio.nome }}
                                 </div>
-                                <div class="font-bold text-xs text-black-500">{{ medio.preco }}€</div>
+                                <div class="text-xs text-white">{{ medio.preco }}€ {{ medio.estado }}</div>
                                 {% if medio.preco > equipa.info.orcamento %}
                                 <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
                                 {% endif %}
@@ -163,7 +163,7 @@
                                 <div class="font-bold {% if defesa.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %}">
                                     {{ defesa.nome }}
                                 </div>
-                                <div class="font-bold text-xs text-black-500">{{ defesa.preco }}€</div>
+                                <div class="text-xs text-white">{{ defesa.preco }}€ {{ defesa.estado }}</div>
                                 {% if defesa.preco > equipa.info.orcamento %}
                                 <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
                                 {% endif %}
@@ -222,7 +222,7 @@
                                 <div class="font-bold {% if gr.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %}">
                                     {{ gr.nome }}
                                 </div>
-                                <div class="font-bold text-xs text-black-500">{{ gr.preco }}€</div>
+                                <div class="text-xs text-white">{{ gr.preco }}€ {{ gr.estado }}</div>
                                 {% if gr.preco > equipa.info.orcamento %}
                                 <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
                                 {% endif %}

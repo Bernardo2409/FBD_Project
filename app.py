@@ -51,6 +51,12 @@ def signup_submit():
 
     return redirect("/")
 
+@app.route("/logout")
+def logout():
+    # Limpar a sessão
+    session.clear()
+    return redirect("/")
+
 @app.route("/index")
 def index():
     user_has_team = False

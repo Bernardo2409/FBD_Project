@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/daisyui@3.0.0/dist/full.js"></script>
     <style>
-        /* Define o tema principal como corporate, mas pode ser mudado */
         :root {
             --fallback-p: 18 100% 70%;
             --p: 219 89% 56%;
@@ -58,6 +57,12 @@
                         Ainda não tens equipa
                         {% endif %}
                     </p>
+
+                    <div class="mt-4">
+                        <a href="/logout" class="btn btn-outline btn-error btn-sm">
+                            Terminar Sessão
+                        </a>
+                    </div>
                 </div>
                 {% endif %}
             </div>

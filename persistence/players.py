@@ -12,6 +12,7 @@ class PlayerDescriptor(NamedTuple):
     posicao: str
     preco: float
     jogador_imagem: str
+    estado: str
 
 
 class PlayerDetails(NamedTuple):
@@ -32,9 +33,10 @@ def list_all() -> list[PlayerDescriptor]:
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem
+            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem, E.Estado
             FROM FantasyChamp.Jogador J
-            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID;
+            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+            JOIN FantasyChamp.Estado_Jogador E ON J.ID_Estado_Jogador = E.ID; 
         """)
 
         return list(map(
@@ -45,7 +47,8 @@ def list_all() -> list[PlayerDescriptor]:
                     row.Posicao,
                     row.Preço,
                     row.jogador_imagem if row.jogador_imagem
-                    else '/static/images/Image-not-found.png'
+                    else '/static/images/Image-not-found.png',
+                    row.Estado
                 ),
             cursor
         ))
