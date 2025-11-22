@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{{ liga.nome }} - Fantasy Champ</title>
@@ -9,57 +9,87 @@
 <body class="bg-gray-100 min-h-screen" data-theme="corporate">
 
 <div class="container mx-auto p-6">
-    <!-- CABEÇALHO -->
+    <!-- HEADER -->
     <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
         <div class="flex justify-between items-start">
+
+            <!-- League Details -->
             <div>
                 <h1 class="text-3xl font-bold text-primary mb-2">{{ liga.nome }}</h1>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                     <div>
-                        <strong>Data de Início:</strong><br>
+                        <strong>Start Date:</strong><br>
                         {{ liga.data_inicio }}
                     </div>
                     <div>
-                        <strong>Data de Fim:</strong><br>
+                        <strong>End Date:</strong><br>
                         {{ liga.data_fim }}
                     </div>
                     <div>
-                        <strong>Tipo:</strong><br>
-                        {{ 'Pública' if liga.id_tipo_liga == 'TL01' else 'Privada' }}
+                        <strong>Type:</strong><br>
+                        {{ 'Public' if liga.id_tipo_liga == 'LT01' else 'Private' }}
                     </div>
                 </div>
+
                 {% if liga.codigo_convite %}
                 <div class="mt-4 p-3 bg-yellow-100 rounded-lg">
-                    <strong>🔐 Código de Convite:</strong>
-                    <code class="font-mono text-lg bg-white px-2 py-1 rounded ml-2">{{ liga.codigo_convite }}</code>
+                    <strong>Invite Code:</strong>
+                    <code class="font-mono text-lg bg-white px-2 py-1 rounded ml-2">
+                        {{ liga.codigo_convite }}
+                    </code>
                 </div>
                 {% endif %}
             </div>
-            <div class="text-right">
-                <a href="/ligas" class="btn btn-secondary">← Voltar às Ligas</a>
+
+            <!-- Leave League Button -->
+            <button onclick="leaveLeagueModal.showModal()"
+                class="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-6 font-bold">
+                Leave League
+            </button>
+
+            <!-- Confirmation Modal -->
+            <dialog id="leaveLeagueModal" class="modal">
+            <div class="modal-box" style="margin: 10px;">
+                <h3 class="font-bold text-lg flex justify-center">Are you sure?</h3>
+                <p class="py-4">Do you really want to leave this league? This action cannot be undone.</p>
+
+                <div class="modal-action flex justify-center">
+                    <form method="POST" action="/abandonar-liga/{{ liga.id }}">
+                        <button class="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-5" style="margin-right: 3px;">
+                            Yes, leave
+                        </button>
+                    </form>
+
+                    <button class="btn bg-green-600 hover:bg-green-700 text-white border-none rounded-full px-5" style="margin-left: 3px;" onclick="leaveLeagueModal.close()">
+                        Cancel
+                    </button>
+                </div>
             </div>
+            </dialog>
+
         </div>
     </div>
 
-    <!-- MENSAGENS -->
+    <!-- MESSAGES -->
     {% if session.get('message') %}
         <div class="alert alert-success mb-6">
             <span>{{ session.pop('message', '') }}</span>
         </div>
     {% endif %}
 
-    <!-- PARTICIPANTES -->
+    <!-- PARTICIPANTS -->
     <div class="bg-white rounded-lg shadow-xl p-6">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">🎯 Participantes</h2>
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Participants</h2>
         
         {% if participantes %}
         <div class="overflow-x-auto">
             <table class="table table-zebra w-full">
                 <thead>
                     <tr>
-                        <th class="text-left">Jogador</th>
+                        <th class="text-left">Player</th>
                         <th class="text-left">Email</th>
-                        <th class="text-left">Equipa</th>
+                        <th class="text-left">Team</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,9 +99,9 @@
                         <td class="text-gray-600">{{ participante.email }}</td>
                         <td>
                             {% if participante.equipa %}
-                            <span class="badge badge-primary">{{ participante.equipa }}</span>
+                                <span class="badge badge-primary">{{ participante.equipa }}</span>
                             {% else %}
-                            <span class="text-gray-400">Sem equipa</span>
+                                <span class="text-gray-400">No team</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -79,25 +109,34 @@
                 </tbody>
             </table>
         </div>
-        
+
         <div class="mt-4 text-sm text-gray-500">
-            Total de participantes: {{ participantes|length }}
+            Total participants: {{ participantes|length }}
         </div>
         {% else %}
         <div class="text-center py-8">
-            <p class="text-gray-500">Ainda não há participantes nesta liga.</p>
+            <p class="text-gray-500">There are no participants in this league yet.</p>
         </div>
         {% endif %}
     </div>
 
-    <!-- CLASSIFICAÇÃO (Futuro) -->
+    <!-- RANKINGS (Future Feature) -->
     <div class="bg-white rounded-lg shadow-xl p-6 mt-6">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">🏆 Classificação</h2>
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Rankings</h2>
         <div class="text-center py-8 text-gray-500">
-            <p>Funcionalidade de classificação em desenvolvimento...</p>
-            <p class="text-sm mt-2">Em breve poderás ver as pontuações dos participantes!</p>
+            <p>The ranking system is currently under development...</p>
+            <p class="text-sm mt-2">Soon you will be able to view player scores here!</p>
         </div>
     </div>
+
+    <!-- Back Button -->
+    <div class="flex justify-center" style="margin: 20px;">
+        <a href="/ligas"
+           class="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-6">
+            ← Back to Leagues
+        </a>
+    </div>
+
 </div>
 
 </body>

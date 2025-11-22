@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Fantasy Champ – Index</title>
@@ -18,71 +18,71 @@
     <div class="hero min-h-screen bg-base-200">
         <div class="hero-content text-center pt-20"> 
             <div class="max-w-md">
-                <h1 class="text-5xl font-extrabold text-primary mb-4"> Fantasy Champ</h1>
+                <h1 class="text-5xl font-extrabold text-primary mb-4">Fantasy Champ</h1>
                 <p class="py-6 text-lg">
-                    Bem-vindo ao Fantasy Champ!
+                    Welcome to Fantasy Champ!
                 </p>
 
-                <h2 class="text-2xl font-semibold mb-6">Opções: </h2>
+                <h2 class="text-2xl font-semibold mb-6">Options:</h2>
                 
                 <div class="flex flex-col gap-4">
                     <a href="/players" class="btn btn-primary btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        👥 Jogadores
+                        Players
                     </a>
                     <a href="/clubs" class="btn btn-secondary btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        🏛️ Clubes
+                        Clubs
                     </a>
                     
-                    <!-- BOTÃO DAS LIGAS -->
+                    <!-- LEAGUES BUTTON -->
                     <a href="/ligas" class="btn btn-info btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        🏆 Ligas
+                        Leagues
                     </a>
                     
                     {% if user_has_team %}
-                    <!-- Se TEM equipa, mostra apenas "Ver Equipa" -->
+                    <!-- If the user HAS a team -->
                     <a href="/equipa" class="btn btn-accent btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        ⚽ Ver Minha Equipa
+                        View My Team
                     </a>
                     {% else %}
-                    <!-- Se NÃO TEM equipa, mostra apenas "Criar Equipa" -->
+                    <!-- If the user does NOT have a team -->
                     <a href="/criar-equipa" class="btn btn-success btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        🎯 Criar Nova Equipa
+                        Create New Team
                     </a>
                     {% endif %}
                 </div>
 
-                <!-- Mostrar informação do utilizador se estiver logado -->
+                <!-- Show user info if logged in -->
                 {% if session.user_name %}
                 <div class="mt-8 p-4 bg-white rounded-lg shadow">
-                    <p class="text-sm text-gray-600">Logado como: <strong>{{ session.user_name }}</strong></p>
+                    <p class="text-sm text-gray-600">Logged in as: <strong>{{ session.user_name }}</strong></p>
                     <p class="text-sm text-gray-600">
                         {% if user_has_team %}
-                        ✅ Tens uma equipa criada
+                        You already have a team created
                         {% else %}
-                        ⚠️ Ainda não tens equipa
+                        You do not have a team yet
                         {% endif %}
                     </p>
 
                     <div class="mt-4 flex gap-2 justify-center">
                         <a href="/ligas" class="btn btn-info btn-sm">
-                            🏆 Ver Ligas
+                            View Leagues
                         </a>
                         <a href="/logout" class="btn btn-outline btn-error btn-sm">
-                            🚪 Sair
+                            Logout
                         </a>
                     </div>
                 </div>
                 {% endif %}
 
-                <!-- Se não estiver logado -->
+                <!-- If not logged in -->
                 {% if not session.user_name %}
                 <div class="mt-8 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                     <p class="text-sm text-yellow-700">
-                        ⚠️ Para aceder a todas as funcionalidades, faz login!
+                        To access all features, please log in!
                     </p>
                     <div class="mt-2">
                         <a href="/" class="btn btn-warning btn-sm">
-                            🔐 Fazer Login
+                            Log In
                         </a>
                     </div>
                 </div>

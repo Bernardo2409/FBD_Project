@@ -1,105 +1,151 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Criar Liga - Fantasy Champ</title>
+    <title>Create League - Fantasy Champ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
+
 <body class="bg-gray-100 min-h-screen" data-theme="corporate">
 
 <div class="container mx-auto p-6 max-w-2xl">
+
     <!-- HEADER -->
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-primary mb-2">Criar Nova Liga</h1>
-        <p class="text-gray-600">Cria a tua própria liga e desafia outros jogadores!</p>
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-bold text-primary mb-2">Create New League</h1>
+        <p class="text-gray-600">Create your own league and challenge other players!</p>
     </div>
 
-    <!-- FORMULÁRIO -->
-    <div class="card bg-white shadow-xl">
+    <!-- FORM -->
+    <div class="card bg-white shadow-xl rounded-xl border border-gray-200">
         <div class="card-body">
-            <form method="POST">
-                <!-- Nome da Liga -->
-                <div class="form-control mb-4">
+
+            <form method="POST" class="space-y-6" style="margin: 10px;">
+
+                <!-- League Name -->
+                <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-semibold">Nome da Liga</span>
+                        <span class="label-text font-semibold">League Name</span>
                     </label>
-                    <input type="text" name="nome" class="input input-bordered" 
-                           placeholder="Ex: Liga dos Campeões 2024" required>
+                    <input type="text" name="nome"
+                        class="input input-bordered input-primary bg-white border-2"
+                        required>
                 </div>
 
-                <!-- Datas -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <!-- Dates -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-semibold">Data de Início</span>
+                            <span class="label-text font-semibold">Start Date</span>
                         </label>
                         <input type="date" name="data_inicio" class="input input-bordered" required>
                     </div>
+
                     <div class="form-control">
                         <label class="label">
-                            <span class="label-text font-semibold">Data de Fim</span>
+                            <span class="label-text font-semibold">End Date</span>
                         </label>
                         <input type="date" name="data_fim" class="input input-bordered" required>
                     </div>
                 </div>
 
-                <!-- Tipo de Liga -->
-                <div class="form-control mb-4">
+                <!-- League Type -->
+                <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-semibold">Tipo de Liga</span>
+                        <span class="label-text font-semibold">League Type</span>
                     </label>
                     <select name="tipo_liga" class="select select-bordered" required>
-                        <option value="" disabled selected>Seleciona o tipo de liga</option>
+                        <option value="" disabled selected>Select league type</option>
                         {% for tipo in tipos_liga %}
                         <option value="{{ tipo.id }}">{{ tipo.tipo }}</option>
                         {% endfor %}
                     </select>
                 </div>
 
-                <!-- Código de Convite (Opcional) -->
-                <div class="form-control mb-6">
+                <!-- Invite Code -->
+                <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-semibold">Código de Convite (Opcional)</span>
+                        <span class="label-text font-semibold">Invite Code (Optional)</span>
                     </label>
-                    <input type="text" name="codigo_convite" class="input input-bordered" 
-                           placeholder="Deixa vazio para gerar automaticamente" 
-                           maxlength="10">
-                    <label class="label">
-                        <span class="label-text-alt text-gray-500">
-                            Se vazio, será gerado um código automaticamente para ligas privadas
-                        </span>
-                    </label>
+
+                    <input type="text" name="codigo_convite"
+                        class="input input-bordered input-primary bg-white border-2"
+                        maxlength="10"
+                        placeholder="Code">
                 </div>
 
-                <!-- BOTÕES -->
-                <div class="card-actions justify-between">
-                    <a href="/ligas" class="btn btn-secondary">← Cancelar</a>
-                    <button type="submit" class="btn btn-primary">🏆 Criar Liga</button>
+                <!-- BUTTONS -->
+                <div class="flex justify-between pt-4">
+                    <a href="/ligas"
+                    class="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-6">
+                        ← Cancel
+                    </a>
+
+                    <button type="submit"
+                        class="btn bg-green-600 hover:bg-green-700 text-white border-none rounded-full px-6">
+                        Create League
+                    </button>
                 </div>
+
+
             </form>
+
         </div>
     </div>
 
-    <!-- INFORMAÇÃO -->
-    <div class="mt-6 bg-blue-50 p-4 rounded-lg">
-        <h3 class="font-bold text-blue-800 mb-2">📝 Informação sobre os tipos de liga:</h3>
+    <!-- INFO BOX -->
+    <div class="mt-8 bg-blue-50 p-5 rounded-lg shadow border border-blue-100">
+        <h3 class="font-bold text-blue-800 mb-2">League Type Information</h3>
         <ul class="text-sm text-blue-700 list-disc list-inside space-y-1">
-            <li><strong>Pública:</strong> Qualquer jogador pode ver e juntar-se</li>
-            <li><strong>Privada:</strong> Apenas jogadores com código de convite podem entrar</li>
+            <li><strong>Public:</strong> Anyone can view and join.</li>
+            <li><strong>Private:</strong> Only players with an invite code can join.</li>
         </ul>
     </div>
+
 </div>
 
 <script>
-// Validação de datas
+// Date validation
 document.addEventListener('DOMContentLoaded', function() {
-    const hoje = new Date().toISOString().split('T')[0];
-    document.querySelector('input[name="data_inicio"]').min = hoje;
-    
-    // Quando a data de início muda, atualiza o mínimo da data de fim
-    document.querySelector('input[name="data_inicio"]').addEventListener('change', function() {
-        document.querySelector('input[name="data_fim"]').min = this.value;
+    const today = new Date().toISOString().split('T')[0];
+    const startInput = document.querySelector('input[name="data_inicio"]');
+    const endInput = document.querySelector('input[name="data_fim"]');
+
+    startInput.min = today;
+
+    startInput.addEventListener('change', function() {
+        endInput.min = this.value;
+    });
+
+    // League type logic
+    const typeSelect = document.querySelector('select[name="tipo_liga"]');
+    const codeInput = document.querySelector('input[name="codigo_convite"]');
+
+    typeSelect.addEventListener('change', function () {
+        const type = this.value;
+
+        if (type === "LT02" || type === "2") {
+            // private league → code required
+            codeInput.required = true;
+            codeInput.placeholder = "Required for private leagues";
+            codeInput.classList.add("input-warning");
+        } else {
+            // public league → code optional
+            codeInput.required = false;
+            codeInput.placeholder = "Leave empty to auto-generate";
+            codeInput.classList.remove("input-warning");
+        }
+    });
+
+    // Final validation
+    document.querySelector("form").addEventListener("submit", function (e) {
+        const type = typeSelect.value;
+
+        if ((type === "LT02" || type === "2") && codeInput.value.trim() === "") {
+            e.preventDefault();
+            alert("To create a private league, you must enter an invite code.");
+        }
     });
 });
 </script>

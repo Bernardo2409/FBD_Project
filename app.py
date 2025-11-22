@@ -4,7 +4,7 @@ import secrets
 from flask import Flask, render_template, request, redirect, jsonify, session, url_for
 
 from persistence.equipa import adicionar_jogador_equipa, criar_equipa, obter_equipa_por_utilizador, obter_jogadores_equipa, remover_jogador_equipa, verificar_limites_equipa
-from persistence.leagues import criar_liga, juntar_liga, obter_liga_por_id, obter_ligas_por_utilizador, obter_ligas_publicas, obter_participantes_liga, obter_tipos_liga
+from persistence.leagues import abandonar_liga, criar_liga, juntar_liga, obter_liga_id_por_codigo, obter_liga_por_id, obter_ligas_por_utilizador, obter_ligas_publicas, obter_participantes_liga, obter_tipos_liga
 from persistence.players import list_all, list_paginated, read
 from persistence.clubs import list_all_clubs, list_paginated_clubs, read_club
 from persistence.users import create_user, login_user, get_users
@@ -254,15 +254,6 @@ def ligas_list():
     minhas_ligas = obter_ligas_por_utilizador(user_id)
     ligas_publicas = obter_ligas_publicas()
     
-    print(f"Minhas ligas: {len(minhas_ligas)}")
-    print(f"Ligas públicas: {len(ligas_publicas)}")
-    
-    for liga in minhas_ligas:
-        print(f"Minha liga: {liga.nome} - Tipo: {liga.id_tipo_liga}")
-    
-    for liga in ligas_publicas:
-        print(f"Liga pública: {liga.nome} - Tipo: {liga.id_tipo_liga}")
-    
     return render_template("ligas.html", 
                          minhas_ligas=minhas_ligas,
                          ligas_publicas=ligas_publicas)
@@ -320,6 +311,44 @@ def liga_detalhes(liga_id):
     return render_template("liga_details.html", 
                          liga=liga, 
                          participantes=participantes)
+
+@app.route("/juntar-liga-codigo", methods=['POST'])
+def juntar_liga_codigo():
+    codigo = request.form.get("codigo")
+    user_id = session["user_id"]
+
+    # procura a liga pelo código
+    liga_id = obter_liga_id_por_codigo(codigo)
+
+    if not liga_id:
+        session['error'] = "Invalid Code"
+        return redirect("/ligas")
+
+    sucesso = juntar_liga(user_id, liga_id, codigo)
+
+    if sucesso:
+        session['message'] = "You've Successfully entered the League!"
+    else:
+        session['error'] = "Failed joining Team"
+
+    return redirect("/ligas")
+
+@app.route("/abandonar-liga/<liga_id>", methods=['POST'])
+def abandonar_liga_route(liga_id):
+    if 'user_id' not in session:
+        return redirect("/")
+
+    user_id = session['user_id']
+
+    sucesso = abandonar_liga(user_id, liga_id)
+
+    if sucesso:
+        session['message'] = "Saíste da liga com sucesso!"
+    else:
+        session['error'] = "Não estás nesta liga."
+
+    return redirect("/ligas")
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

@@ -12,6 +12,7 @@ class Liga(NamedTuple):
     id_tipo_liga: str
     id_criador: str
     codigo_convite: Optional[str] = None 
+    nome_criador: Optional[str] = None
 
 class Participa(NamedTuple):
     id_utilizador: str
@@ -56,7 +57,6 @@ def obter_tipos_liga() -> List[TipoLiga]:
         
         tipos = []
         for row in cursor:
-            print(f"Tipo encontrado: ID={row.ID}, Tipo={row.Tipo}")  # Debug
             tipos.append(TipoLiga(row.ID, row.Tipo))
         
         return tipos
@@ -74,7 +74,6 @@ def obter_ligas_por_utilizador(id_utilizador: str) -> List[Liga]:
         
         ligas = []
         for row in cursor:
-            print(f"Liga do utilizador: {row.Nome} - Tipo: {row.ID_tipoLiga} - Código: {row.Código_Convite}")
             ligas.append(Liga(row.ID, row.Nome, row.Data_Inicio, row.Data_Fim, row.ID_tipoLiga, row.ID_criador, row.Código_Convite))
         
         return ligas
@@ -159,15 +158,69 @@ def obter_ligas_publicas() -> List[Liga]:
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite
-            FROM FantasyChamp.Liga
-            WHERE ID_tipoLiga = 'LT01' AND Data_Fim > GETDATE()
-            ORDER BY Data_Inicio DESC
+            SELECT L.ID, L.Nome, L.Data_Inicio, L.Data_Fim, 
+                   L.ID_tipoLiga, L.ID_criador, L.Código_Convite,
+                   U.PrimeiroNome
+            FROM FantasyChamp.Liga L 
+            JOIN FantasyChamp.Utilizador U ON L.ID_criador = U.ID
+            WHERE L.ID_tipoLiga = 'LT01' AND L.Data_Fim > GETDATE()
+            ORDER BY L.Data_Inicio DESC
         """)
         
         ligas = []
         for row in cursor:
-            print(f"Liga pública encontrada: {row.Nome} - Tipo: {row.ID_tipoLiga} - Código: {row.Código_Convite}")
-            ligas.append(Liga(row.ID, row.Nome, row.Data_Inicio, row.Data_Fim, row.ID_tipoLiga, row.ID_criador, row.Código_Convite))
+            ligas.append(Liga(
+                row.ID,
+                row.Nome,
+                row.Data_Inicio,
+                row.Data_Fim,
+                row.ID_tipoLiga,
+                row.ID_criador,
+                row.Código_Convite,
+                row.PrimeiroNome 
+            ))
         
         return ligas
+
+def obter_liga_id_por_codigo(codigo: str) -> Optional[str]:
+    """Obtém o ID de uma liga privada através do código de convite."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT ID 
+            FROM FantasyChamp.Liga
+            WHERE Código_Convite = ?
+        """, codigo)
+        
+        row = cursor.fetchone()
+        
+        if row:
+            return row.ID  # UUID da liga
+        
+        return None
+    
+def abandonar_liga(id_utilizador: str, id_liga: str) -> bool:
+    """Remove um utilizador de uma liga (deixa de participar)."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+
+        # Verificar se o utilizador participa mesmo na liga
+        cursor.execute("""
+            SELECT 1 
+            FROM FantasyChamp.Participa
+            WHERE ID_Utilizador = ? AND ID_Liga = ?
+        """, id_utilizador, id_liga)
+
+        if not cursor.fetchone():
+            return False  # Não está na liga → nada para remover
+
+        # Remover participação
+        cursor.execute("""
+            DELETE FROM FantasyChamp.Participa
+            WHERE ID_Utilizador = ? AND ID_Liga = ?
+        """, id_utilizador, id_liga)
+
+        conn.commit()
+        return True
+
