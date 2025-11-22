@@ -27,33 +27,46 @@
 
     <!-- SECÇÃO: AVANÇADOS -->
     <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Avançados (3)</h2>
-    
+
     <!-- Dropdown para avançados -->
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64 max-h-60 overflow-y-auto">
-                {% for avancado in todos_jogadores.Forward %}
-                {% if avancado.id not in equipa.avancados|map(attribute='id') %}
-                <li>
-                    <a href="/equipa/adicionar/avancados/{{ avancado.id }}" 
-                    class="substituir-jogador {% if avancado.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
-                        <div class="flex items-center gap-3">
-                            <img src="{{ avancado.jogador_imagem }}" 
-                                class="w-8 h-8 rounded-full object-cover {% if avancado.preco > equipa.info.orcamento %}opacity-50{% endif %}">
-                            <div class="flex-1">
-                                <div class="font-bold {% if avancado.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %}">
-                                    {{ avancado.nome }}
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
+                <!-- Campo de pesquisa -->
+                <div class="p-2 border-b border-gray-200">
+                    <input 
+                        type="text" 
+                        placeholder="Procurar avançado..." 
+                        class="input input-bordered input-sm w-full search-input"
+                        onkeyup="filterPlayers(this, 'avancados-list')"
+                    >
+                </div>
+                
+                <!-- Lista de avançados -->
+                <div id="avancados-list">
+                    {% for avancado in todos_jogadores.Forward %}
+                    {% if avancado.id not in equipa.avancados|map(attribute='id') %}
+                    <li class="player-item">
+                        <a href="/equipa/adicionar/avancados/{{ avancado.id }}" 
+                        class="substituir-jogador {% if avancado.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ avancado.jogador_imagem }}" 
+                                    class="w-8 h-8 rounded-full object-cover {% if avancado.preco > equipa.info.orcamento %}opacity-50{% endif %}">
+                                <div class="flex-1">
+                                    <div class="font-bold {% if avancado.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
+                                        {{ avancado.nome }}
+                                    </div>
+                                    <div class="text-xs font-bold text-white-500">{{ avancado.preco }}€ {{ avancado.estado }}</div>
+                                    {% if avancado.preco > equipa.info.orcamento %}
+                                    <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
+                                    {% endif %}
                                 </div>
-                                <div class="text-xs text-white">{{ avancado.preco }}€ {{ avancado.estado }}</div>
-                                {% if avancado.preco > equipa.info.orcamento %}
-                                <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
-                                {% endif %}
                             </div>
-                        </div>
-                    </a>
-                </li>
-                {% endif %}
-                {% endfor %}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </div>
             </ul>
         </div>
     </div>
@@ -86,33 +99,46 @@
 
     <!-- SECÇÃO: MÉDIOS -->
     <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Médios (5)</h2>
-    
+
     <!-- Dropdown para médios -->
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64 max-h-60 overflow-y-auto">
-                {% for medio in todos_jogadores.Midfielder %}
-                {% if medio.id not in equipa.medios|map(attribute='id') %}
-                <li>
-                    <a href="/equipa/adicionar/medios/{{ medio.id }}" 
-                    class="substituir-jogador {% if medio.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
-                        <div class="flex items-center gap-3">
-                            <img src="{{ medio.jogador_imagem }}" 
-                                class="w-8 h-8 rounded-full object-cover {% if medio.preco > equipa.info.orcamento %}opacity-50{% endif %}">
-                            <div class="flex-1">
-                                <div class="font-bold {% if medio.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %}">
-                                    {{ medio.nome }}
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
+                <!-- Campo de pesquisa -->
+                <div class="p-2 border-b border-gray-200">
+                    <input 
+                        type="text" 
+                        placeholder="Procurar médio..." 
+                        class="input input-bordered input-sm w-full search-input"
+                        onkeyup="filterPlayers(this, 'medios-list')"
+                    >
+                </div>
+                
+                <!-- Lista de médios -->
+                <div id="medios-list">
+                    {% for medio in todos_jogadores.Midfielder %}
+                    {% if medio.id not in equipa.medios|map(attribute='id') %}
+                    <li class="player-item">
+                        <a href="/equipa/adicionar/medios/{{ medio.id }}" 
+                        class="substituir-jogador {% if medio.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ medio.jogador_imagem }}" 
+                                    class="w-8 h-8 rounded-full object-cover {% if medio.preco > equipa.info.orcamento %}opacity-50{% endif %}">
+                                <div class="flex-1">
+                                    <div class="font-bold {% if medio.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
+                                        {{ medio.nome }}
+                                    </div>
+                                    <div class="text-xs font-bold text-white-500">{{ medio.preco }}€ {{ medio.estado }}</div>
+                                    {% if medio.preco > equipa.info.orcamento %}
+                                    <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
+                                    {% endif %}
                                 </div>
-                                <div class="text-xs text-white">{{ medio.preco }}€ {{ medio.estado }}</div>
-                                {% if medio.preco > equipa.info.orcamento %}
-                                <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
-                                {% endif %}
                             </div>
-                        </div>
-                    </a>
-                </li>
-                {% endif %}
-                {% endfor %}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </div>
             </ul>
         </div>
     </div>
@@ -146,33 +172,46 @@
 
     <!-- SECÇÃO: DEFESAS -->
     <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Defesas (5)</h2>
-    
+
     <!-- Dropdown para defesas -->
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64 max-h-60 overflow-y-auto">
-                {% for defesa in todos_jogadores.Defender %}
-                {% if defesa.id not in equipa.defesas|map(attribute='id') %}
-                <li>
-                    <a href="/equipa/adicionar/defesas/{{ defesa.id }}" 
-                    class="substituir-jogador {% if defesa.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
-                        <div class="flex items-center gap-3">
-                            <img src="{{ defesa.jogador_imagem }}" 
-                                class="w-8 h-8 rounded-full object-cover {% if defesa.preco > equipa.info.orcamento %}opacity-50{% endif %}">
-                            <div class="flex-1">
-                                <div class="font-bold {% if defesa.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %}">
-                                    {{ defesa.nome }}
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
+                <!-- Campo de pesquisa -->
+                <div class="p-2 border-b border-gray-200">
+                    <input 
+                        type="text" 
+                        placeholder="Procurar defesa..." 
+                        class="input input-bordered input-sm w-full search-input"
+                        onkeyup="filterPlayers(this, 'defesas-list')"
+                    >
+                </div>
+                
+                <!-- Lista de defesas -->
+                <div id="defesas-list">
+                    {% for defesa in todos_jogadores.Defender %}
+                    {% if defesa.id not in equipa.defesas|map(attribute='id') %}
+                    <li class="player-item">
+                        <a href="/equipa/adicionar/defesas/{{ defesa.id }}" 
+                        class="substituir-jogador {% if defesa.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ defesa.jogador_imagem }}" 
+                                    class="w-8 h-8 rounded-full object-cover {% if defesa.preco > equipa.info.orcamento %}opacity-50{% endif %}">
+                                <div class="flex-1">
+                                    <div class="font-bold {% if defesa.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
+                                        {{ defesa.nome }}
+                                    </div>
+                                    <div class="text-xs font-bold text-white-500">{{ defesa.preco }}€ {{ defesa.estado }}</div>
+                                    {% if defesa.preco > equipa.info.orcamento %}
+                                    <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
+                                    {% endif %}
                                 </div>
-                                <div class="text-xs text-white">{{ defesa.preco }}€ {{ defesa.estado }}</div>
-                                {% if defesa.preco > equipa.info.orcamento %}
-                                <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
-                                {% endif %}
                             </div>
-                        </div>
-                    </a>
-                </li>
-                {% endif %}
-                {% endfor %}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </div>
             </ul>
         </div>
     </div>
@@ -205,33 +244,46 @@
 
     <!-- SECÇÃO: GUARDA-REDES -->
     <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Guarda-Redes (2)</h2>
-    
+
     <!-- Dropdown para guarda-redes -->
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64 max-h-60 overflow-y-auto">
-                {% for gr in todos_jogadores.Goalkeeper %}
-                {% if gr.id not in equipa.gr|map(attribute='id') %}
-                <li>
-                    <a href="/equipa/adicionar/gr/{{ gr.id }}" 
-                    class="substituir-jogador {% if gr.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
-                        <div class="flex items-center gap-3">
-                            <img src="{{ gr.jogador_imagem }}" 
-                                class="w-8 h-8 rounded-full object-cover {% if gr.preco > equipa.info.orcamento %}opacity-50{% endif %}">
-                            <div class="flex-1">
-                                <div class="font-bold {% if gr.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %}">
-                                    {{ gr.nome }}
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
+                <!-- Campo de pesquisa -->
+                <div class="p-2 border-b border-gray-200">
+                    <input 
+                        type="text" 
+                        placeholder="Procurar guarda-redes..." 
+                        class="input input-bordered input-sm w-full search-input"
+                        onkeyup="filterPlayers(this, 'gr-list')"
+                    >
+                </div>
+                
+                <!-- Lista de guarda-redes -->
+                <div id="gr-list">
+                    {% for gr in todos_jogadores.Goalkeeper %}
+                    {% if gr.id not in equipa.gr|map(attribute='id') %}
+                    <li class="player-item">
+                        <a href="/equipa/adicionar/gr/{{ gr.id }}" 
+                        class="substituir-jogador {% if gr.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ gr.jogador_imagem }}" 
+                                    class="w-8 h-8 rounded-full object-cover {% if gr.preco > equipa.info.orcamento %}opacity-50{% endif %}">
+                                <div class="flex-1">
+                                    <div class="font-bold {% if gr.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
+                                        {{ gr.nome }}
+                                    </div>
+                                    <div class="text-xs font-bold text-white-500">{{ gr.preco }}€ {{ gr.estado }}</div>
+                                    {% if gr.preco > equipa.info.orcamento %}
+                                    <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
+                                    {% endif %}
                                 </div>
-                                <div class="text-xs text-white">{{ gr.preco }}€ {{ gr.estado }}</div>
-                                {% if gr.preco > equipa.info.orcamento %}
-                                <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
-                                {% endif %}
                             </div>
-                        </div>
-                    </a>
-                </li>
-                {% endif %}
-                {% endfor %}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </div>
             </ul>
         </div>
     </div>
@@ -269,6 +321,43 @@
     </div>
 
 </div>
+
+<script>
+function filterPlayers(input, listId) {
+    const filter = input.value.toLowerCase();
+    const list = document.getElementById(listId);
+    const items = list.getElementsByClassName('player-item');
+    
+    for (let i = 0; i < items.length; i++) {
+        const playerName = items[i].querySelector('.player-name').textContent.toLowerCase();
+        if (playerName.includes(filter)) {
+            items[i].style.display = '';
+        } else {
+            items[i].style.display = 'none';
+        }
+    }
+}
+
+// Fechar dropdown quando clicar fora
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+        const dropdowns = document.querySelectorAll('.dropdown-content');
+        dropdowns.forEach(dropdown => {
+            dropdown.parentElement.classList.remove('dropdown-open');
+        });
+    }
+});
+
+// Prevenir clique em jogadores sem orçamento
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.substituir-jogador.opacity-50').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Orçamento insuficiente para adicionar este jogador!');
+        });
+    });
+});
+</script>
 
 </body>
 </html>
