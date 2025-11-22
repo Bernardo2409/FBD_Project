@@ -55,18 +55,8 @@
                 {% if session.user_name %}
                 <div class="mt-8 p-4 bg-white rounded-lg shadow">
                     <p class="text-sm text-gray-600">Logged in as: <strong>{{ session.user_name }}</strong></p>
-                    <p class="text-sm text-gray-600">
-                        {% if user_has_team %}
-                        You already have a team created
-                        {% else %}
-                        You do not have a team yet
-                        {% endif %}
-                    </p>
 
                     <div class="mt-4 flex gap-2 justify-center">
-                        <a href="/ligas" class="btn btn-info btn-sm">
-                            View Leagues
-                        </a>
                         <a href="/logout" class="btn btn-outline btn-error btn-sm">
                             Logout
                         </a>
