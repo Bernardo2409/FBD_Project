@@ -221,7 +221,6 @@ def adicionar_jogador_equipa_route(posicao, jogador_id):
                 session['error'] = "Já tens 3 avançados! Remove um primeiro."
             else:
                 adicionar_jogador_equipa(equipa_user.id, jogador_id)
-                session['message'] = "Jogador adicionado com sucesso!"
                 
         except Exception as e:
             session['error'] = str(e)
