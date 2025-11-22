@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Liga - Fantasy Champ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen" data-theme="corporate">
+
+<div class="container mx-auto p-6 max-w-2xl">
+    <!-- HEADER -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-primary mb-2">Criar Nova Liga</h1>
+        <p class="text-gray-600">Cria a tua própria liga e desafia outros jogadores!</p>
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <div class="card bg-white shadow-xl">
+        <div class="card-body">
+            <form method="POST">
+                <!-- Nome da Liga -->
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text font-semibold">Nome da Liga</span>
+                    </label>
+                    <input type="text" name="nome" class="input input-bordered" 
+                           placeholder="Ex: Liga dos Campeões 2024" required>
+                </div>
+
+                <!-- Datas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Data de Início</span>
+                        </label>
+                        <input type="date" name="data_inicio" class="input input-bordered" required>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Data de Fim</span>
+                        </label>
+                        <input type="date" name="data_fim" class="input input-bordered" required>
+                    </div>
+                </div>
+
+                <!-- Tipo de Liga -->
+                <div class="form-control mb-4">
+                    <label class="label">
+                        <span class="label-text font-semibold">Tipo de Liga</span>
+                    </label>
+                    <select name="tipo_liga" class="select select-bordered" required>
+                        <option value="" disabled selected>Seleciona o tipo de liga</option>
+                        {% for tipo in tipos_liga %}
+                        <option value="{{ tipo.id }}">{{ tipo.tipo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Código de Convite (Opcional) -->
+                <div class="form-control mb-6">
+                    <label class="label">
+                        <span class="label-text font-semibold">Código de Convite (Opcional)</span>
+                    </label>
+                    <input type="text" name="codigo_convite" class="input input-bordered" 
+                           placeholder="Deixa vazio para gerar automaticamente" 
+                           maxlength="10">
+                    <label class="label">
+                        <span class="label-text-alt text-gray-500">
+                            Se vazio, será gerado um código automaticamente para ligas privadas
+                        </span>
+                    </label>
+                </div>
+
+                <!-- BOTÕES -->
+                <div class="card-actions justify-between">
+                    <a href="/ligas" class="btn btn-secondary">← Cancelar</a>
+                    <button type="submit" class="btn btn-primary">🏆 Criar Liga</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- INFORMAÇÃO -->
+    <div class="mt-6 bg-blue-50 p-4 rounded-lg">
+        <h3 class="font-bold text-blue-800 mb-2">📝 Informação sobre os tipos de liga:</h3>
+        <ul class="text-sm text-blue-700 list-disc list-inside space-y-1">
+            <li><strong>Pública:</strong> Qualquer jogador pode ver e juntar-se</li>
+            <li><strong>Privada:</strong> Apenas jogadores com código de convite podem entrar</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+// Validação de datas
+document.addEventListener('DOMContentLoaded', function() {
+    const hoje = new Date().toISOString().split('T')[0];
+    document.querySelector('input[name="data_inicio"]').min = hoje;
+    
+    // Quando a data de início muda, atualiza o mínimo da data de fim
+    document.querySelector('input[name="data_inicio"]').addEventListener('change', function() {
+        document.querySelector('input[name="data_fim"]').min = this.value;
+    });
+});
+</script>
+
+</body>
+</html>

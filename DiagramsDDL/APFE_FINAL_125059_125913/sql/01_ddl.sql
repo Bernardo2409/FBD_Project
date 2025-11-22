@@ -70,8 +70,7 @@ CREATE TABLE FantasyChamp.Jogador (
 
 CREATE TABLE FantasyChamp.Tipo_Liga (
     ID VARCHAR(16) NOT NULL PRIMARY KEY,
-    Tipo VARCHAR(50) NOT NULL,
-    Código VARCHAR(16) NOT NULL
+    Tipo VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE FantasyChamp.Liga (
@@ -81,6 +80,7 @@ CREATE TABLE FantasyChamp.Liga (
     Data_Fim DATE NOT NULL,
     ID_tipoLiga VARCHAR(16) NOT NULL,
     ID_criador UNIQUEIDENTIFIER NOT NULL,
+    Código_Convite VARCHAR(10) NULL,
 
     FOREIGN KEY (ID_criador) 
 		REFERENCES FantasyChamp.Utilizador(ID),
@@ -145,7 +145,6 @@ CREATE TABLE FantasyChamp.Jogo (
     FOREIGN KEY (ID_jornada) 
 		REFERENCES FantasyChamp.Jornada(ID)
 );
-
 
 CREATE TABLE FantasyChamp.Pertence (
     ID_Jogador VARCHAR(16) NOT NULL,

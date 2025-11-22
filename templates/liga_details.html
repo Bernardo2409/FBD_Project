@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ liga.nome }} - Fantasy Champ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen" data-theme="corporate">
+
+<div class="container mx-auto p-6">
+    <!-- CABEÇALHO -->
+    <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold text-primary mb-2">{{ liga.nome }}</h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                    <div>
+                        <strong>Data de Início:</strong><br>
+                        {{ liga.data_inicio }}
+                    </div>
+                    <div>
+                        <strong>Data de Fim:</strong><br>
+                        {{ liga.data_fim }}
+                    </div>
+                    <div>
+                        <strong>Tipo:</strong><br>
+                        {{ 'Pública' if liga.id_tipo_liga == 'TL01' else 'Privada' }}
+                    </div>
+                </div>
+                {% if liga.codigo_convite %}
+                <div class="mt-4 p-3 bg-yellow-100 rounded-lg">
+                    <strong>🔐 Código de Convite:</strong>
+                    <code class="font-mono text-lg bg-white px-2 py-1 rounded ml-2">{{ liga.codigo_convite }}</code>
+                </div>
+                {% endif %}
+            </div>
+            <div class="text-right">
+                <a href="/ligas" class="btn btn-secondary">← Voltar às Ligas</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MENSAGENS -->
+    {% if session.get('message') %}
+        <div class="alert alert-success mb-6">
+            <span>{{ session.pop('message', '') }}</span>
+        </div>
+    {% endif %}
+
+    <!-- PARTICIPANTES -->
+    <div class="bg-white rounded-lg shadow-xl p-6">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">🎯 Participantes</h2>
+        
+        {% if participantes %}
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr>
+                        <th class="text-left">Jogador</th>
+                        <th class="text-left">Email</th>
+                        <th class="text-left">Equipa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for participante in participantes %}
+                    <tr>
+                        <td class="font-semibold">{{ participante.nome }}</td>
+                        <td class="text-gray-600">{{ participante.email }}</td>
+                        <td>
+                            {% if participante.equipa %}
+                            <span class="badge badge-primary">{{ participante.equipa }}</span>
+                            {% else %}
+                            <span class="text-gray-400">Sem equipa</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4 text-sm text-gray-500">
+            Total de participantes: {{ participantes|length }}
+        </div>
+        {% else %}
+        <div class="text-center py-8">
+            <p class="text-gray-500">Ainda não há participantes nesta liga.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- CLASSIFICAÇÃO (Futuro) -->
+    <div class="bg-white rounded-lg shadow-xl p-6 mt-6">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">🏆 Classificação</h2>
+        <div class="text-center py-8 text-gray-500">
+            <p>Funcionalidade de classificação em desenvolvimento...</p>
+            <p class="text-sm mt-2">Em breve poderás ver as pontuações dos participantes!</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

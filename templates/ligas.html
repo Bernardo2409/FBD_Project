@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Ligas - Fantasy Champ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen" data-theme="corporate">
+
+<div class="container mx-auto p-6">
+    <!-- HEADER -->
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-primary mb-4">Ligas Fantasy Champ</h1>
+        <a href="/criar-liga" class="btn btn-primary btn-lg">
+            🏆 Criar Nova Liga
+        </a>
+    </div>
+
+    <!-- MENSAGENS -->
+    {% if session.get('message') %}
+        <div class="alert alert-success mb-6">
+            <span>{{ session.pop('message', '') }}</span>
+        </div>
+    {% endif %}
+
+    {% if session.get('error') %}
+        <div class="alert alert-error mb-6">
+            <span>{{ session.pop('error', '') }}</span>
+        </div>
+    {% endif %}
+
+    <!-- MINHAS LIGAS -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Minhas Ligas</h2>
+        
+        {% if minhas_ligas %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for liga in minhas_ligas %}
+            <div class="card bg-white shadow-xl">
+                <div class="card-body">
+                    <h3 class="card-title text-lg">{{ liga.nome }}</h3>
+                    <div class="text-sm text-gray-600">
+                        <p><strong>Início:</strong> {{ liga.data_inicio }}</p>
+                        <p><strong>Fim:</strong> {{ liga.data_fim }}</p>
+                        <p><strong>Tipo:</strong> {{ 'Pública' if liga.id_tipo_liga == 'LT01' else 'Privada' }}</p>
+                    </div>
+                    <div class="card-actions justify-end mt-4">
+                        <a href="/liga/{{ liga.id }}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 bg-white rounded-lg shadow">
+            <p class="text-gray-500">Ainda não participas em nenhuma liga.</p>
+            <p class="text-sm text-gray-400 mt-2">Junta-te a uma liga pública ou cria a tua própria!</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- LIGAS PÚBLICAS -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Ligas Públicas Disponíveis</h2>
+        
+        {% if ligas_publicas %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for liga in ligas_publicas %}
+            <div class="card bg-white shadow-xl">
+                <div class="card-body">
+                    <h3 class="card-title text-lg">{{ liga.nome }}</h3>
+                    <div class="text-sm text-gray-600">
+                        <p><strong>Início:</strong> {{ liga.data_inicio }}</p>
+                        <p><strong>Fim:</strong> {{ liga.data_fim }}</p>
+                        <p><strong>Criador:</strong> {{ liga.id_criador[:8] }}...</p>
+                    </div>
+                    <div class="card-actions justify-end mt-4">
+                        {% if liga.codigo_convite %}
+                        <button class="btn btn-secondary btn-sm" 
+                                onclick="document.getElementById('modal-{{ liga.id }}').showModal()">
+                            🔐 Entrar com Código
+                        </button>
+                        {% else %}
+                        <a href="/juntar-liga/{{ liga.id }}" class="btn btn-success btn-sm">
+                            🎯 Entrar na Liga
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para código -->
+            {% if liga.codigo_convite %}
+            <dialog id="modal-{{ liga.id }}" class="modal">
+                <div class="modal-box">
+                    <h3 class="font-bold text-lg">Entrar em {{ liga.nome }}</h3>
+                    <p class="py-4">Esta liga requer um código de convite.</p>
+                    <form method="POST" action="/juntar-liga/{{ liga.id }}">
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Código de Convite</span>
+                            </label>
+                            <input type="text" name="codigo" class="input input-bordered" required>
+                        </div>
+                        <div class="modal-action">
+                            <button type="submit" class="btn btn-primary">Entrar</button>
+                            <button type="button" class="btn" onclick="document.getElementById('modal-{{ liga.id }}').close()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </dialog>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 bg-white rounded-lg shadow">
+            <p class="text-gray-500">Não há ligas públicas disponíveis no momento.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- BOTÃO VOLTAR -->
+    <div class="text-center">
+        <a href="/index" class="btn btn-secondary">← Voltar ao Início</a>
+    </div>
+</div>
+
+</body>
+</html>

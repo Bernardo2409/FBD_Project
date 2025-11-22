@@ -27,21 +27,26 @@
                 
                 <div class="flex flex-col gap-4">
                     <a href="/players" class="btn btn-primary btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        Jogadores
+                        👥 Jogadores
                     </a>
                     <a href="/clubs" class="btn btn-secondary btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        Clubes
+                        🏛️ Clubes
+                    </a>
+                    
+                    <!-- BOTÃO DAS LIGAS -->
+                    <a href="/ligas" class="btn btn-info btn-lg shadow-md hover:shadow-lg transition duration-300">
+                        🏆 Ligas
                     </a>
                     
                     {% if user_has_team %}
                     <!-- Se TEM equipa, mostra apenas "Ver Equipa" -->
                     <a href="/equipa" class="btn btn-accent btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        Ver Minha Equipa
+                        ⚽ Ver Minha Equipa
                     </a>
                     {% else %}
                     <!-- Se NÃO TEM equipa, mostra apenas "Criar Equipa" -->
                     <a href="/criar-equipa" class="btn btn-success btn-lg shadow-md hover:shadow-lg transition duration-300">
-                        Criar Nova Equipa
+                        🎯 Criar Nova Equipa
                     </a>
                     {% endif %}
                 </div>
@@ -52,15 +57,32 @@
                     <p class="text-sm text-gray-600">Logado como: <strong>{{ session.user_name }}</strong></p>
                     <p class="text-sm text-gray-600">
                         {% if user_has_team %}
-                        Tens uma equipa criada
+                        ✅ Tens uma equipa criada
                         {% else %}
-                        Ainda não tens equipa
+                        ⚠️ Ainda não tens equipa
                         {% endif %}
                     </p>
 
-                    <div class="mt-4">
+                    <div class="mt-4 flex gap-2 justify-center">
+                        <a href="/ligas" class="btn btn-info btn-sm">
+                            🏆 Ver Ligas
+                        </a>
                         <a href="/logout" class="btn btn-outline btn-error btn-sm">
-                            Terminar Sessão
+                            🚪 Sair
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Se não estiver logado -->
+                {% if not session.user_name %}
+                <div class="mt-8 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <p class="text-sm text-yellow-700">
+                        ⚠️ Para aceder a todas as funcionalidades, faz login!
+                    </p>
+                    <div class="mt-2">
+                        <a href="/" class="btn btn-warning btn-sm">
+                            🔐 Fazer Login
                         </a>
                     </div>
                 </div>

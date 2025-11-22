@@ -4,6 +4,7 @@ import secrets
 from flask import Flask, render_template, request, redirect, jsonify, session, url_for
 
 from persistence.equipa import adicionar_jogador_equipa, criar_equipa, obter_equipa_por_utilizador, obter_jogadores_equipa, remover_jogador_equipa, verificar_limites_equipa
+from persistence.leagues import criar_liga, juntar_liga, obter_liga_por_id, obter_ligas_por_utilizador, obter_ligas_publicas, obter_participantes_liga, obter_tipos_liga
 from persistence.players import list_all, list_paginated, read
 from persistence.clubs import list_all_clubs, list_paginated_clubs, read_club
 from persistence.users import create_user, login_user, get_users
@@ -11,7 +12,7 @@ from persistence.users import create_user, login_user, get_users
 import random
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY') or 'chave-temporaria-para-desenvolvimento'  # ← ADIC
+app.secret_key = os.environ.get('SECRET_KEY') or 'chave-temporaria-para-desenvolvimento' 
 
 
 @app.route("/", methods=["GET"])
@@ -27,7 +28,7 @@ def login_submit():
 
     if user:
         # user é um dicionário, usar colchetes
-        session['user_id'] = user["id"]  # ← CORREÇÃO AQUI
+        session['user_id'] = user["id"] 
         session['user_name'] = user["first"]
         return redirect("/index")
 
@@ -244,7 +245,81 @@ def remover_jogador_equipa_route(jogador_id):
     
     return redirect("/equipa")
 
+@app.route("/ligas")
+def ligas_list():
+    if 'user_id' not in session:
+        return redirect("/")
+    
+    user_id = session['user_id']
+    minhas_ligas = obter_ligas_por_utilizador(user_id)
+    ligas_publicas = obter_ligas_publicas()
+    
+    print(f"Minhas ligas: {len(minhas_ligas)}")
+    print(f"Ligas públicas: {len(ligas_publicas)}")
+    
+    for liga in minhas_ligas:
+        print(f"Minha liga: {liga.nome} - Tipo: {liga.id_tipo_liga}")
+    
+    for liga in ligas_publicas:
+        print(f"Liga pública: {liga.nome} - Tipo: {liga.id_tipo_liga}")
+    
+    return render_template("ligas.html", 
+                         minhas_ligas=minhas_ligas,
+                         ligas_publicas=ligas_publicas)
 
+@app.route("/criar-liga", methods=['GET', 'POST'])
+def criar_liga_route():
+    if 'user_id' not in session:
+        return redirect("/")
+    
+    if request.method == 'POST':
+        nome = request.form.get('nome')
+        data_inicio = request.form.get('data_inicio')
+        data_fim = request.form.get('data_fim')
+        id_tipo_liga = request.form.get('tipo_liga')
+        codigo_convite = request.form.get('codigo_convite')  
+        id_criador = session['user_id']
+        
+        if nome and data_inicio and data_fim and id_tipo_liga:
+            liga_id = criar_liga(nome, data_inicio, data_fim, id_tipo_liga, id_criador, codigo_convite)
+            session['message'] = "Liga criada com sucesso!"
+            return redirect("/ligas")
+    
+    tipos_liga = obter_tipos_liga()
+    return render_template("criar_liga.html", tipos_liga=tipos_liga)
+
+@app.route("/juntar-liga/<liga_id>", methods=['GET', 'POST'])
+def juntar_liga_route(liga_id):
+    if 'user_id' not in session:
+        return redirect("/")
+    
+    user_id = session['user_id']
+    
+    if request.method == 'POST':
+        codigo = request.form.get('codigo')
+        sucesso = juntar_liga(user_id, liga_id, codigo)
+        
+        if sucesso:
+            session['message'] = "Juntaste-te à liga com sucesso!"
+        else:
+            session['error'] = "Erro ao juntar-se à liga. Verifica o código ou se já estás na liga."
+    
+    return redirect("/ligas")
+
+@app.route("/liga/<liga_id>")
+def liga_detalhes(liga_id):
+    if 'user_id' not in session:
+        return redirect("/")
+    
+    liga = obter_liga_por_id(liga_id)
+    participantes = obter_participantes_liga(liga_id)
+    
+    if not liga:
+        return "Liga não encontrada", 404
+    
+    return render_template("liga_details.html", 
+                         liga=liga, 
+                         participantes=participantes)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
