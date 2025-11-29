@@ -50,23 +50,10 @@
                     </div>
                 </div>
 
-                <!-- League Type -->
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text font-semibold">League Type</span>
-                    </label>
-                    <select name="tipo_liga" class="select select-bordered" required>
-                        <option value="" disabled selected>Select league type</option>
-                        {% for tipo in tipos_liga %}
-                        <option value="{{ tipo.id }}">{{ tipo.tipo }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
                 <!-- Invite Code -->
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text font-semibold">Invite Code (Optional)</span>
+                        <span class="label-text font-semibold">Invite Code</span>
                     </label>
 
                     <input type="text" name="codigo_convite"
@@ -92,15 +79,6 @@
             </form>
 
         </div>
-    </div>
-
-    <!-- INFO BOX -->
-    <div class="mt-8 bg-blue-50 p-5 rounded-lg shadow border border-blue-100">
-        <h3 class="font-bold text-blue-800 mb-2">League Type Information</h3>
-        <ul class="text-sm text-blue-700 list-disc list-inside space-y-1">
-            <li><strong>Public:</strong> Anyone can view and join.</li>
-            <li><strong>Private:</strong> Only players with an invite code can join.</li>
-        </ul>
     </div>
 
 </div>

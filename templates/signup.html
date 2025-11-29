@@ -12,21 +12,50 @@
     <div class="card w-[450px] bg-base-100 shadow-xl p-8">
         <h1 class="text-3xl font-bold text-center mb-6">Criar Conta</h1>
 
+        <!-- Formulário de Cadastro -->
         <form class="flex flex-col gap-4" action="/signup" method="POST">
 
+            <!-- Nome e Apelido -->
             <div class="flex gap-3">
-                <input name="first" placeholder="Primeiro Nome" class="input input-bordered w-1/2" required>
-                <input name="last" placeholder="Apelido" class="input input-bordered w-1/2" required>
+                <input name="first" placeholder="Primeiro Nome" class="input input-bordered w-1/2">
+                <input name="last" placeholder="Apelido" class="input input-bordered w-1/2">
             </div>
 
-            <input type="email" name="email" placeholder="Email" class="input input-bordered w-full" required>
-            <input type="password" name="password" placeholder="Palavra-passe" class="input input-bordered w-full" required>
-            <input name="country" placeholder="País" class="input input-bordered w-full" required>
-            <input name="nationality" placeholder="Nacionalidade" class="input input-bordered w-full" required>
+            <!-- Email e Password -->
+            <input type="email" name="email" placeholder="Email" class="input input-bordered w-full">
+            <input type="password" name="password" placeholder="Palavra-passe" class="input input-bordered w-full">
 
+            <!-- Dropdown para Seleção de País -->
+            <div class="dropdown w-full">
+                <button type="button" class="input input-bordered w-full text-left flex items-center justify-between gap-2">
+                    <span class="country-label">Selecionar País</span>
+                    <span class="ml-auto">▼</span>
+                </button>
+                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto">
+                    {% for country in pais %}
+                        <li>
+                            <!-- Usamos um botão em vez de <a href="#"> para evitar o refresh -->
+                            <button type="button" class="flex items-center gap-2" onclick="setCountry('{{ country.nome }}')">
+                                <img src="{{ country.imagem }}" alt="{{ country.nome }}" class="w-6 h-6 object-cover">
+                                <span>{{ country.nome }}</span>
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+              <!-- O rótulo do botão da dropdown funciona como campo visível para o País;
+                  guardamos o país seleccionado num campo oculto `country` para envio -->
+              <!-- Campo editável para a Nacionalidade (ex.: português, inglês) -->
+              <input name="nationality" placeholder="Nacionalidade" class="input input-bordered w-full">
+              <!-- Campo oculto para guardar o país selecionado (enviado no form) -->
+              <input type="hidden" name="country" id="country-input">
+
+            <!-- Data de Nascimento -->
             <label class="font-semibold">Data de nascimento</label>
-            <input type="date" name="birthdate" class="input input-bordered w-full" required>
+            <input type="date" name="birthdate" class="input input-bordered w-full">
 
+            <!-- Botão de Submissão -->
             <button class="btn btn-success w-full" type="submit">Criar Conta</button>
         </form>
 
@@ -34,6 +63,39 @@
             Já tens conta? <a href="/login" class="link link-primary">Entrar</a>
         </p>
     </div>
+
+    <script>
+        // Função para definir o país selecionado
+        function setCountry(countryName) {
+            // Atualiza o campo oculto que é enviado no form
+            var countryInput = document.getElementById('country-input');
+            if (countryInput) {
+                countryInput.value = countryName;
+            }
+
+            // Atualiza o rótulo do botão toggle para mostrar o país escolhido
+            var label = document.querySelector('.dropdown > button .country-label');
+            if (label) {
+                label.textContent = countryName;
+            }
+
+            // Fechar a dropdown: mover foco para o botão de submissão do formulário
+            var submitBtn = document.querySelector('form button[type="submit"], form input[type="submit"]');
+            if (submitBtn) {
+                submitBtn.focus();
+            } else {
+                // fallback: criar elemento temporário e focá-lo para remover foco da dropdown
+                var tmp = document.createElement('button');
+                tmp.type = 'button';
+                tmp.style.position = 'absolute';
+                tmp.style.left = '-9999px';
+                tmp.tabIndex = -1;
+                document.body.appendChild(tmp);
+                tmp.focus();
+                setTimeout(function () { tmp.remove(); }, 0);
+            }
+        }
+    </script>
 
 </body>
 </html>

@@ -61,11 +61,43 @@ def create_user(first, last, email, password, country, nationality, birthdate):
     conn = create_connection()
     cursor = conn.cursor()
 
-    query = """
+    # Cria ID manualmente (SEM usar newid() no SQL)
+    cursor.execute("SELECT NEWID()")
+    user_id = cursor.fetchone()[0]
+
+    cursor.execute("""
         INSERT INTO FantasyChamp.Utilizador
         (ID, PrimeiroNome, Apelido, Email, Senha, País, Nacionalidade, DataDeNascimento)
-        VALUES (NEWID(), ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (user_id, first, last, email, password, country, nationality, birthdate))
+
+    conn.commit()
+    return user_id
+
+
+def get_user_by_id(user_id):
+    """Retorna um dicionário com os dados do utilizador ou None se não existir."""
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    query = """
+        SELECT ID, PrimeiroNome, Apelido, Email, País AS Pais, Nacionalidade, DataDeNascimento
+        FROM FantasyChamp.Utilizador
+        WHERE ID = ?
     """
 
-    cursor.execute(query, (first, last, email, password, country, nationality, birthdate))
-    conn.commit()
+    cursor.execute(query, (user_id,))
+    row = cursor.fetchone()
+
+    if not row:
+        return None
+
+    return {
+        "id": row.ID,
+        "first": row.PrimeiroNome,
+        "last": row.Apelido,
+        "email": row.Email,
+        "pais": row.Pais,
+        "nationality": row.Nacionalidade,
+        "birthdate": row.DataDeNascimento,
+    }
