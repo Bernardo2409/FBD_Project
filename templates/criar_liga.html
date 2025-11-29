@@ -36,17 +36,13 @@
                 <!-- Dates -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-semibold">Start Date</span>
-                        </label>
-                        <input type="date" name="data_inicio" class="input input-bordered" required>
+                        <!-- Start date is fixed and hidden from the user -->
+                        <input type="hidden" name="data_inicio" id="data_inicio">
                     </div>
 
                     <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-semibold">End Date</span>
-                        </label>
-                        <input type="date" name="data_fim" class="input input-bordered" required>
+                        <!-- End date is fixed by the programmer and not editable by the user -->
+                        <input type="hidden" name="data_fim" id="data_fim">
                     </div>
                 </div>
 
@@ -90,37 +86,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const startInput = document.querySelector('input[name="data_inicio"]');
     const endInput = document.querySelector('input[name="data_fim"]');
 
-    startInput.min = today;
+    // Start date fixed to today (hidden field)
+    if (startInput) startInput.value = today;
 
-    startInput.addEventListener('change', function() {
-        endInput.min = this.value;
-    });
+    // Force End Date to 2026-07-08
+    const forcedEnd = '2026-07-08';
+    if (endInput) {
+        endInput.min = forcedEnd;
+        endInput.value = forcedEnd;
+    }
 
     // League type logic
     const typeSelect = document.querySelector('select[name="tipo_liga"]');
     const codeInput = document.querySelector('input[name="codigo_convite"]');
 
-    typeSelect.addEventListener('change', function () {
-        const type = this.value;
+    if (typeSelect && codeInput) {
+        typeSelect.addEventListener('change', function () {
+            const type = this.value;
 
-        if (type === "LT02" || type === "2") {
-            // private league → code required
-            codeInput.required = true;
-            codeInput.placeholder = "Required for private leagues";
-            codeInput.classList.add("input-warning");
-        } else {
-            // public league → code optional
-            codeInput.required = false;
-            codeInput.placeholder = "Leave empty to auto-generate";
-            codeInput.classList.remove("input-warning");
-        }
-    });
+            if (type === "LT02" || type === "2") {
+                // private league → code required
+                codeInput.required = true;
+                codeInput.placeholder = "Required for private leagues";
+                codeInput.classList.add("input-warning");
+            } else {
+                // public league → code optional
+                codeInput.required = false;
+                codeInput.placeholder = "Leave empty to auto-generate";
+                codeInput.classList.remove("input-warning");
+            }
+        });
+    }
 
     // Final validation
     document.querySelector("form").addEventListener("submit", function (e) {
-        const type = typeSelect.value;
+        const type = typeSelect ? typeSelect.value : null;
 
-        if ((type === "LT02" || type === "2") && codeInput.value.trim() === "") {
+        if (type && (type === "LT02" || type === "2") && codeInput && codeInput.value.trim() === "") {
             e.preventDefault();
             alert("To create a private league, you must enter an invite code.");
         }

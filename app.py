@@ -299,7 +299,8 @@ def criar_liga_route():
 
         if nome and data_inicio and data_fim:
             # tipo_liga pode vir do formulário (ex.: 'LT01' pública, 'LT02' privada)
-            tipo_liga = request.form.get('tipo_liga') or 'LT01'
+            # Se não for fornecido pelo formulário (criador via UI), garantir que seja 'LT02' (privada)
+            tipo_liga = request.form.get('tipo_liga') or 'LT02'
             codigo_convite = request.form.get('codigo_convite') or None
 
             liga_id = criar_liga(nome, data_inicio, data_fim, tipo_liga, id_criador, codigo_convite)

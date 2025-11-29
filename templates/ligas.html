@@ -22,13 +22,13 @@
     <!-- ALERTS -->
     {% if session.get('message') %}
     <div class="alert alert-success shadow-md mb-6">
-        <span>✅ {{ session.pop('message', '') }}</span>
+        <span> {{ session.pop('message', '') }}</span>
     </div>
     {% endif %}
 
     {% if session.get('error') %}
     <div class="alert alert-error shadow-md mb-6">
-        <span>❌ {{ session.pop('error', '') }}</span>
+        <span> {{ session.pop('error', '') }}</span>
     </div>
     {% endif %}
 

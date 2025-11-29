@@ -27,10 +27,10 @@ class TipoLiga(NamedTuple):
 
 
 # --------------------------------------------------------------------
-# ⚡ Criar liga (pública ou privada)
+# ⚡ Criar liga privada
 # --------------------------------------------------------------------
 def criar_liga(nome: str, data_inicio: str, data_fim: str,
-               id_tipo_liga: str, id_criador: str,
+               id_tipo_liga: str = 'LT02', id_criador: str = None,
                codigo_convite: Optional[str] = None) -> str:
 
     with create_connection() as conn:
@@ -38,17 +38,19 @@ def criar_liga(nome: str, data_inicio: str, data_fim: str,
 
         liga_id = str(uuid.uuid4())
 
+        # Use placeholders for all values and pass id_tipo_liga explicitly.
         cursor.execute("""
             INSERT INTO FantasyChamp.Liga
             (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """, liga_id, nome, data_inicio, data_fim, id_tipo_liga, id_criador, codigo_convite)
 
-        # Criador entra automaticamente
-        cursor.execute("""
-            INSERT INTO FantasyChamp.Participa (ID_Utilizador, ID_Liga)
-            VALUES (?, ?)
-        """, id_criador, liga_id)
+        # Criador entra automaticamente (se fornecido)
+        if id_criador:
+            cursor.execute("""
+                INSERT INTO FantasyChamp.Participa (ID_Utilizador, ID_Liga)
+                VALUES (?, ?)
+            """, id_criador, liga_id)
 
         conn.commit()
 
@@ -56,7 +58,7 @@ def criar_liga(nome: str, data_inicio: str, data_fim: str,
 
 
 # --------------------------------------------------------------------
-# ⚡ Criar liga pública "automática" (Mundial ou país do user)
+# ⚡ Criar liga pública "automática" (Mundial e país do utilizador)
 # --------------------------------------------------------------------
 def criar_liga_publica(nome_liga: str, id_criador: str = None) -> str:
     """Cria liga pública sem código, usada para Mundial + países."""
@@ -99,7 +101,7 @@ def obter_tipos_liga() -> List[TipoLiga]:
 
 
 # --------------------------------------------------------------------
-# ⚡ Obter ligas onde o user já participa
+# ⚡ Obter ligas onde o utilizar participa
 # --------------------------------------------------------------------
 def obter_ligas_por_utilizador(id_utilizador: str) -> List[Liga]:
     with create_connection() as conn:
