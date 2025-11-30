@@ -88,7 +88,6 @@
                 <thead>
                     <tr>
                         <th class="text-left">Player</th>
-                        <th class="text-left">Email</th>
                         <th class="text-left">Team</th>
                     </tr>
                 </thead>
@@ -96,7 +95,6 @@
                     {% for participante in participantes %}
                     <tr>
                         <td class="font-semibold">{{ participante.nome }}</td>
-                        <td class="text-gray-600">{{ participante.email }}</td>
                         <td>
                             {% if participante.equipa %}
                                 <span class="badge badge-primary">{{ participante.equipa }}</span>
