@@ -25,6 +25,8 @@ from persistence.clubs import list_all_clubs, list_paginated_clubs, read_club
 from persistence.users import create_user, login_user, get_users, get_user_by_id
 from persistence.countries import get_pais
 
+from persistence.pontuacoes import calcular_pontuacao_equipa, calcular_pontuacao_jogador
+
 
 import random
 
@@ -402,6 +404,88 @@ def abandonar_liga_route(liga_id):
         session['error'] = "Você não está nessa liga."
 
     return redirect("/ligas")
+
+
+# Função fictícia para obter a jornada atual
+def obter_jornada_atual():
+    # Aqui você pode retornar o id da jornada atual com base na data ou na lógica do sistema
+    return 'jornada_1'
+
+@app.route("/atualizar_pontuacao")
+def atualizar_pontuacao():
+    if 'user_id' not in session:
+        return redirect("/")
+
+    user_id = session['user_id']
+    equipa_user = obter_equipa_por_utilizador(user_id)
+
+    if equipa_user:
+        # Obter o id da jornada atual dinamicamente
+        id_jornada = obter_jornada_atual()  # Função fictícia para obter a jornada atual
+        
+        pontuacao_total = calcular_pontuacao_equipa(equipa_user.id, id_jornada)
+        
+        return render_template("pontuacao.html", pontuacao_total=pontuacao_total)
+    else:
+        return "Não tens uma equipa.", 404
+
+
+@app.route("/pontuacao")
+def pontuacao():
+    if 'user_id' not in session:
+        return redirect("/")
+
+    user_id = session['user_id']
+    
+    # Obter a equipa do utilizador
+    equipa_user = obter_equipa_por_utilizador(user_id)
+    if equipa_user:
+        # Obter o id da jornada atual
+        id_jornada = 'jornada_1'  # Ajuste para obter a jornada correta
+
+        # Calcular a pontuação total da equipa
+        pontuacao_total = calcular_pontuacao_equipa(equipa_user.id, id_jornada)
+
+        # Obter os jogadores da equipa para exibir suas pontuações
+        jogadores_equipa = obter_jogadores_equipa(equipa_user.id)
+
+        # Calcular as pontuações de cada jogador
+        for jogador in jogadores_equipa:
+            jogador['pontuacao'] = calcular_pontuacao_jogador(jogador['id'], id_jornada)
+
+        return render_template("pontuacao.html", pontuacao_total=pontuacao_total, jogadores_equipa=jogadores_equipa)
+    else:
+        return "Não tens uma equipa.", 404
+    
+@app.route("/equipa/<id_equipa>/jornada/<int:id_jornada>")
+def equipa_jornada(id_equipa, id_jornada):
+    if 'user_id' not in session:
+        return redirect("/")
+
+    user_id = session['user_id']
+    equipa_user = obter_equipa_por_utilizador(user_id)
+
+    if equipa_user and equipa_user.id == id_equipa:
+        # Calcular a pontuação da equipa e dos jogadores para a jornada selecionada
+        pontuacao_total = calcular_pontuacao_equipa(id_equipa, id_jornada)
+        
+        # Obter os jogadores da equipa para a jornada selecionada
+        jogadores_equipa = obter_jogadores_equipa(id_equipa)
+
+        # Calcular as pontuações de cada jogador para a jornada selecionada
+        for jogador in jogadores_equipa:
+            jogador['pontuacao'] = calcular_pontuacao_jogador(jogador['id'], id_jornada)
+
+        # Passar a jornada atual para o template
+        return render_template("equipa.html", 
+                               equipa=equipa_user, 
+                               jogadores_equipa=jogadores_equipa,
+                               jornada_atual=id_jornada)
+    else:
+        return "Não tens uma equipa ou jornada válida.", 404
+
+
+
 
 
 if __name__ == "__main__":

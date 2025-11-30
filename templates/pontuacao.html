@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Pontuação da Equipa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
+</head>
+<body class="bg-gray-900 text-white">
+
+<div class="container mx-auto p-6">
+    <h1 class="text-4xl font-bold text-center text-white mb-6">Pontuação da Equipa</h1>
+
+    <!-- Exibir a pontuação total da equipa -->
+    <div class="text-center bg-blue-800 bg-opacity-50 p-4 rounded-lg mb-6">
+        <p class="text-xl">Pontuação Total da Equipa: <strong>{{ pontuacao_total }}</strong></p>
+    </div>
+
+    <h2 class="text-2xl font-bold mb-4">Jogadores da Equipa</h2>
+    
+    <!-- Lista de jogadores -->
+    <ul class="space-y-4">
+        {% for jogador in jogadores_equipa %}
+            <li class="bg-gray-700 p-4 rounded-lg">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <img src="{{ jogador.jogador_imagem }}" alt="Imagem do Jogador" class="w-12 h-12 rounded-full">
+                        <div class="ml-4">
+                            <div class="font-semibold">{{ jogador.nome }}</div>
+                            <div class="text-sm">{{ jogador.posicao }} | {{ jogador.estado }}</div>
+                        </div>
+                    </div>
+                    <div class="text-lg font-bold text-yellow-400">
+                        Pontuação: {{ jogador.pontuacao }} pontos
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="mt-12 text-center">
+        <a href="/index" class="btn btn-primary">Voltar à Equipa</a>
+    </div>
+</div>
+
+</body>
+</html>
