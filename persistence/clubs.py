@@ -10,11 +10,11 @@ def list_all_clubs():
     query = """
         SELECT C.ID,
                C.Nome,
-               P.País AS Pais_Nome,
-               P.país_imagem AS Pais_Imagem,
+               P.nome AS Pais_Nome,
+               P.imagem AS Pais_Imagem,
                C.clube_imagem
         FROM FantasyChamp.Clube C
-        JOIN FantasyChamp.País P ON C.ID_País = P.ID
+        JOIN FantasyChamp.Pais P ON C.ID_País = P.ID
         ORDER BY C.Nome
     """
 
@@ -114,11 +114,11 @@ def list_paginated_clubs(page: int, per_page: int):
     query = f"""
         SELECT C.ID,
                C.Nome,
-               P.País AS Pais_Nome,
-               P.país_imagem AS Pais_Imagem,
+               P.nome AS Pais_Nome,
+               P.imagem AS Pais_Imagem,
                C.clube_imagem
         FROM FantasyChamp.Clube C
-        JOIN FantasyChamp.País P ON C.ID_País = P.ID
+        JOIN FantasyChamp.Pais P ON C.ID_País = P.ID
         ORDER BY C.Nome
         OFFSET {offset} ROWS FETCH NEXT {per_page} ROWS ONLY;
     """
