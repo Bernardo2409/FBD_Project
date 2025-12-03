@@ -15,6 +15,7 @@ class Equipa(NamedTuple):
 class Pertence(NamedTuple):
     id_equipa: str
     id_jogador: str
+    benched: bool
 
 
 def criar_equipa(nome: str, id_utilizador: str) -> str:
@@ -84,7 +85,7 @@ def obter_jogadores_equipa(id_equipa: str):
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem, E.Estado
+            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem, E.Estado, PE.benched
             FROM FantasyChamp.Jogador J
             JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
             JOIN FantasyChamp.Pertence PE ON J.ID = PE.ID_Jogador
@@ -101,11 +102,53 @@ def obter_jogadores_equipa(id_equipa: str):
                 'preco': row.Preço,
                 'jogador_imagem': row.jogador_imagem if row.jogador_imagem 
                           else '/static/images/Image-not-found.png',
-                'estado': row.Estado  # Adicionando o estado
+                'estado': row.Estado,
+                'benched': True if row.benched == 1 else False
             })
         
         return jogadores
 
+
+def obter_posicao_jogador(id_jogador: str) -> str:
+    """Obter a posição de um jogador"""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT P.Posição
+            FROM FantasyChamp.Jogador J
+            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+            WHERE J.ID = ?
+        """, id_jogador)
+        
+        row = cursor.fetchone()
+        return row.Posição if row else None
+
+
+def contar_jogadores_por_posicao(id_equipa: str, apenas_campo: bool = False):
+    """Contar jogadores por posição (no campo ou total)"""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        
+        query = """
+            SELECT P.Posição, COUNT(*) as count
+            FROM FantasyChamp.Jogador J
+            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+            JOIN FantasyChamp.Pertence PE ON J.ID = PE.ID_Jogador
+            WHERE PE.ID_Equipa = ?
+        """
+        
+        if apenas_campo:
+            query += " AND PE.benched = 0"
+        
+        query += " GROUP BY P.Posição"
+        
+        cursor.execute(query, id_equipa)
+        
+        contagem = {'Goalkeeper': 0, 'Defender': 0, 'Midfielder': 0, 'Forward': 0}
+        for row in cursor:
+            contagem[row.Posição] = row.count
+        
+        return contagem
 
 
 def adicionar_jogador_equipa(id_equipa: str, id_jogador: str):
@@ -128,10 +171,10 @@ def adicionar_jogador_equipa(id_equipa: str, id_jogador: str):
         if not verificar_orcamento_suficiente(id_equipa, preco_jogador):
             raise Exception("Orçamento insuficiente para adicionar este jogador")
         
-        # Inserir relação
+        # Inserir relação (por padrão benched=0, ou seja, em campo)
         cursor.execute("""
-            INSERT INTO FantasyChamp.Pertence (ID_Equipa, ID_Jogador)
-            VALUES (?, ?)
+            INSERT INTO FantasyChamp.Pertence (ID_Equipa, ID_Jogador, benched)
+            VALUES (?, ?, 0)
         """, id_equipa, id_jogador)
         
         # Subtrair o preço do jogador ao orçamento
@@ -142,7 +185,6 @@ def adicionar_jogador_equipa(id_equipa: str, id_jogador: str):
         """, preco_jogador, id_equipa)
         
         conn.commit()
-
 
 
 def remover_jogador_equipa(id_equipa: str, id_jogador: str):
@@ -200,3 +242,105 @@ def verificar_limites_equipa(id_equipa: str) -> dict:
             'pode_adicionar_medio': contagem['Midfielder'] < 5,
             'pode_adicionar_avancado': contagem['Forward'] < 3
         }
+
+
+def adicionar_jogador_ao_banco(id_equipa: str, id_jogador: str) -> tuple[bool, str]:
+    """
+    Adiciona um jogador ao banco.
+    Retorna (sucesso, mensagem)
+    """
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        
+        # Obter posição do jogador
+        posicao = obter_posicao_jogador(id_jogador)
+        if not posicao:
+            return False, "Jogador não encontrado"
+        
+        # Contar jogadores em campo por posição
+        contagem_campo = contar_jogadores_por_posicao(id_equipa, apenas_campo=True)
+        
+        # Verificar se há pelo menos 1 jogador em campo dessa posição
+        if contagem_campo[posicao] <= 1:
+            return False, f"Deve haver pelo menos 1 {posicao} em campo!"
+        
+        # Verificar limites mínimos em campo
+        if posicao == 'Goalkeeper' and contagem_campo['Goalkeeper'] <= 1:
+            return False, "Deve haver pelo menos 1 guarda-redes em campo!"
+        elif posicao == 'Forward' and contagem_campo['Forward'] <= 1:
+            return False, "Deve haver pelo menos 1 avançado em campo!"
+        elif posicao == 'Midfielder' and contagem_campo['Midfielder'] <= 1:
+            return False, "Deve haver pelo menos 1 médio em campo!"
+        elif posicao == 'Defender' and contagem_campo['Defender'] <= 1:
+            return False, "Deve haver pelo menos 1 defesa em campo!"
+        
+        # Contar jogadores no banco
+        cursor.execute("""
+            SELECT COUNT(*) FROM FantasyChamp.Pertence
+            WHERE ID_Equipa = ? AND benched = 1
+        """, id_equipa)
+        
+        total_banco = cursor.fetchone()[0]
+        
+        # Verificar se já tem 4 jogadores no banco
+        if total_banco >= 4:
+            return False, "Já tens 4 jogadores no banco!"
+        
+        # Atualizar o jogador para banco
+        cursor.execute("""
+            UPDATE FantasyChamp.Pertence 
+            SET benched = 1
+            WHERE ID_Equipa = ? AND ID_Jogador = ?
+        """, id_equipa, id_jogador)
+        
+        conn.commit()
+        return True, "Jogador movido para o banco com sucesso!"
+
+
+def remover_jogador_do_banco(id_equipa: str, id_jogador: str) -> tuple[bool, str]:
+    """
+    Remove um jogador do banco (coloca-o em campo).
+    Retorna (sucesso, mensagem)
+    """
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        
+        # Obter posição do jogador
+        posicao = obter_posicao_jogador(id_jogador)
+        if not posicao:
+            return False, "Jogador não encontrado"
+        
+        # Contar jogadores no banco
+        cursor.execute("""
+            SELECT COUNT(*) FROM FantasyChamp.Pertence
+            WHERE ID_Equipa = ? AND benched = 1
+        """, id_equipa)
+        
+        total_banco = cursor.fetchone()[0]
+        
+        # Verificar se tem pelo menos 4 jogadores no banco
+        if total_banco <= 4:
+            return False, "Deve haver pelo menos 4 jogadores no banco!"
+        
+        # Verificar se tem pelo menos 1 GR no banco
+        cursor.execute("""
+            SELECT COUNT(*) FROM FantasyChamp.Pertence PE
+            JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
+            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+            WHERE PE.ID_Equipa = ? AND PE.benched = 1 AND P.Posição = 'Goalkeeper'
+        """, id_equipa)
+        
+        gr_banco = cursor.fetchone()[0]
+        
+        if posicao == 'Goalkeeper' and gr_banco <= 1:
+            return False, "Deve haver pelo menos 1 guarda-redes no banco!"
+        
+        # Atualizar para remover do banco
+        cursor.execute("""
+            UPDATE FantasyChamp.Pertence
+            SET benched = 0
+            WHERE ID_Equipa = ? AND ID_Jogador = ?
+        """, id_equipa, id_jogador)
+        
+        conn.commit()
+        return True, "Jogador colocado em campo com sucesso!"

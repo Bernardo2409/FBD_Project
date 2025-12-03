@@ -484,6 +484,44 @@ def equipa_jornada(id_equipa, id_jornada):
     else:
         return "Não tens uma equipa ou jornada válida.", 404
 
+@app.route("/equipa/banco/adicionar/<id_jogador>", methods=["POST"])
+def adicionar_jogador_ao_banco_route(id_jogador):
+    if 'user_id' not in session:
+        return redirect("/")
+    
+    user_id = session['user_id']
+    equipa_user = obter_equipa_por_utilizador(user_id)
+    
+    if equipa_user:
+        from persistence.equipa import adicionar_jogador_ao_banco
+        sucesso, mensagem = adicionar_jogador_ao_banco(equipa_user.id, id_jogador)
+        
+        if sucesso:
+            session['message'] = mensagem
+        else:
+            session['error'] = mensagem
+    
+    return redirect("/equipa")
+
+@app.route("/equipa/banco/remover/<id_jogador>", methods=["POST"])
+def remover_jogador_do_banco_route(id_jogador):
+    if 'user_id' not in session:
+        return redirect("/")
+    
+    user_id = session['user_id']
+    equipa_user = obter_equipa_por_utilizador(user_id)
+    
+    if equipa_user:
+        from persistence.equipa import remover_jogador_do_banco
+        sucesso, mensagem = remover_jogador_do_banco(equipa_user.id, id_jogador)
+        
+        if sucesso:
+            session['message'] = mensagem
+        else:
+            session['error'] = mensagem
+    
+    return redirect("/equipa")
+
 
 
 

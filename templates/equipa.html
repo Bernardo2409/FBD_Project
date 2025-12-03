@@ -12,9 +12,26 @@
     data-theme="corporate"
     style="background-image: url('/static/images/stadium2.jpg');">
 
-
 <div class="container mx-auto p-6">
     
+    <!-- Mensagens de sucesso/erro -->
+    {% if session.get('message') %}
+    <div class="alert alert-success mb-4 shadow-lg">
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{{ session.pop('message') }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if session.get('error') %}
+    <div class="alert alert-error mb-4 shadow-lg">
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{{ session.pop('error') }}</span>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- TÍTULO DINÂMICO COM NOME DA EQUIPA -->
     <h1 class="text-4xl font-bold text-center text-primary mb-6 text-white">
@@ -26,21 +43,26 @@
         <p class="text-lg">Pontuação Total: <strong>{{ equipa.info.pontuacao_total }}</strong></p>
     </div>
         
-        <!-- Adicionando o botão de redirecionamento para a página de pontuação -->
+    <!-- Botão Ver Pontuação -->
+    <div class="text-center mb-6">
         <a href="/pontuacao" class="btn btn-primary mt-4 px-8 py-2 text-white bg-green-500 rounded-md hover:bg-green-600">
             Ver Pontuação
         </a>
     </div>
 
+    <!-- Info do Banco -->
+    <div class="text-center mb-6 bg-yellow-600 bg-opacity-70 p-3 rounded-lg">
+        <p class="text-white font-bold">
+            💡 Regras: Mínimo 4 jogadores no banco (incluindo 1 GR) | Mínimo 1 jogador de cada posição em campo
+        </p>
+    </div>
 
     <!-- SECÇÃO: AVANÇADOS -->
     <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Avançados (3)</h2>
 
-    <!-- Dropdown para avançados -->
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
-                <!-- Campo de pesquisa -->
                 <div class="p-2 border-b border-gray-200">
                     <input 
                         type="text" 
@@ -50,7 +72,6 @@
                     >
                 </div>
                 
-                <!-- Lista de avançados -->
                 <div id="avancados-list">
                     {% for avancado in todos_jogadores.Forward %}
                     {% if avancado.id not in equipa.avancados|map(attribute='id') %}
@@ -79,40 +100,56 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 place-items-center" id="avancados-container">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 place-items-center">
     {% for j in equipa.avancados %}
-    <div class="card shadow-xl p-4 w-64 h-32 flex items-center relative
-        {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}">
+    <div class="card shadow-xl p-4 w-64 flex flex-col relative
+        {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}
+        {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
         
-        <!-- Botão de remover -->
         <a href="/equipa/remover/{{ j.id }}"
-            class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100">
+            class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
                 ✕
         </a>
         
-        <a href="/players/{{ j.id }}">
+        <a href="/players/{{ j.id }}" class="flex-1 mb-2">
             <div class="flex items-center gap-4">
                 <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
                 <div>
-                    <div class="font-bold text-lg">{{ j.nome }}</div>
+                    <div class="font-bold text-lg text-white">{{ j.nome }}</div>
                     <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                    <div class="text-sm text-white-500">{{ j.preco }}€</div>
+                    <div class="text-sm text-white">{{ j.preco }}€</div>
+                    {% if j.benched %}
+                    <div class="badge badge-warning text-xs mt-1">🪑 BANCO</div>
+                    {% endif %}
                 </div>
             </div>
         </a>
+        
+        <div class="mt-2 flex justify-center">
+            {% if j.benched %}
+            <form action="/equipa/banco/remover/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador em campo?');">
+                <button type="submit" class="btn btn-xs bg-green-600 text-white hover:bg-green-700 border-none">
+                    ⚽ Colocar em Campo
+                </button>
+            </form>
+            {% else %}
+            <form action="/equipa/banco/adicionar/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador no banco?');">
+                <button type="submit" class="btn btn-xs bg-yellow-600 text-white hover:bg-yellow-700 border-none">
+                    🪑 Colocar no Banco
+                </button>
+            </form>
+            {% endif %}
+        </div>
     </div>
     {% endfor %}
 </div>
 
-
     <!-- SECÇÃO: MÉDIOS -->
     <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Médios (5)</h2>
 
-    <!-- Dropdown para médios -->
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
-                <!-- Campo de pesquisa -->
                 <div class="p-2 border-b border-gray-200">
                     <input 
                         type="text" 
@@ -122,7 +159,6 @@
                     >
                 </div>
                 
-                <!-- Lista de médios -->
                 <div id="medios-list">
                     {% for medio in todos_jogadores.Midfielder %}
                     {% if medio.id not in equipa.medios|map(attribute='id') %}
@@ -151,29 +187,46 @@
         </div>
     </div>
 
-
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center" id="medios-container">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
         {% for j in equipa.medios %}
-            <div class="card shadow-xl p-4 w-64 h-32 flex items-center relative
-
-            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}">
+            <div class="card shadow-xl p-4 w-64 flex flex-col relative
+            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}
+            {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
 
             <a href="/equipa/remover/{{ j.id }}"
-                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100">
+                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
                     ✕
             </a>
             
-            <a href="/players/{{ j.id }}">
+            <a href="/players/{{ j.id }}" class="flex-1 mb-2">
                 <div class="flex items-center gap-4">
                     <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
-                        <div class="font-bold text-lg">{{ j.nome }}</div>
+                        <div class="font-bold text-lg text-white">{{ j.nome }}</div>
                         <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                        <div class="text-sm text-white-500">{{ j.preco }}€</div>
-
+                        <div class="text-sm text-white">{{ j.preco }}€</div>
+                        {% if j.benched %}
+                        <div class="badge badge-warning text-xs mt-1">🪑 BANCO</div>
+                        {% endif %}
                     </div>
                 </div>
             </a>
+            
+            <div class="mt-2 flex justify-center">
+                {% if j.benched %}
+                <form action="/equipa/banco/remover/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador em campo?');">
+                    <button type="submit" class="btn btn-xs bg-green-600 text-white hover:bg-green-700 border-none">
+                        ⚽ Colocar em Campo
+                    </button>
+                </form>
+                {% else %}
+                <form action="/equipa/banco/adicionar/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador no banco?');">
+                    <button type="submit" class="btn btn-xs bg-yellow-600 text-white hover:bg-yellow-700 border-none">
+                        🪑 Colocar no Banco
+                    </button>
+                </form>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
@@ -181,11 +234,9 @@
     <!-- SECÇÃO: DEFESAS -->
     <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Defesas (5)</h2>
 
-    <!-- Dropdown para defesas -->
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
-                <!-- Campo de pesquisa -->
                 <div class="p-2 border-b border-gray-200">
                     <input 
                         type="text" 
@@ -195,7 +246,6 @@
                     >
                 </div>
                 
-                <!-- Lista de defesas -->
                 <div id="defesas-list">
                     {% for defesa in todos_jogadores.Defender %}
                     {% if defesa.id not in equipa.defesas|map(attribute='id') %}
@@ -224,28 +274,46 @@
         </div>
     </div>
 
-
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center" id="defesas-container">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
         {% for j in equipa.defesas %}
-            <div class="card shadow-xl p-4 w-64 h-32 flex items-center relative
-            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}">
+            <div class="card shadow-xl p-4 w-64 flex flex-col relative
+            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}
+            {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
 
             <a href="/equipa/remover/{{ j.id }}"
-                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100">
+                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
                     ✕
             </a>
             
-            <a href="/players/{{ j.id }}">
+            <a href="/players/{{ j.id }}" class="flex-1 mb-2">
                 <div class="flex items-center gap-4">
                     <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
-                        <div class="font-bold text-lg">{{ j.nome }}</div>
+                        <div class="font-bold text-lg text-white">{{ j.nome }}</div>
                         <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                        <div class="text-sm text-white-500">{{ j.preco }}€</div>
-
+                        <div class="text-sm text-white">{{ j.preco }}€</div>
+                        {% if j.benched %}
+                        <div class="badge badge-warning text-xs mt-1">🪑 BANCO</div>
+                        {% endif %}
                     </div>
                 </div>
             </a>
+            
+            <div class="mt-2 flex justify-center">
+                {% if j.benched %}
+                <form action="/equipa/banco/remover/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador em campo?');">
+                    <button type="submit" class="btn btn-xs bg-green-600 text-white hover:bg-green-700 border-none">
+                        ⚽ Colocar em Campo
+                    </button>
+                </form>
+                {% else %}
+                <form action="/equipa/banco/adicionar/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador no banco?');">
+                    <button type="submit" class="btn btn-xs bg-yellow-600 text-white hover:bg-yellow-700 border-none">
+                        🪑 Colocar no Banco
+                    </button>
+                </form>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
@@ -253,11 +321,9 @@
     <!-- SECÇÃO: GUARDA-REDES -->
     <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Guarda-Redes (2)</h2>
 
-    <!-- Dropdown para guarda-redes -->
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
-                <!-- Campo de pesquisa -->
                 <div class="p-2 border-b border-gray-200">
                     <input 
                         type="text" 
@@ -267,7 +333,6 @@
                     >
                 </div>
                 
-                <!-- Lista de guarda-redes -->
                 <div id="gr-list">
                     {% for gr in todos_jogadores.Goalkeeper %}
                     {% if gr.id not in equipa.gr|map(attribute='id') %}
@@ -296,26 +361,46 @@
         </div>
     </div>
 
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 place-items-center" id="gr-container">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 place-items-center">
         {% for j in equipa.gr %}
-         <div class="card shadow-xl p-4 w-64 h-32 flex items-center relative
-            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}">
+         <div class="card shadow-xl p-4 w-64 flex flex-col relative
+            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}
+            {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
+            
             <a href="/equipa/remover/{{ j.id }}"
-                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100">
+                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
                     ✕
             </a>
             
-            <a href="/players/{{ j.id }}">
+            <a href="/players/{{ j.id }}" class="flex-1 mb-2">
                 <div class="flex items-center gap-4">
                     <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
-                        <div class="font-bold text-lg">{{ j.nome }}</div>
+                        <div class="font-bold text-lg text-white">{{ j.nome }}</div>
                         <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                        <div class="text-sm text-white-500">{{ j.preco }}€</div>
+                        <div class="text-sm text-white">{{ j.preco }}€</div>
+                        {% if j.benched %}
+                        <div class="badge badge-warning text-xs mt-1">🪑 BANCO</div>
+                        {% endif %}
                     </div>
                 </div>
             </a>
+            
+            <div class="mt-2 flex justify-center">
+                {% if j.benched %}
+                <form action="/equipa/banco/remover/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador em campo?');">
+                    <button type="submit" class="btn btn-xs bg-green-600 text-white hover:bg-green-700 border-none">
+                        ⚽ Colocar em Campo
+                    </button>
+                </form>
+                {% else %}
+                <form action="/equipa/banco/adicionar/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador no banco?');">
+                    <button type="submit" class="btn btn-xs bg-yellow-600 text-white hover:bg-yellow-700 border-none">
+                        🪑 Colocar no Banco
+                    </button>
+                </form>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
