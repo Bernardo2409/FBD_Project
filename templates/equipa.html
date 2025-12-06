@@ -112,7 +112,7 @@
                     <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
                     <div class="text-sm text-white">{{ j.preco }}€</div>
                     {% if j.benched %}
-                    <div class="badge badge-warning text-xs mt-1">🪑 BANCO</div>
+                    <div class="badge badge-warning text-xs mt-1">BANCO</div>
                     {% endif %}
                 </div>
             </div>
@@ -196,7 +196,7 @@
                         <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
                         <div class="text-sm text-white">{{ j.preco }}€</div>
                         {% if j.benched %}
-                        <div class="badge badge-warning text-xs mt-1">🪑 BANCO</div>
+                        <div class="badge badge-warning text-xs mt-1">BANCO</div>
                         {% endif %}
                     </div>
                 </div>
@@ -279,7 +279,7 @@
                         <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
                         <div class="text-sm text-white">{{ j.preco }}€</div>
                         {% if j.benched %}
-                        <div class="badge badge-warning text-xs mt-1">🪑 BANCO</div>
+                        <div class="badge badge-warning text-xs mt-1">BANCO</div>
                         {% endif %}
                     </div>
                 </div>
@@ -362,7 +362,7 @@
                         <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
                         <div class="text-sm text-white">{{ j.preco }}€</div>
                         {% if j.benched %}
-                        <div class="badge badge-warning text-xs mt-1">🪑 BANCO</div>
+                        <div class="badge badge-warning text-xs mt-1">BANCO</div>
                         {% endif %}
                     </div>
                 </div>
@@ -475,18 +475,13 @@ function fecharModalTroca() {
 
 function confirmarTroca(idJogadorBanco) {
     console.log('Confirmando troca:', jogadorCampoSelecionado, '<->', idJogadorBanco);
-    
-    if (confirm('Confirmas a troca destes jogadores?')) {
-        // Criar formulário e submeter
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/equipa/trocar/${jogadorCampoSelecionado}/${idJogadorBanco}`;
-        
-        console.log('Submetendo formulário para:', form.action);
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
+    // Criar formulário e submeter diretamente, sem confirmação
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/equipa/trocar/${jogadorCampoSelecionado}/${idJogadorBanco}`;
+    console.log('Submetendo formulário para:', form.action);
+    document.body.appendChild(form);
+    form.submit();
 }
 
 // Fechar modal ao clicar fora
