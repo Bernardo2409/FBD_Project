@@ -49,14 +49,7 @@
             Ver Pontuação
         </a>
     </div>
-
-    <!-- Info do Banco -->
-    <div class="text-center mb-6 bg-yellow-600 bg-opacity-70 p-3 rounded-lg">
-        <p class="text-white font-bold">
-            💡 Regras: Mínimo 4 jogadores no banco (incluindo 1 GR) | Mínimo 1 jogador de cada posição em campo
-        </p>
-    </div>
-
+    
     <!-- SECÇÃO: AVANÇADOS -->
     <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Avançados (3)</h2>
 
@@ -126,18 +119,15 @@
         </a>
         
         <div class="mt-2 flex justify-center">
-            {% if j.benched %}
-            <form action="/equipa/banco/remover/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador em campo?');">
-                <button type="submit" class="btn btn-xs bg-green-600 text-white hover:bg-green-700 border-none">
-                    ⚽ Colocar em Campo
-                </button>
-            </form>
+            {% if not j.benched %}
+            <!-- Botão para trocar jogador do campo com jogador do banco -->
+            <button type="button"
+                    onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Forward')" 
+                    class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
+                Trocar com Banco
+            </button>
             {% else %}
-            <form action="/equipa/banco/adicionar/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador no banco?');">
-                <button type="submit" class="btn btn-xs bg-yellow-600 text-white hover:bg-yellow-700 border-none">
-                    🪑 Colocar no Banco
-                </button>
-            </form>
+            <div class="text-xs text-yellow-100 font-semibold">No Banco</div>
             {% endif %}
         </div>
     </div>
@@ -213,18 +203,14 @@
             </a>
             
             <div class="mt-2 flex justify-center">
-                {% if j.benched %}
-                <form action="/equipa/banco/remover/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador em campo?');">
-                    <button type="submit" class="btn btn-xs bg-green-600 text-white hover:bg-green-700 border-none">
-                        ⚽ Colocar em Campo
-                    </button>
-                </form>
+                {% if not j.benched %}
+                <button type="button"
+                        onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Midfielder')" 
+                        class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
+                    Trocar com Banco
+                </button>
                 {% else %}
-                <form action="/equipa/banco/adicionar/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador no banco?');">
-                    <button type="submit" class="btn btn-xs bg-yellow-600 text-white hover:bg-yellow-700 border-none">
-                        🪑 Colocar no Banco
-                    </button>
-                </form>
+                <div class="text-xs text-yellow-100 font-semibold">No Banco</div>
                 {% endif %}
             </div>
         </div>
@@ -300,18 +286,14 @@
             </a>
             
             <div class="mt-2 flex justify-center">
-                {% if j.benched %}
-                <form action="/equipa/banco/remover/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador em campo?');">
-                    <button type="submit" class="btn btn-xs bg-green-600 text-white hover:bg-green-700 border-none">
-                        ⚽ Colocar em Campo
-                    </button>
-                </form>
+                {% if not j.benched %}
+                <button type="button"
+                        onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Defender')" 
+                        class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
+                    Trocar com Banco
+                </button>
                 {% else %}
-                <form action="/equipa/banco/adicionar/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador no banco?');">
-                    <button type="submit" class="btn btn-xs bg-yellow-600 text-white hover:bg-yellow-700 border-none">
-                        🪑 Colocar no Banco
-                    </button>
-                </form>
+                <div class="text-xs text-yellow-100 font-semibold">No Banco</div>
                 {% endif %}
             </div>
         </div>
@@ -387,18 +369,14 @@
             </a>
             
             <div class="mt-2 flex justify-center">
-                {% if j.benched %}
-                <form action="/equipa/banco/remover/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador em campo?');">
-                    <button type="submit" class="btn btn-xs bg-green-600 text-white hover:bg-green-700 border-none">
-                        ⚽ Colocar em Campo
-                    </button>
-                </form>
+                {% if not j.benched %}
+                <button type="button"
+                        onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Goalkeeper')" 
+                        class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
+                    Trocar com Banco
+                </button>
                 {% else %}
-                <form action="/equipa/banco/adicionar/{{ j.id }}" method="POST" class="inline" onsubmit="return confirm('Colocar este jogador no banco?');">
-                    <button type="submit" class="btn btn-xs bg-yellow-600 text-white hover:bg-yellow-700 border-none">
-                        🪑 Colocar no Banco
-                    </button>
-                </form>
+                <div class="text-xs text-yellow-100 font-semibold">No Banco</div>
                 {% endif %}
             </div>
         </div>
@@ -415,7 +393,110 @@
 
 </div>
 
+<!-- Modal de Troca -->
+<div id="modalTroca" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <h3 class="text-xl font-bold mb-4">Trocar Jogador</h3>
+        <p class="mb-4">Seleciona um jogador do banco para trocar com <strong id="nomeJogadorCampo"></strong>:</p>
+        
+        <div id="listaJogadoresBanco" class="max-h-64 overflow-y-auto mb-4">
+            <!-- Será preenchido dinamicamente -->
+        </div>
+        
+        <div class="flex justify-end gap-2">
+            <button onclick="fecharModalTroca()" class="btn bg-gray-500 text-white hover:bg-gray-600">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
+let jogadorCampoSelecionado = null;
+
+function abrirModalTroca(idJogadorCampo, nomeJogadorCampo, posicao) {
+    console.log('Abrindo modal para trocar:', idJogadorCampo, nomeJogadorCampo, posicao);
+    jogadorCampoSelecionado = idJogadorCampo;
+    document.getElementById('nomeJogadorCampo').textContent = nomeJogadorCampo;
+    
+    // Buscar jogadores do banco da mesma posição
+    const jogadoresBanco = [
+        {% for j in equipa.avancados %}
+        {% if j.benched %}
+        {id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Forward', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}'},
+        {% endif %}
+        {% endfor %}
+        {% for j in equipa.medios %}
+        {% if j.benched %}
+        {id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Midfielder', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}'},
+        {% endif %}
+        {% endfor %}
+        {% for j in equipa.defesas %}
+        {% if j.benched %}
+        {id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Defender', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}'},
+        {% endif %}
+        {% endfor %}
+        {% for j in equipa.gr %}
+        {% if j.benched %}
+        {id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Goalkeeper', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}'},
+        {% endif %}
+        {% endfor %}
+    ];
+    
+    console.log('Jogadores no banco:', jogadoresBanco);
+    const jogadoresMesmaPosicao = jogadoresBanco.filter(j => j.posicao === posicao);
+    console.log('Jogadores da mesma posição:', jogadoresMesmaPosicao);
+    
+    const listaHTML = jogadoresMesmaPosicao.map(j => `
+        <div class="border rounded p-3 mb-2 hover:bg-gray-100 cursor-pointer flex items-center gap-3"
+             onclick="confirmarTroca('${j.id}')">
+            <img src="${j.imagem}" class="w-12 h-12 rounded-full object-cover">
+            <div class="flex-1">
+                <div class="font-bold">${j.nome}</div>
+                <div class="text-sm text-gray-500">${j.estado}</div>
+            </div>
+            <div class="text-blue-600 font-bold">Trocar →</div>
+        </div>
+    `).join('');
+    
+    document.getElementById('listaJogadoresBanco').innerHTML = 
+        listaHTML || '<p class="text-gray-500">Não há jogadores desta posição no banco.</p>';
+    
+    document.getElementById('modalTroca').classList.remove('hidden');
+    document.getElementById('modalTroca').classList.add('flex');
+}
+
+function fecharModalTroca() {
+    console.log('Fechando modal');
+    document.getElementById('modalTroca').classList.add('hidden');
+    document.getElementById('modalTroca').classList.remove('flex');
+    jogadorCampoSelecionado = null;
+}
+
+function confirmarTroca(idJogadorBanco) {
+    console.log('Confirmando troca:', jogadorCampoSelecionado, '<->', idJogadorBanco);
+    
+    if (confirm('Confirmas a troca destes jogadores?')) {
+        // Criar formulário e submeter
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/equipa/trocar/${jogadorCampoSelecionado}/${idJogadorBanco}`;
+        
+        console.log('Submetendo formulário para:', form.action);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Fechar modal ao clicar fora
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('modalTroca');
+    if (modal && e.target === modal) {
+        fecharModalTroca();
+    }
+});
+
 function filterPlayers(input, listId) {
     const filter = input.value.toLowerCase();
     const list = document.getElementById(listId);

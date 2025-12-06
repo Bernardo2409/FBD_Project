@@ -264,6 +264,7 @@ def adicionar_jogador_equipa_route(posicao, jogador_id):
                 session['error'] = "Já tens 3 avançados! Remove um primeiro."
             else:
                 adicionar_jogador_equipa(equipa_user.id, jogador_id)
+                session['message'] = "Jogador adicionado com sucesso!"
 
         except Exception as e:
             session['error'] = str(e)
@@ -522,9 +523,24 @@ def remover_jogador_do_banco_route(id_jogador):
     
     return redirect("/equipa")
 
-
-
-
+@app.route("/equipa/trocar/<id_jogador_campo>/<id_jogador_banco>", methods=["POST"])
+def trocar_jogador_route(id_jogador_campo, id_jogador_banco):
+    if 'user_id' not in session:
+        return redirect("/")
+    
+    user_id = session['user_id']
+    equipa_user = obter_equipa_por_utilizador(user_id)
+    
+    if equipa_user:
+        from persistence.equipa import trocar_jogador_banco_campo
+        sucesso, mensagem = trocar_jogador_banco_campo(equipa_user.id, id_jogador_banco, id_jogador_campo)
+        
+        if sucesso:
+            session['message'] = mensagem
+        else:
+            session['error'] = mensagem
+    
+    return redirect("/equipa")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
