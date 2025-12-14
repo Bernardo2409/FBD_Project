@@ -19,19 +19,6 @@
         </a>
     </div>
 
-    <!-- ALERTS -->
-    {% if session.get('message') %}
-    <div class="alert alert-success shadow-md mb-6">
-        <span> {{ session.pop('message', '') }}</span>
-    </div>
-    {% endif %}
-
-    {% if session.get('error') %}
-    <div class="alert alert-error shadow-md mb-6">
-        <span> {{ session.pop('error', '') }}</span>
-    </div>
-    {% endif %}
-
     <!-- MY LEAGUES -->
     <div class="mb-12">
         <h2 class="text-3xl font-bold mb-6 text-gray-900">My Leagues</h2>

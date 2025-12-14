@@ -57,23 +57,6 @@ def login_user(email, password):
 
     return None
 
-def create_user(first, last, email, password, country, nationality, birthdate):
-    conn = create_connection()
-    cursor = conn.cursor()
-
-    # Cria ID manualmente (SEM usar newid() no SQL)
-    cursor.execute("SELECT NEWID()")
-    user_id = cursor.fetchone()[0]
-
-    cursor.execute("""
-        INSERT INTO FantasyChamp.Utilizador
-        (ID, PrimeiroNome, Apelido, Email, Senha, País, Nacionalidade, DataDeNascimento)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (user_id, first, last, email, password, country, nationality, birthdate))
-
-    conn.commit()
-    return user_id
-
 
 def get_user_by_id(user_id):
     """Retorna um dicionário com os dados do utilizador ou None se não existir."""
@@ -101,3 +84,152 @@ def get_user_by_id(user_id):
         "nationality": row.Nacionalidade,
         "birthdate": row.DataDeNascimento,
     }
+
+
+def create_user_with_ligas(first, last, email, password, country, nationality, birthdate):
+    """
+    Cria um utilizador e adiciona automaticamente às ligas Mundial e do País.
+    Retorna o ID do utilizador se sucesso, None se falhar.
+    """
+    conn = None
+    try:
+        conn = create_connection()
+        cursor = conn.cursor()
+        
+        # Executar stored procedure
+        cursor.execute("""
+            DECLARE @UserID UNIQUEIDENTIFIER, @Sucesso BIT, @Mensagem NVARCHAR(200);
+            
+            EXEC sp_CriarUtilizadorComLigas
+                @PrimeiroNome = ?,
+                @Apelido = ?,
+                @Email = ?,
+                @Senha = ?,
+                @Pais = ?,
+                @Nacionalidade = ?,
+                @DataNascimento = ?,
+                @UserID = @UserID OUTPUT,
+                @Sucesso = @Sucesso OUTPUT,
+                @Mensagem = @Mensagem OUTPUT;
+            
+            SELECT @UserID, @Sucesso, @Mensagem;
+        """, first, last, email, password, country, nationality, birthdate)
+        
+        result = cursor.fetchone()
+        
+        if result:
+            user_id = result[0]
+            sucesso = result[1]
+            mensagem = result[2]
+            
+            if sucesso:
+                conn.commit()
+                return user_id
+            else:
+                conn.rollback()
+                raise Exception(mensagem)
+        else:
+            conn.rollback()
+            raise Exception("Nenhum resultado retornado da stored procedure")
+            
+    except pyodbc.Error as e:
+        if conn:
+            conn.rollback()
+        raise Exception(f"Erro de banco de dados: {str(e)}")
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        raise e
+    finally:
+        if conn:
+            conn.close()
+
+# Mantém a função antiga para compatibilidade
+def create_user(first, last, email, password, country, nationality, birthdate):
+    """
+    Função compatível com o código existente.
+    Usa a nova stored procedure por baixo.
+    """
+    try:
+        return create_user_with_ligas(first, last, email, password, country, nationality, birthdate)
+    except Exception as e:
+        print(f"Erro ao criar utilizador: {e}")
+        return None
+
+def create_liga_pais(country, creator_id):
+    """
+    Cria uma liga para um país se não existir.
+    Retorna o ID da liga.
+    """
+    conn = None
+    try:
+        conn = create_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            DECLARE @LigaID UNIQUEIDENTIFIER, @Sucesso BIT, @Mensagem NVARCHAR(200);
+            
+            EXEC sp_CriarLigaPaisSeNaoExistir
+                @Pais = ?,
+                @CriadorID = ?,
+                @LigaID = @LigaID OUTPUT,
+                @Sucesso = @Sucesso OUTPUT,
+                @Mensagem = @Mensagem OUTPUT;
+            
+            SELECT @LigaID, @Sucesso, @Mensagem;
+        """, country, creator_id)
+        
+        result = cursor.fetchone()
+        
+        if result and result[1]:  # Sucesso = True
+            conn.commit()
+            return result[0]  # LigaID
+        else:
+            conn.rollback()
+            mensagem = result[2] if result else "Erro desconhecido"
+            raise Exception(f"Falha ao criar liga do país: {mensagem}")
+            
+    except pyodbc.Error as e:
+        if conn:
+            conn.rollback()
+        raise Exception(f"Erro de banco de dados: {str(e)}")
+    finally:
+        if conn:
+            conn.close()
+
+def juntar_liga_automatico(user_id, liga_id):
+    """
+    Adiciona um utilizador a uma liga.
+    """
+    conn = None
+    try:
+        conn = create_connection()
+        cursor = conn.cursor()
+        
+        # Verificar se já pertence
+        cursor.execute("""
+            SELECT 1 FROM FantasyChamp.Participa
+            WHERE ID_Utilizador = ? AND ID_Liga = ?
+        """, user_id, liga_id)
+        
+        if cursor.fetchone():
+            print(f"Utilizador já pertence à liga {liga_id}")
+            return True
+        
+        # Adicionar à liga
+        cursor.execute("""
+            INSERT INTO FantasyChamp.Participa (ID_Utilizador, ID_Liga)
+            VALUES (?, ?)
+        """, user_id, liga_id)
+        
+        conn.commit()
+        return True
+        
+    except pyodbc.Error as e:
+        if conn:
+            conn.rollback()
+        print(f"Erro ao juntar liga: {e}")
+        return False
+    finally:
+        if conn:
+            conn.close()

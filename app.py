@@ -71,43 +71,50 @@ def signup_submit():
     birthdate = request.form.get("birthdate")
 
     try:
-        # Tenta criar o utilizador
+        # Usa a nova função que cria utilizador e ligas automaticamente
         user_id = create_user(first, last, email, password, country, nationality, birthdate)
         
-        # Se create_user não devolver um ID (caso a função trate o erro internamente e devolva None)
         if not user_id:
-             raise Exception("Erro ao criar utilizador")
+            raise Exception("Erro ao criar utilizador")
 
-        # 1) Liga Mundial → se não existir é criada, depois utilizador é adicionado
-        liga_mundial = obter_liga_pelo_pais("Mundial")
-        if not liga_mundial:
-            liga_id = criar_liga_publica("Mundial")
-            liga_mundial = obter_liga_por_id(liga_id)
-        juntar_liga_automatico(user_id, liga_mundial)
-
-        # 2) Liga do país → automática
-        liga_pais = obter_liga_pelo_pais(country)
-        if not liga_pais:
-            liga_id = criar_liga_publica(country)
-            liga_pais = obter_liga_por_id(liga_id)
-        juntar_liga_automatico(user_id, liga_pais)
-
-        return redirect("/")
+        # Login automático após registo
+        user_data = {
+            "id": user_id,
+            "first": first,
+            "last": last,
+            "email": email
+        }
+        
+        session['user'] = user_data
+        
+        # Redireciona para o dashboard
+        return redirect("/dashboard")
 
     except Exception as e:
-        # Se houver erro (ex: Email duplicado na BD), recarrega a página signup
-        print(f"Erro no registo: {e}") # Log para tu veres no terminal
+        # Log do erro
+        print(f"Erro no registo: {e}")
         
-        pais = get_pais() # TENS DE BUSCAR OS PAÍSES NOVAMENTE
+        # Obter lista de países novamente
+        pais = get_pais()
         
-        # Podes refinar a mensagem, mas genericamente:
-        mensagem_erro = "Este email já se encontra registado ou ocorreu um erro."
+        # Mensagem de erro mais específica
+        mensagem_erro = str(e)
+        if "email já está registado" in str(e).lower():
+            mensagem_erro = "Este email já está registado."
+        elif "país inválido" in str(e).lower():
+            mensagem_erro = "País selecionado é inválido."
         
-        # Se quiseres ser mais específico e souberes que o erro vem do SQL:
-        if "Duplicate entry" in str(e): 
-            mensagem_erro = "Este email já está a ser utilizado."
-
-        return render_template("signup.html", pais=pais, error=mensagem_erro)
+        return render_template("signup.html", 
+                             pais=pais, 
+                             error=mensagem_erro,
+                             form_data={
+                                 "first": first,
+                                 "last": last,
+                                 "email": email,
+                                 "country": country,
+                                 "nationality": nationality,
+                                 "birthdate": birthdate
+                             })
 
 
 @app.route("/logout")
@@ -534,6 +541,11 @@ def trocar_jogador_route(id_jogador_campo, id_jogador_banco):
     if equipa_user:
         from persistence.equipa import trocar_jogador_banco_campo
         sucesso, mensagem = trocar_jogador_banco_campo(equipa_user.id, id_jogador_banco, id_jogador_campo)
+        
+        if sucesso:
+            session['message'] = mensagem
+        else:
+            session['error'] = mensagem
     
     return redirect("/equipa")
 
