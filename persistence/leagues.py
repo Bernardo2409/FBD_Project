@@ -70,7 +70,7 @@ def criar_liga_publica(nome_liga: str, id_criador: str = None) -> str:
         cursor.execute("""
             INSERT INTO FantasyChamp.Liga
             (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
-            VALUES (?, ?, GETDATE(), '2100-01-01', 'LT01', ?, NULL)
+            VALUES (?, ?, GETDATE(), '30-05-2026', 'LT01', ?, NULL)
         """, liga_id, nome_liga, id_criador)
 
         # Criador entra automaticamente (se existir)

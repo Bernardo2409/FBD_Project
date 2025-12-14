@@ -454,22 +454,13 @@ def pontuacao():
     # Obter a equipa do utilizador
     equipa_user = obter_equipa_por_utilizador(user_id)
     if equipa_user:
-        # Obter o id da jornada atual
-        id_jornada = 'jornada_1'  # Ajuste para obter a jornada correta
+        # Obter todas as jornadas com pontuações acumuladas
+        from persistence.pontuacoes import obter_pontuacoes_jornadas
+        pontuacoes_jornadas = obter_pontuacoes_jornadas(equipa_user.id)
 
-        # Calcular a pontuação total da equipa
-        pontuacao_total = calcular_pontuacao_equipa(equipa_user.id, id_jornada)
-
-        # Obter os jogadores da equipa para exibir suas pontuações
-        jogadores_equipa = obter_jogadores_equipa(equipa_user.id)
-
-        # Calcular as pontuações de cada jogador
-        for jogador in jogadores_equipa:
-            jogador['pontuacao'] = calcular_pontuacao_jogador(jogador['id'], id_jornada)
-
-        return render_template("pontuacao.html", pontuacao_total=pontuacao_total, jogadores_equipa=jogadores_equipa)
+        return render_template("pontuacao.html", equipa={'info': equipa_user}, pontuacoes_jornadas=pontuacoes_jornadas)
     else:
-        return "Não tens uma equipa.", 404
+        return redirect("/criar-equipa")
 
 
 @app.route("/equipa/<id_equipa>/jornada/<int:id_jornada>")

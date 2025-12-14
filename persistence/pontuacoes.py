@@ -65,12 +65,6 @@ def calcular_pontuacao_equipa(id_equipa: str, id_jornada: str) -> int:
             pontuacao_jogador = calcular_pontuacao_jogador(jogador_id, id_jornada)
             pontuacao_total += pontuacao_jogador
 
-        # Atualizar a pontuação total da equipa
-        cursor.execute("""
-            UPDATE FantasyChamp.Equipa
-            SET PontuacaoTotal = ?
-            WHERE ID = ?
-        """, pontuacao_total, id_equipa)
 
         conn.commit()
         return pontuacao_total
@@ -118,4 +112,40 @@ def calcular_pontuacao_jogador_especifico(id_jogador: str):
             calcular_pontuacao_jogador(id_jogador, id_jornada)
 
         conn.commit()
+
+# Função para obter as pontuações por jornada de uma equipa
+def obter_pontuacoes_jornadas(id_equipa: str):
+    """
+    Função que retorna a pontuação de uma equipa para cada jornada com totais acumulados.
+    """
+    with create_connection() as conn:
+        cursor = conn.cursor()
+
+        # Obter todas as jornadas com pontuação da equipa
+        cursor.execute("""
+            SELECT 
+                PJ.ID_jornada as jornada,
+                SUM(CAST(PJ.pontuação_total AS INT)) as pontuacao
+            FROM FantasyChamp.Pertence PE
+            JOIN FantasyChamp.Pontuação_Jogador PJ ON PE.ID_Jogador = PJ.ID_Jogador
+            WHERE PE.ID_Equipa = ?
+            GROUP BY PJ.ID_jornada
+            ORDER BY PJ.ID_jornada
+        """, id_equipa)
+
+        jornadas_data = cursor.fetchall()
+        
+        # Calcular pontuação acumulada
+        pontuacoes = []
+        acumulada = 0
+        
+        for jornada in jornadas_data:
+            acumulada += jornada.pontuacao or 0
+            pontuacoes.append({
+                'jornada': jornada.jornada,
+                'pontuacao': jornada.pontuacao or 0,
+                'pontuacao_acumulada': acumulada
+            })
+        
+        return pontuacoes
 
