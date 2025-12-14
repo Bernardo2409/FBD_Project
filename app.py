@@ -534,11 +534,6 @@ def trocar_jogador_route(id_jogador_campo, id_jogador_banco):
     if equipa_user:
         from persistence.equipa import trocar_jogador_banco_campo
         sucesso, mensagem = trocar_jogador_banco_campo(equipa_user.id, id_jogador_banco, id_jogador_campo)
-        
-        if sucesso:
-            session['message'] = mensagem
-        else:
-            session['error'] = mensagem
     
     return redirect("/equipa")
 

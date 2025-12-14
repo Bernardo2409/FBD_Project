@@ -253,77 +253,48 @@ def verificar_limites_equipa(id_equipa: str) -> dict:
 
 
 def trocar_jogador_banco_campo(id_equipa: str, id_jogador_banco: str, id_jogador_campo: str) -> tuple[bool, str]:
-    """
-    Troca um jogador do banco com um jogador do campo.
-    Retorna (sucesso, mensagem)
-    """
-    import logging
-    logging.basicConfig(level=logging.DEBUG)
-    with create_connection() as conn:
-        cursor = conn.cursor()
-        logging.debug(f"Troca: equipa={id_equipa}, banco={id_jogador_banco}, campo={id_jogador_campo}")
-        # Verificar se o jogador do banco está realmente no banco
-        cursor.execute("""
-            SELECT benched FROM FantasyChamp.Pertence
-            WHERE ID_Equipa = ? AND ID_Jogador = ?
-        """, id_equipa, id_jogador_banco)
-        row_banco = cursor.fetchone()
-        logging.debug(f"row_banco={row_banco}")
-        if not row_banco or row_banco.benched != 1:
-            return False, "O jogador selecionado não está no banco!"
-        # Verificar se o jogador do campo está realmente em campo
-        cursor.execute("""
-            SELECT benched FROM FantasyChamp.Pertence
-            WHERE ID_Equipa = ? AND ID_Jogador = ?
-        """, id_equipa, id_jogador_campo)
-        row_campo = cursor.fetchone()
-        logging.debug(f"row_campo={row_campo}")
-        if not row_campo or row_campo.benched != 0:
-            return False, "O jogador selecionado não está em campo!"
-        # Obter posições dos jogadores
-        posicao_banco = obter_posicao_jogador(id_jogador_banco)
-        posicao_campo = obter_posicao_jogador(id_jogador_campo)
-        logging.debug(f"posicao_banco={posicao_banco}, posicao_campo={posicao_campo}")
-        # Verificar se são da mesma posição
-        if posicao_banco != posicao_campo:
-            return False, f"Não podes trocar {posicao_banco} com {posicao_campo}! Devem ser da mesma posição."
-        # Contar jogadores por posição
-        contagem_campo = contar_jogadores_por_posicao(id_equipa, apenas_campo=True)
-        contagem_banco = contar_jogadores_por_posicao(id_equipa, apenas_banco=True)
-        logging.debug(f"contagem_campo={contagem_campo}, contagem_banco={contagem_banco}")
-        # VALIDAÇÃO 1: Não pode tirar o único GR do banco (mas permite se houver outro GR no banco)
-        if posicao_banco == 'Goalkeeper' and contagem_banco['Goalkeeper'] <= 1:
-            # Permite se houver pelo menos 1 GR em campo e 1 no banco
-            if contagem_campo['Goalkeeper'] >= 1:
-                pass
+    
+    try:
+        with create_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Executar stored procedure
+            cursor.execute("""
+                DECLARE @Sucesso BIT, @Mensagem NVARCHAR(200);
+                
+                EXEC sp_TrocarJogadorBancoCampo 
+                    @ID_Equipa = ?,
+                    @ID_Jogador_Banco = ?,
+                    @ID_Jogador_Campo = ?,
+                    @Sucesso = @Sucesso OUTPUT,
+                    @Mensagem = @Mensagem OUTPUT;
+                
+                SELECT @Sucesso AS Sucesso, @Mensagem AS Mensagem;
+            """, id_equipa, id_jogador_banco, id_jogador_campo)
+            
+            result = cursor.fetchone()
+            
+            if result:
+                sucesso = bool(result.Sucesso)
+                
+                mensagem = result.Mensagem
+                
+                if sucesso:
+                    conn.commit()
+                
+                return sucesso, mensagem
             else:
-                return False, "Deve haver pelo menos 1 guarda-redes no banco!"
-        # VALIDAÇÃO 2: Não pode tirar o único avançado do campo (mas permite se houver outro avançado em campo)
-        if posicao_campo == 'Forward' and contagem_campo['Forward'] <= 1:
-            if contagem_banco['Forward'] >= 1:
-                pass
-            else:
-                return False, "Deve haver pelo menos 1 avançado em campo!"
-        # VALIDAÇÃO 3: Não pode tirar o único GR do campo (mas permite se houver outro GR em campo)
-        if posicao_campo == 'Goalkeeper' and contagem_campo['Goalkeeper'] <= 1:
-            if contagem_banco['Goalkeeper'] >= 1:
-                pass
-            else:
-                return False, "Deve haver pelo menos 1 guarda-redes em campo!"
-        # Fazer a troca atomicamente
-        cursor.execute("""
-            UPDATE FantasyChamp.Pertence
-            SET benched = 0
-            WHERE ID_Equipa = ? AND ID_Jogador = ?
-        """, id_equipa, id_jogador_banco)
-        cursor.execute("""
-            UPDATE FantasyChamp.Pertence
-            SET benched = 1
-            WHERE ID_Equipa = ? AND ID_Jogador = ?
-        """, id_equipa, id_jogador_campo)
-        conn.commit()
-        logging.debug("Troca realizada com sucesso!")
-        return True, "Troca realizada com sucesso!"
+                return False, "Erro: Stored procedure não retornou resultado"
+    
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return False, f"Erro ao executar troca: {str(e)}"
+                
+    except pyodbc.Error as e:
+        return False, f"Erro de banco de dados: {str(e)}"
+    except Exception as e:
+        return False, f"Erro: {str(e)}"
 
 
 def obter_jogadores_banco_por_posicao(id_equipa: str, posicao: str):
