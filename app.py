@@ -315,10 +315,12 @@ def criar_liga_route():
     if request.method == 'POST':
         nome = request.form.get('nome')
         data_inicio = request.form.get('data_inicio')
-        data_fim = request.form.get('data_fim')
         id_criador = session['user_id']
 
-        if nome and data_inicio and data_fim:
+        if nome and data_inicio:
+            # Data de fim fixa para 30 de maio de 2026 FIM DA CHAMPIONS
+            data_fim = '2026-05-30'
+            
             # tipo_liga pode vir do formulário (ex.: 'LT01' pública, 'LT02' privada)
             # Se não for fornecido pelo formulário (criador via UI), garantir que seja 'LT02' (privada)
             tipo_liga = request.form.get('tipo_liga') or 'LT02'

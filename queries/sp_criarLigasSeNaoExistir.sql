@@ -39,7 +39,7 @@ BEGIN
                 (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
             VALUES
                 (@LigaID, @Pais, GETDATE(),
-                DATEADD(YEAR, 100, GETDATE()),
+                CONVERT(DATE, '2026-05-30', 23),
                 @LigaTipoPublica, @CriadorID, @CodigoPais);
 
             SET @Sucesso = 1;

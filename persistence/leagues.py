@@ -38,11 +38,11 @@ def criar_liga(nome: str, data_inicio: str, data_fim: str,
 
         liga_id = str(uuid.uuid4())
 
-        # Use placeholders for all values and pass id_tipo_liga explicitly.
+        # Use placeholders for all values and use CONVERT to ensure proper date parsing
         cursor.execute("""
             INSERT INTO FantasyChamp.Liga
             (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, CONVERT(DATE, ?, 23), CONVERT(DATE, ?, 23), ?, ?, ?)
         """, liga_id, nome, data_inicio, data_fim, id_tipo_liga, id_criador, codigo_convite)
 
         # Criador entra automaticamente (se fornecido)
@@ -70,7 +70,7 @@ def criar_liga_publica(nome_liga: str, id_criador: str = None) -> str:
         cursor.execute("""
             INSERT INTO FantasyChamp.Liga
             (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
-            VALUES (?, ?, GETDATE(), '30-05-2026', 'LT01', ?, NULL)
+            VALUES (?, ?, GETDATE(), CONVERT(DATE, '2026-05-30', 23), 'LT01', ?, NULL)
         """, liga_id, nome_liga, id_criador)
 
         # Criador entra automaticamente (se existir)

@@ -10,7 +10,7 @@
 <body class="bg-base-200 min-h-screen flex items-center justify-center">
 
     <div class="card w-96 bg-base-100 shadow-xl p-8">
-        <h1 class="text-3xl font-bold text-center mb-6">Iniciar Sessão</h1>
+        <h1 class="text-3xl font-bold text-center mb-6">Login</h1>
 
         {% if error %}
             <p class="text-red-500 text-center mb-4">{{ error }}</p>
@@ -18,17 +18,17 @@
 
         <form class="flex flex-col gap-4" action="/login" method="POST">
 
-            <input type="email" name="email" placeholder="Email"
+            <input type="email" name="email" placeholder="E-mail"
                    class="input input-bordered w-full" required />
 
-            <input type="password" name="password" placeholder="Palavra-passe"
+            <input type="password" name="password" placeholder="Password"
                    class="input input-bordered w-full" required />
 
-            <button class="btn btn-primary w-full" type="submit">Entrar</button>
+            <button class="btn btn-primary w-full" type="submit">Enter</button>
         </form>
 
         <p class="text-center mt-4">
-            Não tens conta? <a href="/signup" class="link link-primary">Criar conta</a>
+            First Time? <a href="/signup" class="link link-primary">Create a account</a>
         </p>
     </div>
 

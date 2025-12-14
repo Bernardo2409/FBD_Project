@@ -29,8 +29,8 @@
     </h1>
 
     <div class="text-center mb-8 text-white bg-blue-800 bg-opacity-50 p-4 rounded-lg">
-        <p class="text-xl">Orçamento Disponível: <strong>{{ "%.2f"|format(equipa.info.orcamento) }}€</strong></p>
-        <p class="text-lg">Pontuação Total: <strong>{{ equipa.info.pontuacao_total }}</strong></p>
+        <p class="text-xl">My Money: <strong>{{ "%.2f"|format(equipa.info.orcamento) }}€</strong></p>
+        <p class="text-lg">Total Pontuation: <strong>{{ equipa.info.pontuacao_total }}</strong></p>
     </div>
         
     <!-- Botão Ver Pontuação -->
@@ -41,7 +41,7 @@
     </div>
     
     <!-- SECÇÃO: AVANÇADOS -->
-    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Avançados (3)</h2>
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Forwards(3)</h2>
 
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
@@ -70,7 +70,7 @@
                                     </div>
                                     <div class="text-xs font-bold text-white-500">{{ avancado.preco }}€ {{ avancado.estado }}</div>
                                     {% if avancado.preco > equipa.info.orcamento %}
-                                    <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
+                                    <div class="text-xs text-red-500 font-semibold">No Money</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -102,7 +102,7 @@
                     <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
                     <div class="text-sm text-white">{{ j.preco }}€</div>
                     {% if j.benched %}
-                    <div class="badge badge-warning text-xs mt-1">BANCO</div>
+                    <div class="badge badge-warning text-xs mt-1">Benched</div>
                     {% endif %}
                 </div>
             </div>
@@ -114,10 +114,10 @@
             <button type="button"
                     onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Forward')" 
                     class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
-                Trocar com Banco
+                Trade with Bench
             </button>
             {% else %}
-            <div class="text-xs text-yellow-100 font-semibold">No Banco</div>
+            <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
             {% endif %}
         </div>
     </div>
@@ -125,7 +125,7 @@
 </div>
 
     <!-- SECÇÃO: MÉDIOS -->
-    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Médios (5)</h2>
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Mediums (5)</h2>
 
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
@@ -154,7 +154,7 @@
                                     </div>
                                     <div class="text-xs font-bold text-white-500">{{ medio.preco }}€ {{ medio.estado }}</div>
                                     {% if medio.preco > equipa.info.orcamento %}
-                                    <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
+                                    <div class="text-xs text-red-500 font-semibold">No money</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -186,7 +186,7 @@
                         <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
                         <div class="text-sm text-white">{{ j.preco }}€</div>
                         {% if j.benched %}
-                        <div class="badge badge-warning text-xs mt-1">BANCO</div>
+                        <div class="badge badge-warning text-xs mt-1">Bench</div>
                         {% endif %}
                     </div>
                 </div>
@@ -197,10 +197,10 @@
                 <button type="button"
                         onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Midfielder')" 
                         class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
-                    Trocar com Banco
+                    Trade with Bench
                 </button>
                 {% else %}
-                <div class="text-xs text-yellow-100 font-semibold">No Banco</div>
+                <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
                 {% endif %}
             </div>
         </div>
@@ -208,7 +208,7 @@
     </div>
 
     <!-- SECÇÃO: DEFESAS -->
-    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Defesas (5)</h2>
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Defenders (5)</h2>
 
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
@@ -237,7 +237,7 @@
                                     </div>
                                     <div class="text-xs font-bold text-white-500">{{ defesa.preco }}€ {{ defesa.estado }}</div>
                                     {% if defesa.preco > equipa.info.orcamento %}
-                                    <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
+                                    <div class="text-xs text-red-500 font-semibold">No Money</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -269,7 +269,7 @@
                         <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
                         <div class="text-sm text-white">{{ j.preco }}€</div>
                         {% if j.benched %}
-                        <div class="badge badge-warning text-xs mt-1">BANCO</div>
+                        <div class="badge badge-warning text-xs mt-1">Bench</div>
                         {% endif %}
                     </div>
                 </div>
@@ -280,10 +280,10 @@
                 <button type="button"
                         onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Defender')" 
                         class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
-                    Trocar com Banco
+                    Trade with bench
                 </button>
                 {% else %}
-                <div class="text-xs text-yellow-100 font-semibold">No Banco</div>
+                <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
                 {% endif %}
             </div>
         </div>
@@ -291,7 +291,7 @@
     </div>
 
     <!-- SECÇÃO: GUARDA-REDES -->
-    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Guarda-Redes (2)</h2>
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Goalkeeper(2)</h2>
 
     <div class="mb-6 flex justify-center">
         <div class="dropdown dropdown-bottom">
@@ -320,7 +320,7 @@
                                     </div>
                                     <div class="text-xs font-bold text-white-500">{{ gr.preco }}€ {{ gr.estado }}</div>
                                     {% if gr.preco > equipa.info.orcamento %}
-                                    <div class="text-xs text-red-500 font-semibold">Orçamento insuficiente</div>
+                                    <div class="text-xs text-red-500 font-semibold">No Money</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -352,7 +352,7 @@
                         <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
                         <div class="text-sm text-white">{{ j.preco }}€</div>
                         {% if j.benched %}
-                        <div class="badge badge-warning text-xs mt-1">BANCO</div>
+                        <div class="badge badge-warning text-xs mt-1">Bench</div>
                         {% endif %}
                     </div>
                 </div>
@@ -363,10 +363,10 @@
                 <button type="button"
                         onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Goalkeeper')" 
                         class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
-                    Trocar com Banco
+                    Trade with bench
                 </button>
                 {% else %}
-                <div class="text-xs text-yellow-100 font-semibold">No Banco</div>
+                <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
                 {% endif %}
             </div>
         </div>
@@ -377,7 +377,7 @@
         <a href="/index"
         class="btn px-8"
         style="background-color: white; color: black; border: 1px solid #ccc;">
-        ← Voltar
+        Back
         </a>
     </div>
 
@@ -386,8 +386,8 @@
 <!-- Modal de Troca -->
 <div id="modalTroca" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-xl font-bold mb-4">Trocar Jogador</h3>
-        <p class="mb-4">Seleciona um jogador do banco para trocar com <strong id="nomeJogadorCampo"></strong>:</p>
+        <h3 class="text-xl font-bold mb-4">Trade Player</h3>
+        <p class="mb-4">Select a player from bench to trade with <strong id="nomeJogadorCampo"></strong>:</p>
         
         <div id="listaJogadoresBanco" class="max-h-64 overflow-y-auto mb-4">
             <!-- Será preenchido dinamicamente -->
@@ -395,7 +395,7 @@
         
         <div class="flex justify-end gap-2">
             <button onclick="fecharModalTroca()" class="btn bg-gray-500 text-white hover:bg-gray-600">
-                Cancelar
+                Cancel
             </button>
         </div>
     </div>

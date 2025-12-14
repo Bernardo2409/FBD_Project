@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Criar Conta</title>
+    <title>Create Account</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" rel="stylesheet" />
 </head>
@@ -10,7 +10,7 @@
 <body class="bg-base-200 min-h-screen flex items-center justify-center">
 
     <div class="card w-[450px] bg-base-100 shadow-xl p-8">
-        <h1 class="text-3xl font-bold text-center mb-6">Criar Conta</h1>
+        <h1 class="text-3xl font-bold text-center mb-6">Create Account</h1>
 
         {% if error %}
         <div role="alert" class="alert alert-error mb-4">
@@ -24,24 +24,23 @@
 
             <!-- Nome e Apelido -->
             <div class="flex gap-3">
-                <input name="first" placeholder="Primeiro Nome" class="input input-bordered w-1/2">
-                <input name="last" placeholder="Apelido" class="input input-bordered w-1/2">
+                <input name="first" placeholder="First Name" class="input input-bordered w-1/2">
+                <input name="last" placeholder="Surname" class="input input-bordered w-1/2">
             </div>
 
             <!-- Email e Password -->
-            <input type="email" name="email" placeholder="Email" class="input input-bordered w-full">
+            <input type="email" name="email" placeholder="E-mail" class="input input-bordered w-full">
             <input type="password" name="password" placeholder="Palavra-passe" class="input input-bordered w-full">
 
             <!-- Dropdown para Seleção de País -->
             <div class="dropdown w-full">
                 <button type="button" class="input input-bordered w-full text-left flex items-center justify-between gap-2">
-                    <span class="country-label">Selecionar País</span>
+                    <span class="country-label">Select Country</span>
                     <span class="ml-auto">▼</span>
                 </button>
                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto">
                     {% for country in pais %}
                         <li>
-                            <!-- Usamos um botão em vez de <a href="#"> para evitar o refresh -->
                             <button type="button" class="flex items-center gap-2" onclick="setCountry('{{ country.nome }}')">
                                 <img src="{{ country.imagem }}" alt="{{ country.nome }}" class="w-6 h-6 object-cover">
                                 <span>{{ country.nome }}</span>
@@ -50,24 +49,20 @@
                     {% endfor %}
                 </ul>
             </div>
-
-              <!-- O rótulo do botão da dropdown funciona como campo visível para o País;
-                  guardamos o país seleccionado num campo oculto `country` para envio -->
-              <!-- Campo editável para a Nacionalidade (ex.: português, inglês) -->
-              <input name="nationality" placeholder="Nacionalidade" class="input input-bordered w-full">
-              <!-- Campo oculto para guardar o país selecionado (enviado no form) -->
+              <input name="nationality" placeholder="Nacionality" class="input input-bordered w-full">
+              <!-- Campo oculto para guardar o país selecionado-->
               <input type="hidden" name="country" id="country-input">
 
             <!-- Data de Nascimento -->
-            <label class="font-semibold">Data de nascimento</label>
+            <label class="font-semibold">Born date</label>
             <input type="date" name="birthdate" class="input input-bordered w-full">
 
             <!-- Botão de Submissão -->
-            <button class="btn btn-success w-full" type="submit">Criar Conta</button>
+            <button class="btn btn-success w-full" type="submit">Create Account</button>
         </form>
 
         <p class="text-center mt-4">
-            Já tens conta? <a href="/" class="link link-primary">Entrar</a>
+            Already Signup? <a href="/" class="link link-primary">Enter</a>
         </p>
     </div>
 
