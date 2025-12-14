@@ -87,8 +87,7 @@ def signup_submit():
         
         session['user'] = user_data
         
-        # Redireciona para o dashboard
-        return redirect("/dashboard")
+        return redirect("/")
 
     except Exception as e:
         # Log do erro
