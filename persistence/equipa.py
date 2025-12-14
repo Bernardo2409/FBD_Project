@@ -153,107 +153,46 @@ def contar_jogadores_por_posicao(id_equipa: str, apenas_campo: bool = False, ape
         return contagem
 
 
+import pyodbc
+
 def adicionar_jogador_equipa(id_equipa: str, id_jogador: str):
     with create_connection() as conn:
         cursor = conn.cursor()
         
-        # Verificar se já existe
-        cursor.execute("""
-            SELECT 1 FROM FantasyChamp.Pertence 
-            WHERE ID_Equipa = ? AND ID_Jogador = ?
-        """, id_equipa, id_jogador)
-        
-        if cursor.fetchone():
-            raise Exception("Jogador já está na equipa")
-        
-        # Obter preço do jogador
-        preco_jogador = obter_preco_jogador(id_jogador)
-        
-        # Verificar se tem orçamento suficiente
-        if not verificar_orcamento_suficiente(id_equipa, preco_jogador):
-            raise Exception("Orçamento insuficiente para adicionar este jogador")
-        
-        # Obter posição do jogador
-        posicao_jogador = obter_posicao_jogador(id_jogador)
-        
-        # Contar quantos jogadores já estão no banco
-        cursor.execute("""
-            SELECT COUNT(*) FROM FantasyChamp.Pertence
-            WHERE ID_Equipa = ? AND benched = 1
-        """, id_equipa)
-        total_banco = cursor.fetchone()[0]
-        
-        # Contar jogadores por posição no banco e em campo
-        contagem_banco = contar_jogadores_por_posicao(id_equipa, apenas_banco=True)
-        contagem_campo = contar_jogadores_por_posicao(id_equipa, apenas_campo=True)
-        
-        # Determinar se vai para o banco ou campo
-        benched_status = 1  # Por padrão vai para o banco
-        
-        # ===== REGRAS PRIORITÁRIAS =====
-        
-        # REGRA PRIORITÁRIA 1: Se é GR e não tem GR no banco, VAI PARA O BANCO (SEMPRE!)
-        if posicao_jogador == 'Goalkeeper' and contagem_banco['Goalkeeper'] == 0:
-            benched_status = 1
-        
-        # REGRA PRIORITÁRIA 2: Se é GR e já tem GR no banco, vai para o campo
-        elif posicao_jogador == 'Goalkeeper' and contagem_banco['Goalkeeper'] >= 1:
-            benched_status = 0
-        
-        # ===== REGRAS PARA OUTROS JOGADORES (quando já há GR no banco) =====
-        
-        # REGRA 3: Se já tem 4 no banco, vai para o campo
-        elif total_banco >= 4:
-            benched_status = 0
-        
-        # REGRA 4: Se tem 3 no banco mas ainda não tem GR, este jogador vai para o CAMPO
-        # (porque o 4º lugar do banco está reservado para o GR obrigatório)
-        elif total_banco == 3 and contagem_banco['Goalkeeper'] == 0 and posicao_jogador != 'Goalkeeper':
-            benched_status = 0  # Vai para o campo para deixar espaço para o GR obrigatório
-        
-        # REGRA 5: Para avançados - se já tem 2 avançados no banco, este vai para o campo
-        elif posicao_jogador == 'Forward' and contagem_banco['Forward'] >= 2:
-            benched_status = 0
-        
-        # REGRA 6: Se ainda tem espaço no banco (menos de 3) e já tem GR no banco
-        elif total_banco < 3 and contagem_banco['Goalkeeper'] >= 1:
-            # Verifica se ao adicionar este jogador ao banco, ainda sobra pelo menos 1 avançado para o campo
-            if posicao_jogador == 'Forward':
-                # Contar quantos avançados faltam adicionar
-                total_avancados = contagem_banco['Forward'] + contagem_campo['Forward']
-                if total_avancados >= 2 and contagem_banco['Forward'] >= 2:
-                    # Se já tem 2 no banco e este é o 3º avançado, vai para o campo
-                    benched_status = 0
+        try:
+            # Executar stored procedure
+            cursor.execute("""
+                DECLARE @Resultado INT, @Mensagem NVARCHAR(200);
+                
+                EXEC sp_AdicionarJogadorEquipa 
+                    @ID_Equipa = ?, 
+                    @ID_Jogador = ?,
+                    @Resultado = @Resultado OUTPUT,
+                    @Mensagem = @Mensagem OUTPUT;
+                
+                SELECT @Resultado, @Mensagem;
+            """, id_equipa, id_jogador)
+            
+            row = cursor.fetchone()
+            
+            if row:
+                resultado = row[0]
+                mensagem = row[1]
+                
+                if resultado == 0:
+                    raise Exception(mensagem)
                 else:
-                    benched_status = 1
+                    conn.commit()
+                    return mensagem
             else:
-                benched_status = 1
-        
-        # REGRA 7: Se tem menos de 4 no banco, tem GR, e não quebra outras regras
-        elif total_banco < 4 and contagem_banco['Goalkeeper'] >= 1:
-            if posicao_jogador == 'Forward':
-                # Máximo 2 avançados no banco
-                if contagem_banco['Forward'] >= 2:
-                    benched_status = 0
-                else:
-                    benched_status = 1
-            else:
-                benched_status = 1
-        
-        # Inserir relação
-        cursor.execute("""
-            INSERT INTO FantasyChamp.Pertence (ID_Equipa, ID_Jogador, benched)
-            VALUES (?, ?, ?)
-        """, id_equipa, id_jogador, benched_status)
-        
-        # Subtrair o preço do jogador ao orçamento
-        cursor.execute("""
-            UPDATE FantasyChamp.Equipa
-            SET Orçamento = Orçamento - ?
-            WHERE ID = ?
-        """, preco_jogador, id_equipa)
-        
-        conn.commit()
+                raise Exception("Erro: Nenhum resultado retornado da stored procedure")
+                
+        except pyodbc.Error as e:
+            conn.rollback()
+            raise Exception(f"Erro de banco de dados: {str(e)}")
+        except Exception as e:
+            conn.rollback()
+            raise e
 
 
 def remover_jogador_equipa(id_equipa: str, id_jogador: str):
