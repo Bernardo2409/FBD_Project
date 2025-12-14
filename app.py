@@ -26,6 +26,7 @@ from persistence.users import create_user, login_user, get_users, get_user_by_id
 from persistence.countries import get_pais
 
 from persistence.pontuacoes import calcular_pontuacao_equipa, calcular_pontuacao_jogador
+from persistence import players
 
 
 import random
@@ -150,16 +151,6 @@ def players_list():
         page=page,
         total_pages=total_pages
     )
-
-
-@app.route("/players/<j_id>")
-def player_details(j_id):
-    jogador = read(j_id)
-
-    if jogador:
-        return render_template("player_details.html", jogador=jogador)
-    else:
-        return "Jogador não encontrado", 404
 
 
 @app.route("/clubs")
@@ -364,15 +355,30 @@ def liga_detalhes(liga_id):
     if 'user_id' not in session:
         return redirect("/")
 
+    # Obter detalhes da liga
     liga = obter_liga_por_id(liga_id)
-    participantes = obter_participantes_liga(liga_id)
-
     if not liga:
         return "Liga não encontrada", 404
+    
+    # Obter participantes
+    participantes = obter_participantes_liga(liga_id)
+    
+    # Obter jornada selecionada (se houver)
+    jornada_selecionada = request.args.get('jornada', None)
+    
+    # Obter jornadas disponíveis
+    from persistence.leagues import obter_jornadas_disponiveis, obter_ranking_liga
+    jornadas = obter_jornadas_disponiveis()
+    
+    # Obter ranking
+    ranking = obter_ranking_liga(liga_id, jornada_selecionada)
 
     return render_template("liga_details.html", 
                          liga=liga, 
-                         participantes=participantes)
+                         participantes=participantes,
+                         ranking=ranking,
+                         jornadas=jornadas,
+                         jornada_selecionada=jornada_selecionada)
 
 
 @app.route("/juntar-liga-codigo", methods=['POST'])
@@ -417,6 +423,7 @@ def abandonar_liga_route(liga_id):
 def obter_jornada_atual():
     # Aqui você pode retornar o id da jornada atual com base na data ou na lógica do sistema
     return 'jornada_1'
+
 
 @app.route("/atualizar_pontuacao")
 def atualizar_pontuacao():
@@ -463,7 +470,8 @@ def pontuacao():
         return render_template("pontuacao.html", pontuacao_total=pontuacao_total, jogadores_equipa=jogadores_equipa)
     else:
         return "Não tens uma equipa.", 404
-    
+
+
 @app.route("/equipa/<id_equipa>/jornada/<int:id_jornada>")
 def equipa_jornada(id_equipa, id_jornada):
     if 'user_id' not in session:
@@ -491,6 +499,7 @@ def equipa_jornada(id_equipa, id_jornada):
     else:
         return "Não tens uma equipa ou jornada válida.", 404
 
+
 @app.route("/equipa/banco/adicionar/<id_jogador>", methods=["POST"])
 def adicionar_jogador_ao_banco_route(id_jogador):
     if 'user_id' not in session:
@@ -509,6 +518,7 @@ def adicionar_jogador_ao_banco_route(id_jogador):
             session['error'] = mensagem
     
     return redirect("/equipa")
+
 
 @app.route("/equipa/banco/remover/<id_jogador>", methods=["POST"])
 def remover_jogador_do_banco_route(id_jogador):
@@ -529,6 +539,7 @@ def remover_jogador_do_banco_route(id_jogador):
     
     return redirect("/equipa")
 
+
 @app.route("/equipa/trocar/<id_jogador_campo>/<id_jogador_banco>", methods=["POST"])
 def trocar_jogador_route(id_jogador_campo, id_jogador_banco):
     if 'user_id' not in session:
@@ -547,6 +558,35 @@ def trocar_jogador_route(id_jogador_campo, id_jogador_banco):
             session['error'] = mensagem
     
     return redirect("/equipa")
+
+
+@app.route('/players/<player_id>')
+def player_details(player_id):
+    if 'user_id' not in session:
+        return redirect("/")
+    
+    # Obter detalhes básicos do jogador
+    jogador = players.read(player_id)
+    
+    if not jogador:
+        return "Jogador não encontrado", 404
+    
+    # Obter estatísticas do jogador
+    stats, total_pontos = players.get_player_stats(player_id)
+    
+    # Calcular totais para o resumo
+    total_golos = sum(stat.golos_marcados for stat in stats)
+    total_assistencias = sum(stat.assistencias for stat in stats)
+    
+    return render_template(
+        'player_details.html',
+        jogador=jogador,
+        stats=stats,
+        total_pontos=total_pontos,
+        total_golos=total_golos,
+        total_assistencias=total_assistencias
+    )
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

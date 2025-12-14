@@ -27,6 +27,16 @@ class PlayerDetails(NamedTuple):
     jogador_imagem: str
 
 
+class PlayerStats(NamedTuple):
+    id_jornada: str
+    pontuacao_total: int
+    golos_marcados: int
+    assistencias: int
+    cartoes_amarelos: int
+    cartoes_vermelhos: int
+    tempo_jogo: int
+
+
 # --- CRUD FUNCTIONS ---
 
 def list_all() -> list[PlayerDescriptor]:
@@ -52,7 +62,6 @@ def list_all() -> list[PlayerDescriptor]:
                 ),
             cursor
         ))
-
 
 
 def read(j_id: str):
@@ -91,6 +100,55 @@ def read(j_id: str):
             row.clube_imagem if row.clube_imagem else '/static/images/Image-not-found.png',
             row.jogador_imagem if row.jogador_imagem else '/static/images/Image-not-found.png'
         )
+
+
+def get_player_stats(j_id: str) -> tuple[list[PlayerStats], int]:
+    """
+    Obtém as estatísticas do jogador por jornada e a pontuação total
+    """
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        
+        # Buscar estatísticas por jornada
+        cursor.execute("""
+            SELECT 
+                ID_jornada,
+                pontuação_total,
+                GolosMarcados,
+                Assistencias,
+                CartoesAmarelos,
+                CartoesVermelhos,
+                TempoJogo
+            FROM FantasyChamp.Pontuação_Jogador
+            WHERE ID_jogador = ?
+            ORDER BY ID_jornada
+        """, j_id)
+        
+        stats = []
+        total_pontos = 0
+        
+        for row in cursor:
+            # Converter valores para garantir tipos corretos
+            pontuacao = int(row.pontuação_total) if row.pontuação_total is not None else 0
+            golos = int(row.GolosMarcados) if row.GolosMarcados is not None else 0
+            assistencias = int(row.Assistencias) if row.Assistencias is not None else 0
+            amarelos = int(row.CartoesAmarelos) if row.CartoesAmarelos is not None else 0
+            vermelhos = int(row.CartoesVermelhos) if row.CartoesVermelhos is not None else 0
+            minutos = int(row.TempoJogo) if row.TempoJogo is not None else 0
+            
+            stats.append(PlayerStats(
+                row.ID_jornada,
+                pontuacao,
+                golos,
+                assistencias,
+                amarelos,
+                vermelhos,
+                minutos
+            ))
+            total_pontos += pontuacao
+        
+        return stats, total_pontos
+
 
 def list_paginated(page: int, per_page: int) -> tuple[list[PlayerDescriptor], int]:
     offset = (page - 1) * per_page

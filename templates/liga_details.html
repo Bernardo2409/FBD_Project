@@ -78,6 +78,89 @@
         </div>
     {% endif %}
 
+    <!-- RANKINGS -->
+    <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Rankings</h2>
+            
+            <!-- Filtro de Jornada -->
+            {% if jornadas %}
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-semibold text-gray-600">View:</label>
+                <select id="jornadaSelect" class="select select-bordered select-sm" onchange="filtrarJornada()">
+                    <option value="">Overall Ranking</option>
+                    {% for jornada in jornadas %}
+                    <option value="{{ jornada }}" {% if jornada_selecionada == jornada %}selected{% endif %}>
+                        {{ jornada|replace('jornada_', 'Matchday ')|replace('_', ' ')|title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if ranking %}
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr>
+                        <th class="text-center w-16">Pos</th>
+                        <th class="text-left">Manager</th>
+                        <th class="text-left">Team</th>
+                        <th class="text-center">Points</th>
+                        <th class="text-center">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in ranking %}
+                    <tr class="hover">
+                        <td class="text-center font-bold">
+                            <span class="text-gray-600">{{ team.posicao }}</span>
+                        </td>
+                        <td class="font-semibold">{{ team.nome_utilizador }}</td>
+                        <td>
+                            <span class="badge badge-primary badge-lg">
+                                {{ team.nome_equipa }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            {% if jornada_selecionada %}
+                                <span class="font-bold text-lg text-primary">
+                                    {{ team.pontuacao }}
+                                </span>
+                            {% else %}
+                                <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="font-bold text-lg text-secondary">
+                                {{ team.pontuacao_acumulada }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 flex justify-between items-center text-sm text-gray-500">
+            <span>Total teams: {{ ranking|length }}</span>
+            {% if jornada_selecionada %}
+            <span class="badge badge-info">
+                Showing: {{ jornada_selecionada|replace('jornada_', 'Matchday ')|replace('_', ' ')|title }}
+            </span>
+            {% else %}
+            <span class="badge badge-success">Showing: Overall Ranking</span>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="text-center py-8">
+            <p class="text-gray-500 text-lg"> No scores available yet</p>
+            <p class="text-sm text-gray-400 mt-2">Scores will appear here once matchdays are completed</p>
+        </div>
+        {% endif %}
+    </div>
+
     <!-- PARTICIPANTS -->
     <div class="bg-white rounded-lg shadow-xl p-6">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">Participants</h2>
@@ -118,15 +201,6 @@
         {% endif %}
     </div>
 
-    <!-- RANKINGS (Future Feature) -->
-    <div class="bg-white rounded-lg shadow-xl p-6 mt-6">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">Rankings</h2>
-        <div class="text-center py-8 text-gray-500">
-            <p>The ranking system is currently under development...</p>
-            <p class="text-sm mt-2">Soon you will be able to view player scores here!</p>
-        </div>
-    </div>
-
     <!-- Back Button -->
     <div class="flex justify-center" style="margin: 20px;">
         <a href="/ligas"
@@ -136,6 +210,19 @@
     </div>
 
 </div>
+
+<script>
+function filtrarJornada() {
+    const select = document.getElementById('jornadaSelect');
+    const jornada = select.value;
+    
+    if (jornada) {
+        window.location.href = `?jornada=${jornada}`;
+    } else {
+        window.location.href = window.location.pathname;
+    }
+}
+</script>
 
 </body>
 </html>

@@ -11,11 +11,12 @@
     <div class="container mx-auto p-6">
         <h1 class="text-4xl font-bold mb-8 text-center text-primary">Player Details</h1>
 
-        <div class="card lg:card-side bg-white shadow-xl max-w-4xl mx-auto p-6 border-t-4 border-primary">
+        <!-- Card de Informação Básica -->
+        <div class="card lg:card-side bg-white shadow-xl max-w-4xl mx-auto p-6 border-t-4 border-primary mb-8">
             
             <figure class="p-4 lg:p-0 flex justify-center items-center">
                 <img src="{{ jogador.jogador_imagem }}" 
-                     alt="Imagem do Jogador" 
+                     alt="Not-Found" 
                      class="w-64 h-64 object-cover rounded-box shadow-lg border-4 border-base-200 mask mask-squircle" />
             </figure>
 
@@ -35,13 +36,82 @@
                 <div class="flex flex-col md:flex-row items-center gap-4 justify-center md:justify-start">
                     <a href="/clubs/{{ jogador.Clube_id }}" 
                         class="btn btn-primary btn-outline font-semibold">
-                    <img src="{{ jogador.clube_imagem }}" 
-                         alt="Imagem do Clube" 
-                         class="w-16 h-16 object-cover rounded-full mask mask-squircle shadow-md" />
+                        <img src="{{ jogador.clube_imagem }}" 
+                             alt="Imagem do Clube" 
+                             class="w-16 h-16 object-cover rounded-full mask mask-squircle shadow-md" />
                     </a>
                 </div>
             </div>
         </div>
+
+        <!-- Card de Estatísticas e Pontuação -->
+        <div class="card bg-white shadow-xl max-w-4xl mx-auto p-6 border-t-4 border-secondary mb-8">
+            <div class="card-body">
+                <h2 class="card-title text-2xl font-bold text-gray-800 mb-6">
+                    Pontuation and Stats
+                </h2>
+
+                <!-- Resumo Total -->
+                <div class="stats shadow mb-6 w-full">
+                    <div class="stat place-items-center">
+                        <div class="stat-title">Total Points</div>
+                        <div class="stat-value text-primary">{{ total_pontos }}</div>
+                    </div>
+                    
+                    <div class="stat place-items-center">
+                        <div class="stat-title">Goals</div>
+                        <div class="stat-value text-secondary">{{ total_golos }}</div>
+                    </div>
+                    
+                    <div class="stat place-items-center">
+                        <div class="stat-title">Assists</div>
+                        <div class="stat-value text-accent">{{ total_assistencias }}</div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Estatísticas por Jornada -->
+                {% if stats %}
+                <div class="overflow-x-auto">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Per Round</h3>
+                    <table class="table table-zebra w-full">
+                        <thead>
+                            <tr>
+                                <th>Round</th>
+                                <th>Pointss</th>
+                                <th>Goals</th>
+                                <th>Assists</th>
+                                <th>Yellow Card</th>
+                                <th>Red Card</th>
+                                <th>Play time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in stats %}
+                            <tr class="hover">
+                                <td class="font-semibold">{{ stat.id_jornada }}</td>
+                                <td>
+                                    <span class="badge badge-primary badge-lg">{{stat.pontuacao_total }}</span>
+                                </td>
+                                <td>{{ stat.golos_marcados }}</td>
+                                <td>{{ stat.assistencias }}</td>
+                                <td>{{ stat.cartoes_amarelos }}</td>
+                                <td>{{ stat.cartoes_vermelhos }}</td>
+                                <td> {{stat.tempo_jogo }}'</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <span>Manutenção.</span>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- Botão de Voltar -->
         <div class="mt-10 text-center">
             <a href="/players" class="btn btn-primary px-8">← Back to Players</a>
         </div>
