@@ -63,7 +63,7 @@ BEGIN
             VALUES
                 (@LigaMundialID, 'Mundial', GETDATE(),
                 CONVERT(DATE, '2026-05-30', 23),
-                @LigaTipoPublica, @UserID, NULL);
+                @LigaTipoPublica, '00000000-0000-0000-0000-000000000000', NULL);
         END
 
         -- Adicionar utilizador à Liga Mundial
@@ -96,7 +96,7 @@ BEGIN
             VALUES
                 (@LigaPaisID, @Pais, GETDATE(),
                 CONVERT(DATE, '2026-05-30', 23),
-                @LigaTipoPublica, @UserID, @CodigoPais);
+                @LigaTipoPublica, '00000000-0000-0000-0000-000000000000', @CodigoPais);
         END
 
         -- Adicionar utilizador à Liga do País
