@@ -62,7 +62,7 @@ BEGIN
                 (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
             VALUES
                 (@LigaMundialID, 'Mundial', GETDATE(),
-                DATEADD(YEAR, 100, GETDATE()), -- 100 anos no futuro
+                CONVERT(DATE, '2026-05-30', 23),
                 @LigaTipoPublica, @UserID, NULL);
         END
 
