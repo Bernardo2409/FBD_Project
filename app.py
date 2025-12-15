@@ -12,8 +12,6 @@ from persistence.equipa import (
     remover_jogador_equipa, 
     verificar_limites_equipa, 
     obter_detalhes_equipa_para_visualizacao, 
-    adicionar_jogador_ao_banco, 
-    remover_jogador_do_banco, 
     trocar_jogador_banco_campo
 )
 from persistence.leagues import (
@@ -576,6 +574,7 @@ def adicionar_jogador_ao_banco_route(id_jogador):
     equipa_user = obter_equipa_por_utilizador(user_id)
     
     if equipa_user:
+        from persistence.equipa import adicionar_jogador_ao_banco
         sucesso, mensagem = adicionar_jogador_ao_banco(equipa_user.id, id_jogador)
         
         if sucesso:
@@ -595,6 +594,7 @@ def remover_jogador_do_banco_route(id_jogador):
     equipa_user = obter_equipa_por_utilizador(user_id)
     
     if equipa_user:
+        from persistence.equipa import remover_jogador_do_banco
         sucesso, mensagem = remover_jogador_do_banco(equipa_user.id, id_jogador)
         
         if sucesso:
