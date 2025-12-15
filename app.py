@@ -58,7 +58,7 @@ def login_submit():
 
 @app.route("/signup", methods=["GET"])
 def signup_page():
-    pais = get_pais()  # Obtém os países com suas imagens da tabela Pais
+    pais = get_pais()
     return render_template("signup.html", pais=pais)
 
 
@@ -73,13 +73,11 @@ def signup_submit():
     birthdate = request.form.get("birthdate")
 
     try:
-        # Usa a nova função que cria utilizador e ligas automaticamente
         user_id = create_user(first, last, email, password, country, nationality, birthdate)
         
         if not user_id:
             raise Exception("Erro ao criar utilizador")
 
-        # Login automático após registo
         user_data = {
             "id": user_id,
             "first": first,
@@ -92,13 +90,10 @@ def signup_submit():
         return redirect("/")
 
     except Exception as e:
-        # Log do erro
         print(f"Erro no registo: {e}")
         
-        # Obter lista de países novamente
         pais = get_pais()
         
-        # Mensagem de erro mais específica
         mensagem_erro = str(e)
         if "email já está registado" in str(e).lower():
             mensagem_erro = "Este email já está registado."
@@ -295,7 +290,6 @@ def ligas_list():
 
     user_id = session['user_id']
     minhas_ligas = obter_ligas_por_utilizador(user_id)
-    # obter país do utilizador (se disponível) para filtrar ligas públicas
     user = get_user_by_id(user_id)
     user_country = None
     if user:
@@ -319,11 +313,8 @@ def criar_liga_route():
         id_criador = session['user_id']
 
         if nome and data_inicio:
-            # Data de fim fixa para 30 de maio de 2026 FIM DA CHAMPIONS
             data_fim = '2026-05-30'
             
-            # tipo_liga pode vir do formulário (ex.: 'LT01' pública, 'LT02' privada)
-            # Se não for fornecido pelo formulário (criador via UI), garantir que seja 'LT02' (privada)
             tipo_liga = request.form.get('tipo_liga') or 'LT02'
             codigo_convite = request.form.get('codigo_convite') or None
 
@@ -358,22 +349,17 @@ def liga_detalhes(liga_id):
     if 'user_id' not in session:
         return redirect("/")
 
-    # Obter detalhes da liga
     liga = obter_liga_por_id(liga_id)
     if not liga:
         return "Liga não encontrada", 404
     
-    # Obter participantes
     participantes = obter_participantes_liga(liga_id)
     
-    # Obter jornada selecionada (se houver)
     jornada_selecionada = request.args.get('jornada', None)
     
-    # Obter jornadas disponíveis
     from persistence.leagues import obter_jornadas_disponiveis, obter_ranking_liga
     jornadas = obter_jornadas_disponiveis()
     
-    # Obter ranking
     ranking = obter_ranking_liga(liga_id, jornada_selecionada)
 
     return render_template("liga_details.html", 
@@ -422,9 +408,7 @@ def abandonar_liga_route(liga_id):
     return redirect("/ligas")
 
 
-# Função fictícia para obter a jornada atual
 def obter_jornada_atual():
-    # Aqui você pode retornar o id da jornada atual com base na data ou na lógica do sistema
     return 'jornada_1'
 
 
@@ -437,8 +421,7 @@ def atualizar_pontuacao():
     equipa_user = obter_equipa_por_utilizador(user_id)
 
     if equipa_user:
-        # Obter o id da jornada atual dinamicamente
-        id_jornada = obter_jornada_atual()  # Função fictícia para obter a jornada atual
+        id_jornada = obter_jornada_atual()
         
         pontuacao_total = calcular_pontuacao_equipa(equipa_user.id, id_jornada)
         
@@ -454,15 +437,12 @@ def pontuacao():
 
     user_id = session['user_id']
     
-    # Obter a equipa do utilizador
     equipa_user = obter_equipa_por_utilizador(user_id)
     if equipa_user:
         try:
-            # Obter todas as jornadas com pontuações acumuladas
             from persistence.pontuacoes import obter_pontuacoes_jornadas
             pontuacoes_jornadas = obter_pontuacoes_jornadas(equipa_user.id)
             
-            # Calcular estatísticas
             total_pontos = sum(p['pontuacao'] for p in pontuacoes_jornadas if p['pontuacao'])
             media_pontos = total_pontos / len(pontuacoes_jornadas) if pontuacoes_jornadas else 0
             melhor_jornada = max(pontuacoes_jornadas, key=lambda x: x['pontuacao']) if pontuacoes_jornadas else None
@@ -475,7 +455,6 @@ def pontuacao():
                                  melhor_jornada=melhor_jornada)
         except Exception as e:
             print(f"Erro ao obter pontuações: {e}")
-            # Se falhar, mostrar página sem dados
             return render_template("pontuacao.html", 
                                  equipa={'info': equipa_user}, 
                                  pontuacoes_jornadas=[],
@@ -492,25 +471,19 @@ def equipa_jornada(id_equipa, id_jornada):
     user_id = session['user_id']
     
     try:
-        # Usar a função otimizada que faz tudo em uma só chamada
         from persistence.pontuacoes import obter_equipa_com_pontuacoes_jornada
         dados = obter_equipa_com_pontuacoes_jornada(id_equipa, id_jornada)
         
-        # Obter informações da equipa
         equipa_user = obter_equipa_por_utilizador(user_id)
         
-        # Validar que o utilizador tem permissão
         if not equipa_user or str(equipa_user.id) != str(id_equipa):
             return "Não tens permissão para ver esta equipa.", 403
         
-        # Obter informações da jornada
         jornada_info = obter_jornada_info(id_jornada)
         
-        # Formatar dados para o template
         jogadores_campo = [j for j in dados['jogadores'] if not j.get('benched', 1)]
         jogadores_banco = [j for j in dados['jogadores'] if j.get('benched', 1)]
         
-        # Separar por posição
         def agrupar_por_posicao(jogadores):
             grupos = {
                 'goalkeeper': [],
@@ -535,12 +508,10 @@ def equipa_jornada(id_equipa, id_jornada):
         campo_agrupado = agrupar_por_posicao(jogadores_campo)
         banco_agrupado = agrupar_por_posicao(jogadores_banco)
         
-        # Calcular estatísticas
         total_pontos = dados.get('pontuacao_total', 0)
         total_jogadores = len(jogadores_campo)
         media_por_jogador = total_pontos / total_jogadores if total_jogadores > 0 else 0
         
-        # Jogador com melhor pontuação
         melhor_jogador = max(jogadores_campo, key=lambda x: x.get('pontuacao', 0)) if jogadores_campo else None
         
         return render_template("equipa.html", 
@@ -558,20 +529,16 @@ def equipa_jornada(id_equipa, id_jornada):
     except Exception as e:
         print(f"Erro na rota equipa_jornada: {e}")
         
-        # Fallback para o método antigo se o novo falhar
         try:
             equipa_user = obter_equipa_por_utilizador(user_id)
             
             if equipa_user and str(equipa_user.id) == str(id_equipa):
-                # Método fallback usando funções individuais
-                
                 pontuacao_total = calcular_pontuacao_equipa(id_equipa, id_jornada)
                 jogadores_equipa = obter_jogadores_equipa(id_equipa)
 
                 for jogador in jogadores_equipa:
                     jogador['pontuacao'] = calcular_pontuacao_jogador(jogador['id'], id_jornada)
                 
-                # Separar jogadores em campo e banco
                 jogadores_campo = [j for j in jogadores_equipa if not j.get('benched', 1)]
                 jogadores_banco = [j for j in jogadores_equipa if j.get('benched', 1)]
                 
@@ -654,16 +621,13 @@ def player_details(player_id):
     if 'user_id' not in session:
         return redirect("/")
     
-    # Obter detalhes básicos do jogador
     jogador = players.read(player_id)
     
     if not jogador:
         return "Jogador não encontrado", 404
     
-    # Obter estatísticas do jogador
     stats, total_pontos = players.get_player_stats(player_id)
     
-    # Calcular totais para o resumo
     total_golos = sum(stat.golos_marcados for stat in stats)
     total_assistencias = sum(stat.assistencias for stat in stats)
     
@@ -675,6 +639,8 @@ def player_details(player_id):
         total_golos=total_golos,
         total_assistencias=total_assistencias
     )
+
+
 @app.route("/jogos")
 def jogos_list():
     if 'user_id' not in session:
@@ -682,15 +648,31 @@ def jogos_list():
     page = int(request.args.get("page", 1))
     per_page = 10
 
-    jogos, total = list_paginated(page, per_page)
+    from persistence.match import list_paginated_matches
+    matches, total = list_paginated_matches(page, per_page)
     total_pages = (total + per_page - 1) // per_page
 
     return render_template(
         "jogos.html",
-        jogos=jogos,
+        match=matches,
         page=page,
         total_pages=total_pages
     )
+
+
+@app.route("/jogos/<match_id>")
+def match_details(match_id):
+    if 'user_id' not in session:
+        return redirect("/")
+    
+    from persistence.match import read_match
+    match = read_match(match_id)
+
+    if match:
+        return render_template("jogos_details.html", match=match)
+    else:
+        return "Jogo não encontrado", 404
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
