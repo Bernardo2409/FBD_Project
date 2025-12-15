@@ -5,7 +5,17 @@ from datetime import datetime
 
 from flask import Flask, render_template, request, redirect, jsonify, session, url_for
 
-from persistence.equipa import adicionar_jogador_equipa, criar_equipa, obter_equipa_por_utilizador, obter_jogadores_equipa, remover_jogador_equipa, verificar_limites_equipa, obter_detalhes_equipa_para_visualizacao
+from persistence.equipa import (
+    adicionar_jogador_equipa, 
+    criar_equipa, obter_equipa_por_utilizador, 
+    obter_jogadores_equipa, 
+    remover_jogador_equipa, 
+    verificar_limites_equipa, 
+    obter_detalhes_equipa_para_visualizacao, 
+    adicionar_jogador_ao_banco, 
+    remover_jogador_do_banco, 
+    trocar_jogador_banco_campo
+)
 from persistence.leagues import (
     abandonar_liga,
     criar_liga,
@@ -19,15 +29,18 @@ from persistence.leagues import (
     obter_liga_pelo_pais,
     obter_ligas_publicas_para_utilizador,
     obter_liga_id_por_codigo,
+    obter_ranking_liga,
+    verificar_participacao_liga,
 )
-from persistence.jornadas import obter_jornada_info, obter_jornada_atual
+from persistence.jornadas import obter_jornada_info, obter_jornada_atual, obter_todas_jornadas
 from persistence.players import list_all, list_paginated, read
 from persistence.clubs import list_all_clubs, list_paginated_clubs, read_club
 from persistence.users import create_user, login_user, get_users, get_user_by_id
 from persistence.countries import get_pais
 
-from persistence.pontuacoes import calcular_pontuacao_equipa, calcular_pontuacao_jogador
+from persistence.pontuacoes import calcular_pontuacao_equipa, calcular_pontuacao_jogador, obter_pontuacoes_jornadas, obter_equipa_com_pontuacoes_jornada
 from persistence import players
+from persistence.match import list_paginated_matches, read_match
 
 
 import random
@@ -357,12 +370,9 @@ def liga_detalhes(liga_id):
     
     jornada_selecionada = request.args.get('jornada', None)
     
-    # Obter jornadas disponíveis
-    from persistence.jornadas import obter_todas_jornadas
     jornadas = obter_todas_jornadas()
     
     # Obter ranking
-    from persistence.leagues import obter_ranking_liga
     ranking = obter_ranking_liga(liga_id, jornada_selecionada)
 
     return render_template("liga_details.html", 
@@ -443,7 +453,6 @@ def pontuacao():
     equipa_user = obter_equipa_por_utilizador(user_id)
     if equipa_user:
         try:
-            from persistence.pontuacoes import obter_pontuacoes_jornadas
             pontuacoes_jornadas = obter_pontuacoes_jornadas(equipa_user.id)
             
             total_pontos = sum(p['pontuacao'] for p in pontuacoes_jornadas if p['pontuacao'])
@@ -474,7 +483,6 @@ def equipa_jornada(id_equipa, id_jornada):
     user_id = session['user_id']
     
     try:
-        from persistence.pontuacoes import obter_equipa_com_pontuacoes_jornada
         dados = obter_equipa_com_pontuacoes_jornada(id_equipa, id_jornada)
         
         equipa_user = obter_equipa_por_utilizador(user_id)
@@ -568,7 +576,6 @@ def adicionar_jogador_ao_banco_route(id_jogador):
     equipa_user = obter_equipa_por_utilizador(user_id)
     
     if equipa_user:
-        from persistence.equipa import adicionar_jogador_ao_banco
         sucesso, mensagem = adicionar_jogador_ao_banco(equipa_user.id, id_jogador)
         
         if sucesso:
@@ -588,7 +595,6 @@ def remover_jogador_do_banco_route(id_jogador):
     equipa_user = obter_equipa_por_utilizador(user_id)
     
     if equipa_user:
-        from persistence.equipa import remover_jogador_do_banco
         sucesso, mensagem = remover_jogador_do_banco(equipa_user.id, id_jogador)
         
         if sucesso:
@@ -608,7 +614,6 @@ def trocar_jogador_route(id_jogador_campo, id_jogador_banco):
     equipa_user = obter_equipa_por_utilizador(user_id)
     
     if equipa_user:
-        from persistence.equipa import trocar_jogador_banco_campo
         sucesso, mensagem = trocar_jogador_banco_campo(equipa_user.id, id_jogador_banco, id_jogador_campo)
         
         if sucesso:
@@ -651,7 +656,6 @@ def jogos_list():
     page = int(request.args.get("page", 1))
     per_page = 10
 
-    from persistence.match import list_paginated_matches
     matches, total = list_paginated_matches(page, per_page)
     total_pages = (total + per_page - 1) // per_page
 
@@ -668,7 +672,6 @@ def match_details(match_id):
     if 'user_id' not in session:
         return redirect("/")
     
-    from persistence.match import read_match
     match = read_match(match_id)
 
     if match:
@@ -686,7 +689,6 @@ def ver_equipa_liga(id_liga, id_equipa):
     
     try:
         # Verificar se o utilizador pertence à liga
-        from persistence.leagues import verificar_participacao_liga
         user_id = session['user_id']
         
         if not verificar_participacao_liga(user_id, id_liga):
@@ -696,7 +698,6 @@ def ver_equipa_liga(id_liga, id_equipa):
         dados_equipa = obter_detalhes_equipa_para_visualizacao(id_equipa)
         
         # Obter informações da liga para o breadcrumb
-        from persistence.leagues import obter_liga_por_id
         liga = obter_liga_por_id(id_liga)
         
         if not liga:
