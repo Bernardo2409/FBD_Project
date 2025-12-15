@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-900" data-theme="corporate">
+
+    <div class="container mx-auto p-6">
+        
+
+        <h2 class="text-3xl font-bold mb-6 text-center text-primary">Matches</h2>
+        <div class="overflow-x-auto bg-white shadow-xl rounded-box p-4 mb-8">
+            <table class="table table-zebra w-full">
+                <thead class="bg-primary text-primary-content">
+                    <tr>
+                        <th class="py-3 px-4 text-center">Date</th>
+                        <th class="py-3 px-4 text-center">Round</th>
+                        <th class="py-3 px-4 text-center">Club 1</th>
+                        <th class="py-3 px-4 text-center">Club 2</th>
+                        <th class="py-3 px-4 text-center">Details</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for match in match %}
+                    <tr class="hover:bg-base-200 transition duration-150">
+                        <td class="py-3 px-4 font-mono text-center">{{ match.date }}</td>
+                        <td class="py-3 px-4 font-semibold text-center">{{ match.round }}</td>
+                        <td class="py-3 px-4 text-gray-600 text-center">{{ match.club1 }}</td>
+                        <td class="py-3 px-4 text-gray-600 text-center">{{ match.club2 }}</td>
+                        <td class="py-3 px-4 text-center">
+                            <a href="/jogos/{{ match.id }}" class="btn btn-sm btn-primary btn-outline">See Details</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="mt-8 flex justify-center items-center gap-4">
+            {% if page > 1 %}
+                <a href="/jogos?page={{ page - 1 }}" class="btn btn-outline">
+                    ← Previous
+                </a>
+            {% else %}
+                <button class="btn btn-outline btn-disabled">← Previous</button>
+            {% endif %}
+
+            <span class="font-bold">
+                Page {{ page }} of {{ total_pages }}
+            </span>
+
+            {% if page < total_pages %}
+                <a href="/jogos?page={{ page + 1 }}" class="btn btn-outline">
+                    Next → 
+                </a>
+            {% else %}
+                <button class="btn btn-outline btn-disabled">Next →</button>
+            {% endif %}
+        </div>
+
+    </div>
+     <div class="mt-10 text-center">
+        <a href="/index" class="btn btn-secondary px-8">← Back to Index </a>
+    </div>
+
+</body>
+</html>

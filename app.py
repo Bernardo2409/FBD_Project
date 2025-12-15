@@ -579,7 +579,22 @@ def player_details(player_id):
         total_golos=total_golos,
         total_assistencias=total_assistencias
     )
+@app.route("/jogos")
+def jogos_list():
+    if 'user_id' not in session:
+        return redirect("/")
+    page = int(request.args.get("page", 1))
+    per_page = 10
 
+    jogos, total = list_paginated(page, per_page)
+    total_pages = (total + per_page - 1) // per_page
+
+    return render_template(
+        "jogos.html",
+        jogos=jogos,
+        page=page,
+        total_pages=total_pages
+    )
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
