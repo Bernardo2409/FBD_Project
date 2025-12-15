@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Match</title>
+    <title>Matches</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
@@ -11,7 +11,6 @@
 
     <div class="container mx-auto p-6">
         
-
         <h2 class="text-3xl font-bold mb-6 text-center text-primary">Matches</h2>
         <div class="overflow-x-auto bg-white shadow-xl rounded-box p-4 mb-8">
             <table class="table table-zebra w-full">
@@ -19,21 +18,45 @@
                     <tr>
                         <th class="py-3 px-4 text-center">Date</th>
                         <th class="py-3 px-4 text-center">Round</th>
-                        <th class="py-3 px-4 text-center">Club 1</th>
-                        <th class="py-3 px-4 text-center">Club 2</th>
+                        <th class="py-3 px-4 text-center">Home Team</th>
+                        <th class="py-3 px-4 text-center">Score</th>
+                        <th class="py-3 px-4 text-center">Away Team</th>
                         <th class="py-3 px-4 text-center">Details</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                {% for match in match %}
+                {% for m in match %}
                     <tr class="hover:bg-base-200 transition duration-150">
-                        <td class="py-3 px-4 font-mono text-center">{{ match.date }}</td>
-                        <td class="py-3 px-4 font-semibold text-center">{{ match.round }}</td>
-                        <td class="py-3 px-4 text-gray-600 text-center">{{ match.club1 }}</td>
-                        <td class="py-3 px-4 text-gray-600 text-center">{{ match.club2 }}</td>
+                        <td class="py-3 px-4 font-mono text-center">{{ m.date }}</td>
+                        <td class="py-3 px-4 font-semibold text-center">{{ m.round }}</td>
+                        
                         <td class="py-3 px-4 text-center">
-                            <a href="/jogos/{{ match.id }}" class="btn btn-sm btn-primary btn-outline">See Details</a>
+                            <div class="flex items-center justify-center gap-2">
+                                <img src="{{ m.club1_image }}" 
+                                     alt="{{ m.club1 }}" 
+                                     class="w-8 h-8 object-contain">
+                                <span class="font-medium">{{ m.club1 }}</span>
+                            </div>
+                        </td>
+                        
+                        <td class="py-3 px-4 text-center">
+                            <span class="font-bold text-lg">
+                                {{ m.goals_home }} - {{ m.goals_away }}
+                            </span>
+                        </td>
+                        
+                        <td class="py-3 px-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <img src="{{ m.club2_image }}" 
+                                     alt="{{ m.club2 }}" 
+                                     class="w-8 h-8 object-contain">
+                                <span class="font-medium">{{ m.club2 }}</span>
+                            </div>
+                        </td>
+                        
+                        <td class="py-3 px-4 text-center">
+                            <a href="/jogos/{{ m.id }}" class="btn btn-sm btn-primary btn-outline">See Details</a>
                         </td>
                     </tr>
                 {% endfor %}
@@ -65,8 +88,9 @@
         </div>
 
     </div>
-     <div class="mt-10 text-center">
-        <a href="/index" class="btn btn-secondary px-8">← Back to Index </a>
+    
+    <div class="mt-10 text-center">
+        <a href="/index" class="btn btn-secondary px-8">← Back to Index</a>
     </div>
 
 </body>
