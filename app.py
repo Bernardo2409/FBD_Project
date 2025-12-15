@@ -5,7 +5,7 @@ from datetime import datetime
 
 from flask import Flask, render_template, request, redirect, jsonify, session, url_for
 
-from persistence.equipa import adicionar_jogador_equipa, criar_equipa, obter_equipa_por_utilizador, obter_jogadores_equipa, remover_jogador_equipa, verificar_limites_equipa
+from persistence.equipa import adicionar_jogador_equipa, criar_equipa, obter_equipa_por_utilizador, obter_jogadores_equipa, remover_jogador_equipa, verificar_limites_equipa, obter_detalhes_equipa_para_visualizacao
 from persistence.leagues import (
     abandonar_liga,
     criar_liga,
@@ -20,7 +20,7 @@ from persistence.leagues import (
     obter_ligas_publicas_para_utilizador,
     obter_liga_id_por_codigo,
 )
-from persistence.jornadas import obter_jornada_info
+from persistence.jornadas import obter_jornada_info, obter_jornada_atual
 from persistence.players import list_all, list_paginated, read
 from persistence.clubs import list_all_clubs, list_paginated_clubs, read_club
 from persistence.users import create_user, login_user, get_users, get_user_by_id
@@ -370,10 +370,11 @@ def liga_detalhes(liga_id):
     jornada_selecionada = request.args.get('jornada', None)
     
     # Obter jornadas disponíveis
-    from persistence.leagues import obter_jornadas_disponiveis, obter_ranking_liga
-    jornadas = obter_jornadas_disponiveis()
+    from persistence.jornadas import obter_todas_jornadas
+    jornadas = obter_todas_jornadas()
     
     # Obter ranking
+    from persistence.leagues import obter_ranking_liga
     ranking = obter_ranking_liga(liga_id, jornada_selecionada)
 
     return render_template("liga_details.html", 
@@ -691,6 +692,62 @@ def jogos_list():
         page=page,
         total_pages=total_pages
     )
+
+@app.route("/liga/<id_liga>/equipa/<id_equipa>")
+def ver_equipa_liga(id_liga, id_equipa):
+    """
+    Rota para ver a equipa de outro participante na liga.
+    """
+    if 'user_id' not in session:
+        return redirect("/")
+    
+    try:
+        # Verificar se o utilizador pertence à liga
+        from persistence.leagues import verificar_participacao_liga
+        user_id = session['user_id']
+        
+        if not verificar_participacao_liga(user_id, id_liga):
+            return "Não tens permissão para ver esta equipa.", 403
+        
+        # Obter detalhes da equipa
+        dados_equipa = obter_detalhes_equipa_para_visualizacao(id_equipa)
+        
+        # Obter informações da liga para o breadcrumb
+        from persistence.leagues import obter_liga_por_id
+        liga = obter_liga_por_id(id_liga)
+        
+        if not liga:
+            return "Liga não encontrada", 404
+        
+        # Verificar se é a equipa do próprio utilizador
+        is_minha_equipa = False
+        minha_equipa = obter_equipa_por_utilizador(user_id)
+        if minha_equipa and str(minha_equipa.id) == str(id_equipa):
+            is_minha_equipa = True
+        
+        # Calcular pontuação atual se houver jornada atual
+        
+        jornada_atual = obter_jornada_atual()
+        pontuacao_atual = 0
+        
+        if jornada_atual:
+            try:
+                pontuacao_atual = calcular_pontuacao_equipa(id_equipa, jornada_atual['id'])
+            except:
+                pass  # Ignora erros no cálculo
+        
+        return render_template("ver_equipa_liga.html",
+                             liga=liga,
+                             dados_equipa=dados_equipa,
+                             pontuacao_atual=pontuacao_atual,
+                             is_minha_equipa=is_minha_equipa,
+                             jornada_atual=jornada_atual)
+        
+    except Exception as e:
+        print(f"Erro ao ver equipa da liga: {e}")
+        return render_template("error.html",
+                             message="Erro ao carregar equipa",
+                             details=str(e)), 500
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

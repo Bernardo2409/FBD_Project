@@ -322,3 +322,90 @@ def obter_jogadores_banco_por_posicao(id_equipa: str, posicao: str):
             })
         
         return jogadores
+    
+def obter_detalhes_equipa_para_visualizacao(id_equipa):
+    """
+    Obtém todos os detalhes de uma equipa para visualização.
+    """
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("""
+                DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
+                
+                EXEC sp_ObterDetalhesEquipaParaVisualizacao 
+                    @ID_Equipa = ?,
+                    @Resultado = @Resultado OUTPUT,
+                    @Mensagem = @Mensagem OUTPUT;
+            """, id_equipa)
+            
+            # Obter informações da equipa
+            equipa_info = None
+            if cursor.description:
+                columns = [column[0] for column in cursor.description]
+                row = cursor.fetchone()
+                if row:
+                    equipa_info = dict(zip(columns, row))
+            
+            if not equipa_info:
+                raise Exception("Equipa não encontrada")
+            
+            # Obter jogadores por posição
+            jogadores_agrupados = {
+                'gr': [],
+                'defesas': [],
+                'medios': [],
+                'avancados': []
+            }
+            
+            # Goalkeepers
+            if cursor.nextset() and cursor.description:
+                columns = [column[0] for column in cursor.description]
+                rows = cursor.fetchall()
+                for row in rows:
+                    jogador = dict(zip(columns, row))
+                    jogadores_agrupados['gr'].append(jogador)
+            
+            # Defenders
+            if cursor.nextset() and cursor.description:
+                columns = [column[0] for column in cursor.description]
+                rows = cursor.fetchall()
+                for row in rows:
+                    jogador = dict(zip(columns, row))
+                    jogadores_agrupados['defesas'].append(jogador)
+            
+            # Midfielders
+            if cursor.nextset() and cursor.description:
+                columns = [column[0] for column in cursor.description]
+                rows = cursor.fetchall()
+                for row in rows:
+                    jogador = dict(zip(columns, row))
+                    jogadores_agrupados['medios'].append(jogador)
+            
+            # Forwards
+            if cursor.nextset() and cursor.description:
+                columns = [column[0] for column in cursor.description]
+                rows = cursor.fetchall()
+                for row in rows:
+                    jogador = dict(zip(columns, row))
+                    jogadores_agrupados['avancados'].append(jogador)
+            
+            # Estatísticas
+            estatisticas = {}
+            if cursor.nextset() and cursor.description:
+                columns = [column[0] for column in cursor.description]
+                row = cursor.fetchone()
+                if row:
+                    estatisticas = dict(zip(columns, row))
+            
+            return {
+                'info': equipa_info,
+                'jogadores': jogadores_agrupados,
+                'estatisticas': estatisticas
+            }
+            
+        except pyodbc.Error as e:
+            raise Exception(f"Erro de banco de dados: {str(e)}")
+        except Exception as e:
+            raise e

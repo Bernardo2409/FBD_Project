@@ -5,6 +5,7 @@
     <title>{{ liga.nome }} - Fantasy Champ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
 </head>
 <body class="bg-gray-100 min-h-screen" data-theme="corporate">
 
@@ -90,8 +91,8 @@
                 <select id="jornadaSelect" class="select select-bordered select-sm" onchange="filtrarJornada()">
                     <option value="">Overall Ranking</option>
                     {% for jornada in jornadas %}
-                    <option value="{{ jornada }}" {% if jornada_selecionada == jornada %}selected{% endif %}>
-                        {{ jornada|replace('jornada_', 'Matchday ')|replace('_', ' ')|title }}
+                    <option value="{{ jornada.id }}" {% if jornada_selecionada == jornada.id %}selected{% endif %}>
+                        {{ jornada.numero|string }} - {{ jornada.data_inicio|string }} to {{ jornada.data_fim|string }}
                     </option>
                     {% endfor %}
                 </select>
@@ -119,9 +120,11 @@
                         </td>
                         <td class="font-semibold">{{ team.nome_utilizador }}</td>
                         <td>
-                            <span class="badge badge-primary badge-lg">
+                            {% if team.id_equipa %}
+                            <a href="/liga/{{ liga.id }}/equipa/{{ team.id_equipa }}" class="btn btn-sm btn-outline btn-info hover:btn-info" title="View this team">
                                 {{ team.nome_equipa }}
-                            </span>
+                            </a>
+                            {% endif %}
                         </td>
                         <td class="text-center">
                             {% if jornada_selecionada %}
@@ -147,7 +150,11 @@
             <span>Total teams: {{ ranking|length }}</span>
             {% if jornada_selecionada %}
             <span class="badge badge-info">
-                Showing: {{ jornada_selecionada|replace('jornada_', 'Matchday ')|replace('_', ' ')|title }}
+                {% for jornada in jornadas %}
+                    {% if jornada.id == jornada_selecionada %}
+                        Showing: Matchday {{ jornada.numero }}
+                    {% endif %}
+                {% endfor %}
             </span>
             {% else %}
             <span class="badge badge-success">Showing: Overall Ranking</span>
@@ -155,7 +162,7 @@
         </div>
         {% else %}
         <div class="text-center py-8">
-            <p class="text-gray-500 text-lg"> No scores available yet</p>
+            <p class="text-gray-500 text-lg">No scores available yet</p>
             <p class="text-sm text-gray-400 mt-2">Scores will appear here once matchdays are completed</p>
         </div>
         {% endif %}
@@ -180,7 +187,11 @@
                         <td class="font-semibold">{{ participante.nome }}</td>
                         <td>
                             {% if participante.equipa %}
-                                <span class="badge badge-primary">{{ participante.equipa }}</span>
+                                <a href="/liga/{{ liga.id }}/equipa/{{ participante.id_equipa }}" 
+                                   class="btn btn-xs btn-outline btn-info hover:btn-info"
+                                   title="View {{ participante.nome }}'s team">
+                                    {{ participante.equipa }}
+                                </a>
                             {% else %}
                                 <span class="text-gray-400">No team</span>
                             {% endif %}

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ dados_equipa.info.NomeManager }}'s Team - {{ liga.nome }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
+</head>
+
+<body
+    class="text-gray-900 bg-cover bg-center bg-no-repeat min-h-screen"
+    data-theme="corporate"
+    style="background-image: url('/static/images/stadium2.jpg');">
+
+<div class="container mx-auto p-6">
+
+    {% if session.get('error') %}
+    <div class="alert alert-error mb-4 shadow-lg">
+        <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{{ session.pop('error') }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Nome Equipa -->
+    <h1 class="text-4xl font-bold text-center text-primary mb-6 text-white">
+        {{ dados_equipa.info.NomeEquipa }}
+    </h1>
+
+    <div class="text-center mb-8 text-white bg-blue-800 bg-opacity-50 p-4 rounded-lg">
+        <p class="text-xl">Manager: <strong>{{ dados_equipa.info.NomeManager }}</strong></p>
+        <p class="text-lg">Budget: <strong>{{ "%.2f"|format(dados_equipa.info.Orcamento) }}€</strong></p>
+        <p class="text-lg">Total Points: <strong>{{ dados_equipa.info.PontuacaoTotal }}</strong></p>
+    </div>
+    
+    <!-- SECÇÃO: AVANÇADOS -->
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Forwards</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 place-items-center">
+        {% for j in dados_equipa.jogadores.avancados %}
+        <div class="card shadow-xl p-4 w-64 flex flex-col
+            {% if j.Estado == 'Active' %}bg-green-500
+            {% elif j.Estado == 'On doubt' %}bg-blue-500
+            {% elif j.Estado == 'Unavailable' %}bg-black
+            {% elif j.benched %}bg-yellow-500
+            {% elif j.Estado == 'Injured' %}bg-red-500
+            {% else %}bg-gray-200{% endif %}
+            {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
+            
+            <a href="/players/{{ j.ID }}" class="flex-1 mb-2">
+                <div class="flex items-center gap-4">
+                    <img src="{{ j.jogador_imagem or '/static/images/default_player.png' }}" 
+                         class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <div class="font-bold text-lg text-white">{{ j.Nome }}</div>
+                        <div class="badge badge-primary badge-outline">{{ j.Estado }}</div>
+                        <div class="text-sm text-white">{{ j.Preço }}€</div>
+                        {% if j.benched %}
+                        <div class="badge badge-warning text-xs mt-1">Bench</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            
+            <div class="mt-2 flex justify-center">
+                {% if j.ClubeImagem %}
+                <img src="{{ j.ClubeImagem }}" class="w-8 h-8 inline-block" 
+                     onerror="this.src='/static/images/default_club.png'">
+                <span class="text-xs text-white ml-2">{{ j.ClubeNome }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- SECÇÃO: MÉDIOS -->
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Midfielders</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
+        {% for j in dados_equipa.jogadores.medios %}
+        <div class="card shadow-xl p-4 w-64 flex flex-col
+            {% if j.Estado == 'Active' %}bg-green-500
+            {% elif j.Estado == 'On doubt' %}bg-blue-500
+            {% elif j.Estado == 'Unavailable' %}bg-black
+            {% elif j.benched %}bg-yellow-500
+            {% elif j.Estado == 'Injured' %}bg-red-500
+            {% else %}bg-gray-200{% endif %}
+            {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
+            
+            <a href="/players/{{ j.ID }}" class="flex-1 mb-2">
+                <div class="flex items-center gap-4">
+                    <img src="{{ j.jogador_imagem or '/static/images/default_player.png' }}" 
+                         class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <div class="font-bold text-lg text-white">{{ j.Nome }}</div>
+                        <div class="badge badge-primary badge-outline">{{ j.Estado }}</div>
+                        <div class="text-sm text-white">{{ j.Preço }}€</div>
+                        {% if j.benched %}
+                        <div class="badge badge-warning text-xs mt-1">Bench</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            
+            <div class="mt-2 flex justify-center">
+                {% if j.ClubeImagem %}
+                <img src="{{ j.ClubeImagem }}" class="w-8 h-8 inline-block" 
+                     onerror="this.src='/static/images/default_club.png'">
+                <span class="text-xs text-white ml-2">{{ j.ClubeNome }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- SECÇÃO: DEFESAS -->
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Defenders</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
+        {% for j in dados_equipa.jogadores.defesas %}
+        <div class="card shadow-xl p-4 w-64 flex flex-col
+            {% if j.Estado == 'Active' %}bg-green-500
+            {% elif j.Estado == 'On doubt' %}bg-blue-500
+            {% elif j.Estado == 'Unavailable' %}bg-black
+            {% elif j.benched %}bg-yellow-500
+            {% elif j.Estado == 'Injured' %}bg-red-500
+            {% else %}bg-gray-200{% endif %}
+            {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
+            
+            <a href="/players/{{ j.ID }}" class="flex-1 mb-2">
+                <div class="flex items-center gap-4">
+                    <img src="{{ j.jogador_imagem or '/static/images/default_player.png' }}" 
+                         class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <div class="font-bold text-lg text-white">{{ j.Nome }}</div>
+                        <div class="badge badge-primary badge-outline">{{ j.Estado }}</div>
+                        <div class="text-sm text-white">{{ j.Preço }}€</div>
+                        {% if j.benched %}
+                        <div class="badge badge-warning text-xs mt-1">Bench</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            
+            <div class="mt-2 flex justify-center">
+                {% if j.ClubeImagem %}
+                <img src="{{ j.ClubeImagem }}" class="w-8 h-8 inline-block" 
+                     onerror="this.src='/static/images/default_club.png'">
+                <span class="text-xs text-white ml-2">{{ j.ClubeNome }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- SECÇÃO: GUARDA-REDES -->
+    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Goalkeepers</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 place-items-center">
+        {% for j in dados_equipa.jogadores.gr %}
+        <div class="card shadow-xl p-4 w-64 flex flex-col
+            {% if j.Estado == 'Active' %}bg-green-500
+            {% elif j.Estado == 'On doubt' %}bg-blue-500
+            {% elif j.Estado == 'Unavailable' %}bg-black
+            {% elif j.benched %}bg-yellow-500
+            {% elif j.Estado == 'Injured' %}bg-red-500
+            {% else %}bg-gray-200{% endif %}
+            {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
+            
+            <a href="/players/{{ j.ID }}" class="flex-1 mb-2">
+                <div class="flex items-center gap-4">
+                    <img src="{{ j.jogador_imagem or '/static/images/default_player.png' }}" 
+                         class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <div class="font-bold text-lg text-white">{{ j.Nome }}</div>
+                        <div class="badge badge-primary badge-outline">{{ j.Estado }}</div>
+                        <div class="text-sm text-white">{{ j.Preço }}€</div>
+                        {% if j.benched %}
+                        <div class="badge badge-warning text-xs mt-1">Bench</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            
+            <div class="mt-2 flex justify-center">
+                {% if j.ClubeImagem %}
+                <img src="{{ j.ClubeImagem }}" class="w-8 h-8 inline-block" 
+                     onerror="this.src='/static/images/default_club.png'">
+                <span class="text-xs text-white ml-2">{{ j.ClubeNome }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- BOTÕES DE NAVEGAÇÃO -->
+    <div class="flex justify-center gap-4 mt-8">
+        <a href="/liga/{{ liga.id }}" 
+           class="btn bg-blue-600 hover:bg-blue-700 text-white border-none rounded-full px-8">
+            ← Back to {{ liga.nome }}
+        </a>
+        
+        {% if is_minha_equipa %}
+        <a href="/equipa" 
+           class="btn bg-green-600 hover:bg-green-700 text-white border-none rounded-full px-8">
+            Edit My Team
+        </a>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+// Scripts para filtragem de jogadores (se necessário no futuro)
+function filterPlayers(input, listId) {
+    const filter = input.value.toLowerCase();
+    const list = document.getElementById(listId);
+    const items = list.getElementsByClassName('player-item');
+    
+    for (let i = 0; i < items.length; i++) {
+        const playerName = items[i].querySelector('.player-name').textContent.toLowerCase();
+        if (playerName.includes(filter)) {
+            items[i].style.display = '';
+        } else {
+            items[i].style.display = 'none';
+        }
+    }
+}
+</script>
+
+</body>
+</html>

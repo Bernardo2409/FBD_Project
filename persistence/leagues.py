@@ -3,6 +3,7 @@ from typing import NamedTuple, Optional, List
 from persistence.session import create_connection
 import uuid
 from datetime import datetime
+import pyodbc
 
 
 class Liga(NamedTuple):
@@ -221,28 +222,41 @@ def juntar_liga(id_utilizador: str, id_liga: str, codigo: Optional[str]) -> bool
 # --------------------------------------------------------------------
 # ⚡ Obter participantes de uma liga
 # --------------------------------------------------------------------
-def obter_participantes_liga(id_liga: str):
-    """Obtém todos os participantes de uma liga, excluindo o 'Sistema'"""
+def obter_participantes_liga(id_liga):
+    """
+    Obtém a lista de participantes de uma liga.
+    """
     with create_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("""
-            SELECT U.ID, U.PrimeiroNome, U.Apelido, U.Email, E.Nome as NomeEquipa
-            FROM FantasyChamp.Utilizador U
-            JOIN FantasyChamp.Participa P ON U.ID = P.ID_Utilizador
-            LEFT JOIN FantasyChamp.Equipa E ON U.ID = E.ID_Utilizador
-            WHERE P.ID_Liga = ? AND U.PrimeiroNome != 'Sistema'
-        """, id_liga)
         
-        participantes = []
-        for row in cursor:
-            participantes.append({
-                'id': row.ID,
-                'nome': f"{row.PrimeiroNome} {row.Apelido}",
-                'email': row.Email,
-                'equipa': row.NomeEquipa
-            })
-        
-        return participantes
+        try:
+            cursor.execute("""
+                SELECT 
+                    U.PrimeiroNome + ' ' + U.Apelido AS nome,
+                    E.Nome AS equipa,
+                    E.ID AS id_equipa
+                FROM FantasyChamp.Participa P
+                JOIN FantasyChamp.Utilizador U ON P.ID_Utilizador = U.ID
+                LEFT JOIN FantasyChamp.Equipa E ON U.ID = E.ID_utilizador
+                WHERE P.ID_Liga = ?
+                ORDER BY U.PrimeiroNome, U.Apelido
+            """, id_liga)
+            
+            rows = cursor.fetchall()
+            
+            participantes = []
+            for row in rows:
+                participantes.append({
+                    'nome': row.nome,
+                    'equipa': row.equipa,
+                    'id_equipa': row.id_equipa
+                })
+            
+            return participantes
+            
+        except pyodbc.Error as e:
+            print(f"Erro ao obter participantes da liga: {e}")
+            return []
 
 
 
@@ -317,66 +331,46 @@ def abandonar_liga(id_utilizador: str, id_liga: str) -> bool:
         conn.commit()
         return True
 
-# Adiciona estas funções ao ficheiro persistence/leagues.py
-
-def obter_ranking_liga(id_liga: str, id_jornada: str = None):
+def obter_ranking_liga(id_liga, id_jornada=None):
     """
-    Obtém o ranking de uma liga específica
-    Se id_jornada for None, retorna o ranking total (pontuação acumulada)
-    Se id_jornada for especificado, retorna o ranking dessa jornada específica
+    Obtém o ranking da liga (apenas participantes com equipa).
     """
     with create_connection() as conn:
         cursor = conn.cursor()
         
-        if id_jornada:
-            # Ranking de uma jornada específica
-            query = """
-                SELECT 
-                    U.PrimeiroNome + ' ' + U.Apelido AS NomeUtilizador,
-                    E.Nome AS NomeEquipa,
-                    PE.pontuação_jornada AS Pontuacao,
-                    PE.pontuação_acumulada AS PontuacaoAcumulada,
-                    E.Orçamento
-                FROM FantasyChamp.Participa P
-                JOIN FantasyChamp.Utilizador U ON P.ID_Utilizador = U.ID
-                JOIN FantasyChamp.Equipa E ON U.ID = E.ID_Utilizador
-                LEFT JOIN FantasyChamp.Pontuação_Equipa PE ON E.ID = PE.ID_Equipa AND PE.ID_jornada = ?
-                WHERE P.ID_Liga = ? AND U.PrimeiroNome != 'Sistema'
-                ORDER BY PE.pontuação_jornada DESC, E.Nome
-            """
-            cursor.execute(query, id_jornada, id_liga)
-        else:
-            # Ranking total (pontuação acumulada mais recente)
-            query = """
-                SELECT 
-                    U.PrimeiroNome + ' ' + U.Apelido AS NomeUtilizador,
-                    E.Nome AS NomeEquipa,
-                    E.PontuaçãoTotal AS Pontuacao,
-                    E.Orçamento,
-                    (SELECT MAX(pontuação_acumulada) 
-                     FROM FantasyChamp.Pontuação_Equipa 
-                     WHERE ID_Equipa = E.ID) AS PontuacaoAcumulada
-                FROM FantasyChamp.Participa P
-                JOIN FantasyChamp.Utilizador U ON P.ID_Utilizador = U.ID
-                JOIN FantasyChamp.Equipa E ON U.ID = E.ID_Utilizador
-                WHERE P.ID_Liga = ? AND U.PrimeiroNome != 'Sistema'
-                ORDER BY E.PontuaçãoTotal DESC, E.Nome
-            """
-            cursor.execute(query, id_liga)
-        
-        rankings = []
-        for i, row in enumerate(cursor, 1):
-            rankings.append({
-                'posicao': i,
-                'nome_utilizador': row.NomeUtilizador,
-                'nome_equipa': row.NomeEquipa,
-                'pontuacao': row.Pontuacao if row.Pontuacao is not None else 0,
-                'pontuacao_acumulada': row.PontuacaoAcumulada if hasattr(row, 'PontuacaoAcumulada') and row.PontuacaoAcumulada is not None else row.Pontuacao if row.Pontuacao is not None else 0,
-                'orcamento': float(row.Orçamento) if row.Orçamento is not None else 100.0
-            })
-        
-        return rankings
-
+        try:
+            cursor.execute("""
+                DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
+                
+                EXEC sp_ObterRankingLigaComEquipas 
+                    @ID_Liga = ?,
+                    @ID_Jornada = ?,
+                    @Resultado = @Resultado OUTPUT,
+                    @Mensagem = @Mensagem OUTPUT;
+            """, id_liga, id_jornada)
+            
+            # Obter resultados
+            ranking = []
+            if cursor.description:
+                columns = [column[0] for column in cursor.description]
+                rows = cursor.fetchall()
+                
+                for row in rows:
+                    equipa = type('EquipaRanking', (), {
+                        'posicao': row.posicao,
+                        'nome_utilizador': row.nome_utilizador,
+                        'nome_equipa': row.nome_equipa,
+                        'pontuacao': row.pontuacao,
+                        'pontuacao_acumulada': row.pontuacao_acumulada,
+                        'id_equipa': row.id_equipa,
+                        'id_utilizador': row.id_utilizador
+                    })
+                    ranking.append(equipa)
+            
+            return ranking
+            
+        except pyodbc.Error as e:
+            print(f"Erro ao obter ranking da liga: {e}")
 
 def obter_jornadas_disponiveis():
     """
@@ -421,3 +415,22 @@ def obter_historico_equipa_liga(id_liga: str, id_equipa: str):
         
         return historico
 
+def verificar_participacao_liga(id_utilizador, id_liga):
+    """
+    Verifica se um utilizador participa numa liga.
+    """
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("""
+                SELECT 1 
+                FROM FantasyChamp.Participa 
+                WHERE ID_Utilizador = ? AND ID_Liga = ?
+            """, id_utilizador, id_liga)
+            
+            return cursor.fetchone() is not None
+            
+        except pyodbc.Error as e:
+            print(f"Erro ao verificar participação na liga: {e}")
+            return False
