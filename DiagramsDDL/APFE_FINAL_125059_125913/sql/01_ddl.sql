@@ -22,10 +22,10 @@ CREATE TABLE FantasyChamp.Equipa (
 
 -- NOVO
 
-CREATE TABLE FantasyChamp.País (
+CREATE TABLE FantasyChamp.Pais (
     ID VARCHAR(16) NOT NULL PRIMARY KEY,
-    País VARCHAR(50) NOT NULL,
-    país_imagem VARCHAR(255)
+    nome VARCHAR(50) NOT NULL,
+    imagem VARCHAR(255)
 );
 
 CREATE TABLE FantasyChamp.Clube (
@@ -94,18 +94,16 @@ CREATE TABLE FantasyChamp.Jornada (
     Data_Inicio DATE NOT NULL,
     Data_Fim DATE NOT NULL,
     Numero INT NOT NULL,
-    ID_liga UNIQUEIDENTIFIER NOT NULL,
-
-    FOREIGN KEY (ID_liga) 
-		REFERENCES FantasyChamp.Liga(ID)
 );
 
 
 CREATE TABLE FantasyChamp.Pontuação_Equipa (
-    ID VARCHAR(16) NOT NULL PRIMARY KEY,
-    ID_equipa UNIQUEIDENTIFIER NOT NULL,
+    ID_Equipa UNIQUEIDENTIFIER NOT NULL,
     ID_jornada VARCHAR(16) NOT NULL,
-    Pontuação_Jornada INT NOT NULL,
+    pontuação_jornada INT DEFAULT 0,
+    pontuação_acumulada INT DEFAULT 0,
+
+    PRIMARY KEY (ID_Equipa, ID_jornada),
 
     FOREIGN KEY (ID_equipa) 
 		REFERENCES FantasyChamp.Equipa(ID),
@@ -114,15 +112,17 @@ CREATE TABLE FantasyChamp.Pontuação_Equipa (
 );
 
 CREATE TABLE FantasyChamp.Pontuação_Jogador (
-    ID VARCHAR(16) NOT NULL PRIMARY KEY,
     ID_jogador VARCHAR(16) NOT NULL,
     ID_jornada VARCHAR(16) NOT NULL,
-    TempoJogo INT NOT NULL DEFAULT 0,
+    TempoJogo INT DEFAULT 0,
     GolosSofridos INT DEFAULT 0,
-    Pontuacao_Jornada INT NOT NULL,
+    GolosMarcados INT DEFAULT 0, 
     Assistencias INT DEFAULT 0,
     CartoesAmarelos INT DEFAULT 0,
     CartoesVermelhos INT DEFAULT 0,
+    pontuação_total VARCHAR(10),
+
+    PRIMARY KEY(ID_jogador, ID_jornada),
 
     FOREIGN KEY (ID_jogador) 
 		REFERENCES FantasyChamp.Jogador(ID),
@@ -132,7 +132,7 @@ CREATE TABLE FantasyChamp.Pontuação_Jogador (
 
 
 CREATE TABLE FantasyChamp.Jogo (
-    ID VARCHAR(16) NOT NULL PRIMARY KEY,
+    ID UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
     [Data] DATE NOT NULL,
     ID_Clube1 VARCHAR(16) NOT NULL,
     ID_Clube2 VARCHAR(16) NOT NULL,
@@ -149,6 +149,8 @@ CREATE TABLE FantasyChamp.Jogo (
 CREATE TABLE FantasyChamp.Pertence (
     ID_Jogador VARCHAR(16) NOT NULL,
     ID_Equipa UNIQUEIDENTIFIER NOT NULL,
+    benched BIT NOT NULL DEFAULT 1,
+
     PRIMARY KEY (ID_Jogador, ID_Equipa),
     FOREIGN KEY (ID_Jogador) 
 		REFERENCES FantasyChamp.Jogador(ID),
@@ -169,7 +171,7 @@ CREATE TABLE FantasyChamp.Participa (
 
 
 CREATE TABLE FantasyChamp.Enfrenta (
-    ID_Jogo VARCHAR(16) NOT NULL,
+    ID_Jogo UNIQUEIDENTIFIER NOT NULL,
     ID_Clube1 VARCHAR(16) NOT NULL,
     ID_Clube2 VARCHAR(16) NOT NULL,
     PRIMARY KEY (ID_Jogo, ID_Clube1, ID_Clube2),

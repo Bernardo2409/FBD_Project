@@ -20,6 +20,7 @@ from persistence.leagues import (
     obter_ligas_publicas_para_utilizador,
     obter_liga_id_por_codigo,
 )
+from persistence.jornadas import obter_jornada_info
 from persistence.players import list_all, list_paginated, read
 from persistence.clubs import list_all_clubs, list_paginated_clubs, read_club
 from persistence.users import create_user, login_user, get_users, get_user_by_id
@@ -456,41 +457,136 @@ def pontuacao():
     # Obter a equipa do utilizador
     equipa_user = obter_equipa_por_utilizador(user_id)
     if equipa_user:
-        # Obter todas as jornadas com pontuações acumuladas
-        from persistence.pontuacoes import obter_pontuacoes_jornadas
-        pontuacoes_jornadas = obter_pontuacoes_jornadas(equipa_user.id)
-
-        return render_template("pontuacao.html", equipa={'info': equipa_user}, pontuacoes_jornadas=pontuacoes_jornadas)
+        try:
+            # Obter todas as jornadas com pontuações acumuladas
+            from persistence.pontuacoes import obter_pontuacoes_jornadas
+            pontuacoes_jornadas = obter_pontuacoes_jornadas(equipa_user.id)
+            
+            # Calcular estatísticas
+            total_pontos = sum(p['pontuacao'] for p in pontuacoes_jornadas if p['pontuacao'])
+            media_pontos = total_pontos / len(pontuacoes_jornadas) if pontuacoes_jornadas else 0
+            melhor_jornada = max(pontuacoes_jornadas, key=lambda x: x['pontuacao']) if pontuacoes_jornadas else None
+            
+            return render_template("pontuacao.html", 
+                                 equipa={'info': equipa_user}, 
+                                 pontuacoes_jornadas=pontuacoes_jornadas,
+                                 total_pontos=total_pontos,
+                                 media_pontos=round(media_pontos, 2),
+                                 melhor_jornada=melhor_jornada)
+        except Exception as e:
+            print(f"Erro ao obter pontuações: {e}")
+            # Se falhar, mostrar página sem dados
+            return render_template("pontuacao.html", 
+                                 equipa={'info': equipa_user}, 
+                                 pontuacoes_jornadas=[],
+                                 error="Erro ao carregar pontuações")
     else:
         return redirect("/criar-equipa")
 
 
-@app.route("/equipa/<id_equipa>/jornada/<int:id_jornada>")
+@app.route("/equipa/<id_equipa>/jornada/<id_jornada>")
 def equipa_jornada(id_equipa, id_jornada):
     if 'user_id' not in session:
         return redirect("/")
 
     user_id = session['user_id']
-    equipa_user = obter_equipa_por_utilizador(user_id)
-
-    if equipa_user and equipa_user.id == id_equipa:
-        # Calcular a pontuação da equipa e dos jogadores para a jornada selecionada
-        pontuacao_total = calcular_pontuacao_equipa(id_equipa, id_jornada)
+    
+    try:
+        # Usar a função otimizada que faz tudo em uma só chamada
+        from persistence.pontuacoes import obter_equipa_com_pontuacoes_jornada
+        dados = obter_equipa_com_pontuacoes_jornada(id_equipa, id_jornada)
         
-        # Obter os jogadores da equipa para a jornada selecionada
-        jogadores_equipa = obter_jogadores_equipa(id_equipa)
-
-        # Calcular as pontuações de cada jogador para a jornada selecionada
-        for jogador in jogadores_equipa:
-            jogador['pontuacao'] = calcular_pontuacao_jogador(jogador['id'], id_jornada)
-
-        # Passar a jornada atual para o template
+        # Obter informações da equipa
+        equipa_user = obter_equipa_por_utilizador(user_id)
+        
+        # Validar que o utilizador tem permissão
+        if not equipa_user or str(equipa_user.id) != str(id_equipa):
+            return "Não tens permissão para ver esta equipa.", 403
+        
+        # Obter informações da jornada
+        jornada_info = obter_jornada_info(id_jornada)
+        
+        # Formatar dados para o template
+        jogadores_campo = [j for j in dados['jogadores'] if not j.get('benched', 1)]
+        jogadores_banco = [j for j in dados['jogadores'] if j.get('benched', 1)]
+        
+        # Separar por posição
+        def agrupar_por_posicao(jogadores):
+            grupos = {
+                'goalkeeper': [],
+                'defender': [],
+                'midfielder': [],
+                'forward': []
+            }
+            
+            for jogador in jogadores:
+                posicao = jogador.get('posicao', '').lower()
+                if 'goalkeeper' in posicao:
+                    grupos['goalkeeper'].append(jogador)
+                elif 'defender' in posicao:
+                    grupos['defender'].append(jogador)
+                elif 'midfielder' in posicao:
+                    grupos['midfielder'].append(jogador)
+                elif 'forward' in posicao:
+                    grupos['forward'].append(jogador)
+            
+            return grupos
+        
+        campo_agrupado = agrupar_por_posicao(jogadores_campo)
+        banco_agrupado = agrupar_por_posicao(jogadores_banco)
+        
+        # Calcular estatísticas
+        total_pontos = dados.get('pontuacao_total', 0)
+        total_jogadores = len(jogadores_campo)
+        media_por_jogador = total_pontos / total_jogadores if total_jogadores > 0 else 0
+        
+        # Jogador com melhor pontuação
+        melhor_jogador = max(jogadores_campo, key=lambda x: x.get('pontuacao', 0)) if jogadores_campo else None
+        
         return render_template("equipa.html", 
-                               equipa=equipa_user, 
-                               jogadores_equipa=jogadores_equipa,
-                               jornada_atual=id_jornada)
-    else:
-        return "Não tens uma equipa ou jornada válida.", 404
+                             equipa=equipa_user,
+                             jogadores_campo=jogadores_campo,
+                             jogadores_banco=jogadores_banco,
+                             campo_agrupado=campo_agrupado,
+                             banco_agrupado=banco_agrupado,
+                             pontuacao_total=total_pontos,
+                             media_por_jogador=round(media_por_jogador, 2),
+                             melhor_jogador=melhor_jogador,
+                             jornada_info=jornada_info,
+                             jornada_atual=id_jornada)
+        
+    except Exception as e:
+        print(f"Erro na rota equipa_jornada: {e}")
+        
+        # Fallback para o método antigo se o novo falhar
+        try:
+            equipa_user = obter_equipa_por_utilizador(user_id)
+            
+            if equipa_user and str(equipa_user.id) == str(id_equipa):
+                # Método fallback usando funções individuais
+                
+                pontuacao_total = calcular_pontuacao_equipa(id_equipa, id_jornada)
+                jogadores_equipa = obter_jogadores_equipa(id_equipa)
+
+                for jogador in jogadores_equipa:
+                    jogador['pontuacao'] = calcular_pontuacao_jogador(jogador['id'], id_jornada)
+                
+                # Separar jogadores em campo e banco
+                jogadores_campo = [j for j in jogadores_equipa if not j.get('benched', 1)]
+                jogadores_banco = [j for j in jogadores_equipa if j.get('benched', 1)]
+                
+                return render_template("equipa.html", 
+                                     equipa=equipa_user, 
+                                     jogadores_campo=jogadores_campo,
+                                     jogadores_banco=jogadores_banco,
+                                     pontuacao_total=pontuacao_total,
+                                     jornada_atual=id_jornada)
+        except Exception as e2:
+            print(f"Erro no método fallback: {e2}")
+        
+        return render_template("error.html", 
+                             message="Erro ao carregar dados da equipa",
+                             details=str(e)), 500
 
 
 @app.route("/equipa/banco/adicionar/<id_jogador>", methods=["POST"])
