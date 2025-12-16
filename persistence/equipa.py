@@ -10,7 +10,8 @@ class Equipa(NamedTuple):
     orcamento: float
     pontuacao_total: int
     id_utilizador: str
-
+    num_jogadores: int = 0
+    valor_total_plantel: float = 0.0
 
 class Pertence(NamedTuple):
     id_equipa: str
@@ -22,49 +23,55 @@ def criar_equipa(nome: str, id_utilizador: str) -> str:
     with create_connection() as conn:
         cursor = conn.cursor()
         
-        # Gerar ID único
-        cursor.execute("SELECT NEWID()")
+        # Parâmetro de output
+        equipa_id = None
+        
+        # Chamar a stored procedure
+        cursor.execute("""
+            DECLARE @EquipaID UNIQUEIDENTIFIER;
+            EXEC FantasyChamp.sp_CriarEquipa 
+                @Nome = ?, 
+                @ID_Utilizador = ?, 
+                @EquipaID = @EquipaID OUTPUT;
+            SELECT @EquipaID;
+        """, nome, id_utilizador)
+        
         equipa_id = cursor.fetchone()[0]
         
-        # Inserir equipa com orçamento inicial de 100
-        cursor.execute("""
-            INSERT INTO FantasyChamp.Equipa (ID, Nome, Orçamento, PontuaçãoTotal, ID_Utilizador)
-            VALUES (?, ?, 100.00, 0, ?)
-        """, equipa_id, nome, id_utilizador)
-        
-        conn.commit()
-        return equipa_id
+        return str(equipa_id)
 
 
 def obter_preco_jogador(id_jogador: str) -> float:
-    """Obter o preço de um jogador"""
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT Preço FROM FantasyChamp.Jogador WHERE ID = ?
+            SELECT Preço 
+            FROM FantasyChamp.vwJogadorPreco 
+            WHERE ID = ?
         """, id_jogador)
         
         row = cursor.fetchone()
-        return row.Preço if row else 0
+        return float(row[0]) if row else 0.0
 
 def verificar_orcamento_suficiente(id_equipa: str, preco_jogador: float) -> bool:
-    """Verificar se a equipa tem orçamento suficiente"""
     with create_connection() as conn:
         cursor = conn.cursor()
+        """ UDF: """
         cursor.execute("""
-            SELECT Orçamento FROM FantasyChamp.Equipa WHERE ID = ?
-        """, id_equipa)
+            SELECT FantasyChamp.OrcamentoSuficiente(?, ?)
+        """, id_equipa, preco_jogador)
         
-        row = cursor.fetchone()
-        orcamento_atual = row.Orçamento if row else 0
-        return orcamento_atual >= preco_jogador
+        return bool(cursor.fetchone()[0])
     
 def obter_equipa_por_utilizador(id_utilizador: str) -> Optional[Equipa]:
+    """Obtém equipa com dados completos da view"""
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT ID, Nome, Orçamento, PontuaçãoTotal, ID_Utilizador
-            FROM FantasyChamp.Equipa
+            SELECT 
+                ID, Nome, Orçamento, PontuaçãoTotal, ID_Utilizador,
+                Num_Jogadores, Valor_Total_Plantel
+            FROM FantasyChamp.EquipaCompleta
             WHERE ID_Utilizador = ?
         """, id_utilizador)
         
@@ -73,13 +80,14 @@ def obter_equipa_por_utilizador(id_utilizador: str) -> Optional[Equipa]:
             return None
         
         return Equipa(
-            row.ID,
-            row.Nome,
-            row.Orçamento,
-            row.PontuaçãoTotal,
-            row.ID_Utilizador
+            id=str(row.ID),
+            nome=row.Nome,
+            orcamento=float(row.Orçamento),
+            pontuacao_total=float(row.PontuaçãoTotal),
+            id_utilizador=str(row.ID_Utilizador),
+            num_jogadores=int(row.Num_Jogadores),
+            valor_total_plantel=float(row.Valor_Total_Plantel) if row.Valor_Total_Plantel else 0.0
         )
-
 
 def obter_jogadores_equipa(id_equipa: str):
     with create_connection() as conn:
