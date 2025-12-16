@@ -43,10 +43,8 @@ def list_all() -> list[PlayerDescriptor]:
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem, E.Estado
-            FROM FantasyChamp.Jogador J
-            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-            JOIN FantasyChamp.Estado_Jogador E ON J.ID_Estado_Jogador = E.ID; 
+            SELECT ID, Nome, Posicao, Preço, jogador_imagem, Estado
+            FROM FantasyChamp.JogadorCompleto
         """)
 
         return list(map(
@@ -69,20 +67,17 @@ def read(j_id: str):
         cursor = conn.cursor()
         cursor.execute("""
             SELECT 
-                J.ID, 
-                J.Nome, 
-                P.Posição AS Posicao,
-                J.Preço,
-                J.jogador_imagem,
-                C.Nome AS Clube,
-                C.clube_imagem,
-                C.ID AS Clube_id,
-                E.Estado
-            FROM FantasyChamp.Jogador J
-            JOIN FantasyChamp.Clube C ON J.ID_clube = C.ID
-            JOIN FantasyChamp.Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
-            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-            WHERE J.ID = ?;
+                ID,
+                Jogador_Nome AS Nome,
+                Posicao,
+                Preço,
+                jogador_imagem,
+                Clube_Nome AS Clube,
+                clube_imagem,
+                ID_clube AS Clube_id,
+                Estado
+            FROM FantasyChamp.PlayerDetails
+            WHERE ID = ?
         """, j_id)
 
         row = cursor.fetchone()
@@ -109,7 +104,7 @@ def get_player_stats(j_id: str) -> tuple[list[PlayerStats], int]:
     with create_connection() as conn:
         cursor = conn.cursor()
         
-        # Buscar estatísticas por jornada
+        # Buscar estatísticas por jornada usando a VIEW simplificada
         cursor.execute("""
             SELECT 
                 ID_jornada,
@@ -119,7 +114,7 @@ def get_player_stats(j_id: str) -> tuple[list[PlayerStats], int]:
                 CartoesAmarelos,
                 CartoesVermelhos,
                 TempoJogo
-            FROM FantasyChamp.Pontuação_Jogador
+            FROM FantasyChamp.PontuacaoJogador
             WHERE ID_jogador = ?
             ORDER BY ID_jornada
         """, j_id)
@@ -128,7 +123,7 @@ def get_player_stats(j_id: str) -> tuple[list[PlayerStats], int]:
         total_pontos = 0
         
         for row in cursor:
-            # Converter valores para garantir tipos corretos
+            # Manter a mesma lógica de conversão do código original
             pontuacao = int(row.pontuação_total) if row.pontuação_total is not None else 0
             golos = int(row.GolosMarcados) if row.GolosMarcados is not None else 0
             assistencias = int(row.Assistencias) if row.Assistencias is not None else 0
@@ -156,20 +151,19 @@ def list_paginated(page: int, per_page: int) -> tuple[list[PlayerDescriptor], in
     with create_connection() as conn:
         cursor = conn.cursor()
 
-        # total de jogadores
-        cursor.execute("SELECT COUNT(*) FROM FantasyChamp.Jogador;")
+        # total de jogadores (usando VIEW)
+        cursor.execute("SELECT COUNT(*) FROM FantasyChamp.PlayerCompleto;")
         total = cursor.fetchone()[0]
 
-        # query paginada
-        cursor.execute(f"""
-            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem, E.Estado
-            FROM FantasyChamp.Jogador J
-            JOIN FantasyChamp.Estado_Jogador E ON J.ID_Estado_Jogador = E.ID 
-            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-            ORDER BY J.Nome
-            OFFSET {offset} ROWS FETCH NEXT {per_page} ROWS ONLY;
-        """)
+        # query paginada usando parâmetros seguros
+        cursor.execute("""
+            SELECT ID, Nome, Posicao, Preço, jogador_imagem, Estado
+            FROM FantasyChamp.PlayerCompleto
+            ORDER BY Nome
+            OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;
+        """, (offset, per_page))
 
+        # Processar resultados
         jogadores = list(map(
             lambda row: PlayerDescriptor(
                 row.ID,

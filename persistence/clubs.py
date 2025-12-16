@@ -8,14 +8,13 @@ def list_all_clubs():
     cursor = conn.cursor()
 
     query = """
-        SELECT C.ID,
-               C.Nome,
-               P.nome AS Pais_Nome,
-               P.imagem AS Pais_Imagem,
-               C.clube_imagem
-        FROM FantasyChamp.Clube C
-        JOIN FantasyChamp.Pais P ON C.ID_País = P.ID
-        ORDER BY C.Nome
+        SELECT ID,
+               Nome,
+               Pais_Nome,
+               Pais_Imagem,
+               clube_imagem
+        FROM FantasyChamp.ClubDetails
+        ORDER BY Nome
     """
 
     cursor.execute(query)
@@ -42,16 +41,15 @@ def read_club(club_id):
     conn = create_connection()
     cursor = conn.cursor()
 
-    # ---- info do clube ----
+    # ---- info do clube (usando VIEW) ----
     query_club = """
-        SELECT C.ID,
-               C.Nome,
-               P.nome AS Pais_Nome,
-               P.imagem AS Pais_Imagem,
-               C.clube_imagem
-        FROM FantasyChamp.Clube C
-        JOIN FantasyChamp.Pais P ON C.ID_País = P.ID
-        WHERE C.ID = ?
+        SELECT ID,
+               Nome,
+               Pais_Nome,
+               Pais_Imagem,
+               clube_imagem
+        FROM FantasyChamp.ClubDetails
+        WHERE ID = ?
     """
 
     cursor.execute(query_club, club_id)
@@ -102,41 +100,29 @@ def read_club(club_id):
 
 def list_paginated_clubs(page: int, per_page: int):
     offset = (page - 1) * per_page
+    
+    with create_connection() as conn:
+        cursor = conn.cursor()
 
-    conn = create_connection()
-    cursor = conn.cursor()
+        # Total
+        cursor.execute("SELECT COUNT(*) FROM FantasyChamp.ClubDetails")
+        total = cursor.fetchone()[0]
 
-    # Total de clubes
-    cursor.execute("SELECT COUNT(*) FROM FantasyChamp.Clube;")
-    total = cursor.fetchone()[0]
-
-    # Query paginada
-    query = f"""
-        SELECT C.ID,
-               C.Nome,
-               P.nome AS Pais_Nome,
-               P.imagem AS Pais_Imagem,
-               C.clube_imagem
-        FROM FantasyChamp.Clube C
-        JOIN FantasyChamp.Pais P ON C.ID_País = P.ID
-        ORDER BY C.Nome
-        OFFSET {offset} ROWS FETCH NEXT {per_page} ROWS ONLY;
-    """
-
-    cursor.execute(query)
-    rows = cursor.fetchall()
-
-    clubes = []
-    for row in rows:
-        imagem_clube = row.clube_imagem if row.clube_imagem else DEFAULT_IMAGE
-        imagem_pais = row.Pais_Imagem if row.Pais_Imagem else DEFAULT_IMAGE
-
-        clubes.append({
+        # Dados paginados
+        cursor.execute("""
+            SELECT ID, Nome, Pais_Nome, Pais_Imagem, clube_imagem
+            FROM FantasyChamp.ClubDetails
+            ORDER BY Nome
+            OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+        """, (offset, per_page))
+        
+        # Processamento com list comprehension
+        clubes = [{
             "id": row.ID,
             "nome": row.Nome,
             "pais": row.Pais_Nome,
-            "pais_imagem": imagem_pais,
-            "imagem": imagem_clube
-        })
+            "pais_imagem": row.Pais_Imagem or DEFAULT_IMAGE,
+            "imagem": row.clube_imagem or DEFAULT_IMAGE
+        } for row in cursor.fetchall()]
 
-    return clubes, total
+        return clubes, total
