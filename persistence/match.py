@@ -72,7 +72,7 @@ def read_match(match_id):
             P2.nome AS Clube2_Pais,
             P2.imagem AS Clube2_Pais_Imagem,
             J.golos_clube1,
-            J.golos_clube2,
+            J.golos_clube2
         FROM FantasyChamp.Jogo J
         JOIN FantasyChamp.Jornada Jor ON J.ID_jornada = Jor.ID
         JOIN FantasyChamp.Clube C1 ON J.ID_Clube1 = C1.ID
@@ -112,11 +112,13 @@ def read_match(match_id):
         JOIN FantasyChamp.Jogador J ON PJ.ID_jogador = J.ID
         JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
         JOIN FantasyChamp.Clube C ON J.ID_clube = C.ID
-        WHERE PJ.ID_jornada = ? AND PJ.ID_jogo = ?
+        WHERE PJ.ID_jornada = ? 
+          AND C.ID IN (?, ?)
+          AND PJ.TempoJogo > 0
         ORDER BY C.ID, P.Posição, J.Nome
     """
 
-    cursor.execute(query_stats, row.Jornada_ID, match_id)
+    cursor.execute(query_stats, row.Jornada_ID, row.Clube1_ID, row.Clube2_ID)
     stats_rows = cursor.fetchall()
 
     jogadores_casa = []
