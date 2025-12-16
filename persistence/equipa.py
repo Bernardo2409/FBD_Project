@@ -1,6 +1,7 @@
 # persistence/equipa.py
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Dict, Optional
 from pyodbc import IntegrityError
+import pyodbc
 from persistence.session import create_connection
 
 
@@ -93,43 +94,47 @@ def obter_jogadores_equipa(id_equipa: str):
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT J.ID, J.Nome, P.Posição AS Posicao, J.Preço, J.jogador_imagem, E.Estado, PE.benched
-            FROM FantasyChamp.Jogador J
-            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-            JOIN FantasyChamp.Pertence PE ON J.ID = PE.ID_Jogador
-            JOIN FantasyChamp.Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
-            WHERE PE.ID_Equipa = ?
+            SELECT 
+                ID, Nome, Posicao, Preço, jogador_imagem, 
+                Estado, benched, ClubeNome, clube_imagem
+            FROM FantasyChamp.JogadoresEquipa
+            WHERE ID_Equipa = ?
+            ORDER BY 
+                CASE Posicao 
+                    WHEN 'Guarda-Redes' THEN 1
+                    WHEN 'Defesa' THEN 2
+                    WHEN 'Médio' THEN 3
+                    WHEN 'Avançado' THEN 4
+                    ELSE 5
+                END,
+                Nome
         """, id_equipa)
         
         jogadores = []
         for row in cursor:
             jogadores.append({
-                'id': row.ID,
+                'id': str(row.ID),
                 'nome': row.Nome,
                 'posicao': row.Posicao,
-                'preco': row.Preço,
+                'preco': float(row.Preço),
                 'jogador_imagem': row.jogador_imagem if row.jogador_imagem 
                           else '/static/images/Image-not-found.png',
                 'estado': row.Estado,
-                'benched': True if row.benched == 1 else False
+                'benched': True if row.benched == 1 else False  
             })
         
         return jogadores
 
 
-def obter_posicao_jogador(id_jogador: str) -> str:
-    """Obter a posição de um jogador"""
+def obter_posicao_jogador(id_jogador: str) -> Optional[str]:
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT P.Posição
-            FROM FantasyChamp.Jogador J
-            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-            WHERE J.ID = ?
+            SELECT FantasyChamp.fn_ObterPosicaoJogador(?)
         """, id_jogador)
         
         row = cursor.fetchone()
-        return row.Posição if row else None
+        return row[0] if row and row[0] else None
 
 
 def contar_jogadores_por_posicao(id_equipa: str, apenas_campo: bool = False, apenas_banco: bool = False):
@@ -159,9 +164,6 @@ def contar_jogadores_por_posicao(id_equipa: str, apenas_campo: bool = False, ape
             contagem[row.Posição] = row.count
         
         return contagem
-
-
-import pyodbc
 
 def adicionar_jogador_equipa(id_equipa: str, id_jogador: str):
     with create_connection() as conn:
@@ -206,49 +208,36 @@ def adicionar_jogador_equipa(id_equipa: str, id_jogador: str):
 def remover_jogador_equipa(id_equipa: str, id_jogador: str):
     with create_connection() as conn:
         cursor = conn.cursor()
-        
-        # Obter preço do jogador antes de remover
-        preco_jogador = obter_preco_jogador(id_jogador)
-        
-        # Remover relação
         cursor.execute("""
-            DELETE FROM FantasyChamp.Pertence 
-            WHERE ID_Equipa = ? AND ID_Jogador = ?
+            EXEC FantasyChamp.RemoverJogadorEquipa ?, ?
         """, id_equipa, id_jogador)
-        
-        # Devolver o preço ao orçamento
-        cursor.execute("""
-            UPDATE FantasyChamp.Equipa
-            SET Orçamento = Orçamento + ?
-            WHERE ID = ?
-        """, preco_jogador, id_equipa)
-        
         conn.commit()
 
 
 def verificar_limites_equipa(id_equipa: str) -> dict:
-    """Verifica quantos jogadores de cada posição a equipa tem e se pode adicionar mais"""
     with create_connection() as conn:
         cursor = conn.cursor()
         
-        # Contar jogadores por posição
+        # Usar view
         cursor.execute("""
-            SELECT P.Posição, COUNT(*) as count
-            FROM FantasyChamp.Jogador J
-            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-            JOIN FantasyChamp.Pertence PE ON J.ID = PE.ID_Jogador
-            WHERE PE.ID_Equipa = ?
-            GROUP BY P.Posição
+            SELECT gr, defesa, medio, avancado, total
+            FROM FantasyChamp.ContagemEquipa
+            WHERE ID_Equipa = ?
         """, id_equipa)
         
-        contagem = {'Goalkeeper': 0, 'Defender': 0, 'Midfielder': 0, 'Forward': 0}
-        for row in cursor:
-            contagem[row.Posição] = row.count
+        row = cursor.fetchone()
+        contagem = {
+            'Goalkeeper': row.gr if row else 0,
+            'Defender': row.defesa if row else 0,
+            'Midfielder': row.medio if row else 0,
+            'Forward': row.avancado if row else 0,
+            'Total': row.total if row else 0
+        }
         
-        # Obter orçamento atual
+        # Obter orçamento
         cursor.execute("SELECT Orçamento FROM FantasyChamp.Equipa WHERE ID = ?", id_equipa)
         row = cursor.fetchone()
-        orcamento_atual = row.Orçamento if row else 0
+        orcamento_atual = float(row.Orçamento) if row else 0.0
         
         return {
             'contagem': contagem,
@@ -256,7 +245,8 @@ def verificar_limites_equipa(id_equipa: str) -> dict:
             'pode_adicionar_gr': contagem['Goalkeeper'] < 2,
             'pode_adicionar_defesa': contagem['Defender'] < 5,
             'pode_adicionar_medio': contagem['Midfielder'] < 5,
-            'pode_adicionar_avancado': contagem['Forward'] < 3
+            'pode_adicionar_avancado': contagem['Forward'] < 3,
+            'maximo_jogadores': contagem['Total'] < 15  # Exemplo: limite total de 15
         }
 
 
