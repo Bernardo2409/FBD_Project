@@ -315,15 +315,24 @@ def obter_jogadores_banco_por_posicao(id_equipa: str, posicao: str) -> list:
             for row in cursor.fetchall()
         ]
     
-def obter_detalhes_equipa_para_visualizacao(id_equipa: str) -> dict:
-
+def obter_detalhes_equipa_para_visualizacao(id_equipa):
+    """
+    Obtém todos os detalhes de uma equipa para visualização.
+    """
     with create_connection() as conn:
         cursor = conn.cursor()
         
         try:
-            cursor.execute("EXEC FantasyChamp.ObterDetalhesEquipaParaVisualizacao ?", id_equipa)
+            cursor.execute("""
+                DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
+                
+                EXEC sp_ObterDetalhesEquipaParaVisualizacao 
+                    @ID_Equipa = ?,
+                    @Resultado = @Resultado OUTPUT,
+                    @Mensagem = @Mensagem OUTPUT;
+            """, id_equipa)
             
-            # 1. Informações da equipa
+            # Obter informações da equipa
             equipa_info = None
             if cursor.description:
                 columns = [column[0] for column in cursor.description]
@@ -334,50 +343,49 @@ def obter_detalhes_equipa_para_visualizacao(id_equipa: str) -> dict:
             if not equipa_info:
                 raise Exception("Equipa não encontrada")
             
-            # 2. Guarda-Redes
-            cursor.nextset()
-            gr = []
-            if cursor.description:
-                columns = [column[0] for column in cursor.description]
-                for row in cursor.fetchall():
-                    jogador = dict(zip(columns, row))
-                    jogador['benched'] = bool(jogador['benched'])
-                    gr.append(jogador)
+            # Obter jogadores por posição
+            jogadores_agrupados = {
+                'gr': [],
+                'defesas': [],
+                'medios': [],
+                'avancados': []
+            }
             
-            # 3. Defesas
-            cursor.nextset()
-            defesas = []
-            if cursor.description:
+            # Goalkeepers
+            if cursor.nextset() and cursor.description:
                 columns = [column[0] for column in cursor.description]
-                for row in cursor.fetchall():
+                rows = cursor.fetchall()
+                for row in rows:
                     jogador = dict(zip(columns, row))
-                    jogador['benched'] = bool(jogador['benched'])
-                    defesas.append(jogador)
+                    jogadores_agrupados['gr'].append(jogador)
             
-            # 4. Médios
-            cursor.nextset()
-            medios = []
-            if cursor.description:
+            # Defenders
+            if cursor.nextset() and cursor.description:
                 columns = [column[0] for column in cursor.description]
-                for row in cursor.fetchall():
+                rows = cursor.fetchall()
+                for row in rows:
                     jogador = dict(zip(columns, row))
-                    jogador['benched'] = bool(jogador['benched'])
-                    medios.append(jogador)
+                    jogadores_agrupados['defesas'].append(jogador)
             
-            # 5. Avançados
-            cursor.nextset()
-            avancados = []
-            if cursor.description:
+            # Midfielders
+            if cursor.nextset() and cursor.description:
                 columns = [column[0] for column in cursor.description]
-                for row in cursor.fetchall():
+                rows = cursor.fetchall()
+                for row in rows:
                     jogador = dict(zip(columns, row))
-                    jogador['benched'] = bool(jogador['benched'])
-                    avancados.append(jogador)
+                    jogadores_agrupados['medios'].append(jogador)
             
-            # 6. Estatísticas
-            cursor.nextset()
+            # Forwards
+            if cursor.nextset() and cursor.description:
+                columns = [column[0] for column in cursor.description]
+                rows = cursor.fetchall()
+                for row in rows:
+                    jogador = dict(zip(columns, row))
+                    jogadores_agrupados['avancados'].append(jogador)
+            
+            # Estatísticas
             estatisticas = {}
-            if cursor.description:
+            if cursor.nextset() and cursor.description:
                 columns = [column[0] for column in cursor.description]
                 row = cursor.fetchone()
                 if row:
@@ -385,12 +393,7 @@ def obter_detalhes_equipa_para_visualizacao(id_equipa: str) -> dict:
             
             return {
                 'info': equipa_info,
-                'jogadores': {
-                    'gr': gr,
-                    'defesas': defesas,
-                    'medios': medios,
-                    'avancados': avancados
-                },
+                'jogadores': jogadores_agrupados,
                 'estatisticas': estatisticas
             }
             

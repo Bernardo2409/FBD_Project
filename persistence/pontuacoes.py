@@ -3,10 +3,6 @@ import pyodbc
 
 # Função para calcular a pontuação de um jogador usando stored procedure
 def calcular_pontuacao_jogador(id_jogador: str, id_jornada: str) -> int:
-    """
-    Calcula a pontuação total de um jogador para uma jornada específica
-    usando a stored procedure sp_CalcularPontuacaoJogador.
-    """
     with create_connection() as conn:
         cursor = conn.cursor()
         
@@ -14,7 +10,7 @@ def calcular_pontuacao_jogador(id_jogador: str, id_jornada: str) -> int:
             cursor.execute("""
                 DECLARE @Pontuacao INT, @Resultado BIT, @Mensagem NVARCHAR(200);
                 
-                EXEC sp_CalcularPontuacaoJogador 
+                EXEC CalcularPontuacaoJogador 
                     @ID_Jogador = ?,
                     @ID_Jornada = ?,
                     @Pontuacao = @Pontuacao OUTPUT,
@@ -49,10 +45,6 @@ def calcular_pontuacao_jogador(id_jogador: str, id_jornada: str) -> int:
 
 # Função para calcular a pontuação de uma equipa usando stored procedure
 def calcular_pontuacao_equipa(id_equipa: str, id_jornada: str) -> int:
-    """
-    Calcula a pontuação total de uma equipa para uma jornada específica
-    usando a stored procedure sp_CalcularPontuacaoEquipa.
-    """
     with create_connection() as conn:
         cursor = conn.cursor()
         
@@ -60,7 +52,7 @@ def calcular_pontuacao_equipa(id_equipa: str, id_jornada: str) -> int:
             cursor.execute("""
                 DECLARE @PontuacaoTotal INT, @Resultado BIT, @Mensagem NVARCHAR(200);
                 
-                EXEC sp_CalcularPontuacaoEquipa 
+                EXEC CalcularPontuacaoEquipa 
                     @ID_Equipa = ?,
                     @ID_Jornada = ?,
                     @PontuacaoTotal = @PontuacaoTotal OUTPUT,

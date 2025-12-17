@@ -285,7 +285,7 @@ def obter_ranking_liga(id_liga, id_jornada=None):
             cursor.execute("""
                 DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
                 
-                EXEC ObterRankingLigaComEquipas 
+                EXEC sp_ObterRankingLigaComEquipas 
                     @ID_Liga = ?,
                     @ID_Jornada = ?,
                     @Resultado = @Resultado OUTPUT,
