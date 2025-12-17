@@ -300,7 +300,7 @@ def obter_jogadores_banco_por_posicao(id_equipa: str, posicao: str) -> list:
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT * FROM FantasyChamp.fn_ObterJogadoresBancoPorPosicao(?, ?)
+            SELECT * FROM FantasyChamp.ObterJogadoresBancoPorPosicao(?, ?)
         """, id_equipa, posicao)
         
         return [
