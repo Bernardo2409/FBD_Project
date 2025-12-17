@@ -46,11 +46,11 @@ BEGIN
         END
 
         SET @Resultado = 1;
-        SET @Mensagem = 'Ranking obtido com sucesso';
+        SET @Mensagem = 'Ranking obtained successfully';
 
     END TRY
     BEGIN CATCH
         SET @Resultado = 0;
-        SET @Mensagem = 'Erro: ' + ERROR_MESSAGE();
+        SET @Mensagem = 'Error: ' + ERROR_MESSAGE();
     END CATCH
 END;

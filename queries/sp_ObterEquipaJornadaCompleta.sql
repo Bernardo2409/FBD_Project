@@ -33,10 +33,10 @@ BEGIN
             ON J.ID = PJ.ID_Jogador AND PJ.ID_jornada = @ID_Jornada
         WHERE PE.ID_Equipa = @ID_Equipa
         ORDER BY
-            CASE WHEN P.Posição = 'Guarda-Redes' THEN 1
-                 WHEN P.Posição = 'Defesa' THEN 2
-                 WHEN P.Posição = 'Médio' THEN 3
-                 WHEN P.Posição = 'Avançado' THEN 4
+            CASE WHEN P.Posição = 'Goalkeeper' THEN 1
+                 WHEN P.Posição = 'Defender' THEN 2
+                 WHEN P.Posição = 'Midfielder' THEN 3
+                 WHEN P.Posição = 'Forward' THEN 4
                  ELSE 5 END,
             CASE WHEN PE.benched = 0 THEN 1 ELSE 2 END,
             J.Nome;
@@ -57,11 +57,11 @@ BEGIN
         SELECT @PontuacaoTotal AS PontuacaoTotal;
 
         SET @Resultado = 1;
-        SET @Mensagem = 'Dados obtidos com sucesso';
+        SET @Mensagem = 'Data retrieved successfully';
 
     END TRY
     BEGIN CATCH
         SET @Resultado = 0;
-        SET @Mensagem = 'Erro: ' + ERROR_MESSAGE();
+        SET @Mensagem = 'Error: ' + ERROR_MESSAGE();
     END CATCH
 END;

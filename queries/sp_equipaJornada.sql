@@ -21,7 +21,7 @@ BEGIN
         IF @EquipaExiste = 0
         BEGIN
             SET @Resultado = 0;
-            SET @Mensagem = 'Não tens permissão para ver esta equipa';
+            SET @Mensagem = 'You do not have permission to view this team';
             RETURN;
         END
 
@@ -29,7 +29,7 @@ BEGIN
         IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Jornada WHERE ID = @ID_Jornada)
         BEGIN
             SET @Resultado = 0;
-            SET @Mensagem = 'Jornada não encontrada';
+            SET @Mensagem = 'Round not found';
             RETURN;
         END
 
@@ -55,11 +55,11 @@ BEGIN
         WHERE J.ID = @ID_Jornada;
 
         SET @Resultado = 1;
-        SET @Mensagem = 'Operação concluída com sucesso';
+        SET @Mensagem = 'Operation completed successfully';
 
     END TRY
     BEGIN CATCH
         SET @Resultado = 0;
-        SET @Mensagem = 'Erro: ' + ERROR_MESSAGE();
+        SET @Mensagem = 'Error: ' + ERROR_MESSAGE();
     END CATCH
 END;

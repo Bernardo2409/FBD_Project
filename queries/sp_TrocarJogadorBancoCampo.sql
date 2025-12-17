@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE sp_TrocarJogadorBancoCampo
+CREATE PROCEDURE sp_TrocarJogadorBancoCampo
     @ID_Equipa UNIQUEIDENTIFIER,
     @ID_Jogador_Banco VARCHAR(16),
     @ID_Jogador_Campo VARCHAR(16),
@@ -17,14 +17,14 @@ BEGIN
         IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Jogador WHERE ID = @ID_Jogador_Banco)
         BEGIN
             SET @Sucesso = 0;
-            SET @Mensagem = 'Jogador do banco não encontrado';
+            SET @Mensagem = 'Player from bench not found';
             RETURN;
         END
 
         IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Jogador WHERE ID = @ID_Jogador_Campo)
         BEGIN
             SET @Sucesso = 0;
-            SET @Mensagem = 'Jogador do campo não encontrado';
+            SET @Mensagem = 'Player from field not found';
             RETURN;
         END
 
@@ -41,14 +41,14 @@ BEGIN
         IF @Benched_Banco IS NULL
         BEGIN
             SET @Sucesso = 0;
-            SET @Mensagem = 'Jogador do banco não pertence a esta equipa';
+            SET @Mensagem = 'Player from bench does not belong to this team';
             RETURN;
         END
 
         IF @Benched_Campo IS NULL
         BEGIN
             SET @Sucesso = 0;
-            SET @Mensagem = 'Jogador do campo não pertence a esta equipa';
+            SET @Mensagem = 'Player from field does not belong to this team';
             RETURN;
         END
 
@@ -56,7 +56,7 @@ BEGIN
         IF @Benched_Banco != 1 OR @Benched_Campo != 0
         BEGIN
             SET @Sucesso = 0;
-            SET @Mensagem = 'Jogadores não estão nas posições corretas (banco/campo)';
+            SET @Mensagem = 'Players are not in the correct positions (bench/field)';
             RETURN;
         END
 
@@ -75,7 +75,7 @@ BEGIN
         IF @Posicao_Banco != @Posicao_Campo
         BEGIN
             SET @Sucesso = 0;
-            SET @Mensagem = 'Jogadores devem ser da mesma posição para trocar. ' +
+            SET @Mensagem = 'Players must be in the same position to swap. ' +
                            @Posicao_Banco + ' ≠ ' + @Posicao_Campo;
             RETURN;
         END
@@ -108,7 +108,7 @@ BEGIN
             IF @Count_GR_Banco = 0 OR @Count_GR_Campo = 0
             BEGIN
                 SET @Sucesso = 0;
-                SET @Mensagem = 'Deve haver pelo menos 1 guarda-redes no banco e 1 em campo';
+                SET @Mensagem = 'There must be at least 1 goalkeeper on the bench and 1 on the field';
                 RETURN;
             END
 
@@ -137,7 +137,7 @@ BEGIN
         COMMIT TRANSACTION;
 
         SET @Sucesso = 1;
-        SET @Mensagem = 'Troca realizada com sucesso!';
+        SET @Mensagem = 'Swap completed successfully!';
 
     END TRY
     BEGIN CATCH
@@ -145,7 +145,7 @@ BEGIN
             ROLLBACK TRANSACTION;
 
         SET @Sucesso = 0;
-        SET @Mensagem = 'Erro: ' + ERROR_MESSAGE();
+        SET @Mensagem = 'Error: ' + ERROR_MESSAGE();
     END CATCH
 END;
 GO

@@ -35,7 +35,7 @@ BEGIN
     JOIN FantasyChamp.Estado_Jogador ej ON j.ID_Estado_Jogador = ej.ID
     JOIN FantasyChamp.Clube c ON j.ID_clube = c.ID
     WHERE p.ID_Equipa = @ID_Equipa
-      AND pos.Posição = 'Guarda-Redes'
+      AND pos.Posição = 'Goalkeeper'
     ORDER BY p.benched, j.Nome;
 
     -- Defesas
@@ -54,7 +54,7 @@ BEGIN
     JOIN FantasyChamp.Estado_Jogador ej ON j.ID_Estado_Jogador = ej.ID
     JOIN FantasyChamp.Clube c ON j.ID_clube = c.ID
     WHERE p.ID_Equipa = @ID_Equipa
-      AND pos.Posição = 'Defesa'
+      AND pos.Posição = 'Defender'
     ORDER BY p.benched, j.Nome;
 
     -- Médios
@@ -73,7 +73,7 @@ BEGIN
     JOIN FantasyChamp.Estado_Jogador ej ON j.ID_Estado_Jogador = ej.ID
     JOIN FantasyChamp.Clube c ON j.ID_clube = c.ID
     WHERE p.ID_Equipa = @ID_Equipa
-      AND pos.Posição = 'Médio'
+      AND pos.Posição = 'Midfielder'
     ORDER BY p.benched, j.Nome;
 
     -- Avançados
@@ -92,7 +92,7 @@ BEGIN
     JOIN FantasyChamp.Estado_Jogador ej ON j.ID_Estado_Jogador = ej.ID
     JOIN FantasyChamp.Clube c ON j.ID_clube = c.ID
     WHERE p.ID_Equipa = @ID_Equipa
-      AND pos.Posição = 'Avançado'
+      AND pos.Posição = 'Forward'
     ORDER BY p.benched, j.Nome;
 
     -- Estatísticas
@@ -101,22 +101,22 @@ BEGIN
         (SELECT COUNT(*) FROM FantasyChamp.Jogador j
          JOIN FantasyChamp.Posição pos ON j.ID_Posição = pos.ID
          JOIN FantasyChamp.Pertence p ON j.ID = p.ID_Jogador
-         WHERE p.ID_Equipa = @ID_Equipa AND pos.Posição = 'Guarda-Redes') AS Total_GR,
+         WHERE p.ID_Equipa = @ID_Equipa AND pos.Posição = 'Goalkeeper') AS Total_GR,
 
         (SELECT COUNT(*) FROM FantasyChamp.Jogador j
          JOIN FantasyChamp.Posição pos ON j.ID_Posição = pos.ID
          JOIN FantasyChamp.Pertence p ON j.ID = p.ID_Jogador
-         WHERE p.ID_Equipa = @ID_Equipa AND pos.Posição = 'Defesa') AS Total_Defesas,
+         WHERE p.ID_Equipa = @ID_Equipa AND pos.Posição = 'Defender') AS Total_Defesas,
 
         (SELECT COUNT(*) FROM FantasyChamp.Jogador j
          JOIN FantasyChamp.Posição pos ON j.ID_Posição = pos.ID
          JOIN FantasyChamp.Pertence p ON j.ID = p.ID_Jogador
-         WHERE p.ID_Equipa = @ID_Equipa AND pos.Posição = 'Médio') AS Total_Medios,
+         WHERE p.ID_Equipa = @ID_Equipa AND pos.Posição = 'Midfielder') AS Total_Medios,
 
         (SELECT COUNT(*) FROM FantasyChamp.Jogador j
          JOIN FantasyChamp.Posição pos ON j.ID_Posição = pos.ID
          JOIN FantasyChamp.Pertence p ON j.ID = p.ID_Jogador
-         WHERE p.ID_Equipa = @ID_Equipa AND pos.Posição = 'Avançado') AS Total_Avancados,
+         WHERE p.ID_Equipa = @ID_Equipa AND pos.Posição = 'Forward') AS Total_Avancados,
 
         -- Valor total
         (SELECT SUM(j.Preço) FROM FantasyChamp.Jogador j

@@ -16,7 +16,7 @@ BEGIN
         IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Pais WHERE Pais.nome = @Pais OR ID = @Pais)
         BEGIN
             SET @Sucesso = 0;
-            SET @Mensagem = 'País não encontrado';
+            SET @Mensagem = 'Country not found';
             RETURN;
         END
 
@@ -43,12 +43,12 @@ BEGIN
                 @LigaTipoPublica, @CriadorID, @CodigoPais);
 
             SET @Sucesso = 1;
-            SET @Mensagem = 'Liga do país criada com sucesso';
+            SET @Mensagem = 'League created successfully';
         END
         ELSE
         BEGIN
             SET @Sucesso = 1;
-            SET @Mensagem = 'Liga do país já existe';
+            SET @Mensagem = 'League already exists';
         END
 
     END TRY

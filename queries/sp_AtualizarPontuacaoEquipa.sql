@@ -13,14 +13,14 @@ BEGIN
     -- 1. Verificar se a equipa existe
     IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Equipa WHERE ID = @ID_Equipa)
     BEGIN
-        SET @Mensagem = 'Equipa não encontrada';
+        SET @Mensagem = 'Team not found';
         RETURN;
     END
 
     -- 2. Verificar se a jornada existe
     IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Jornada WHERE ID = @ID_Jornada)
     BEGIN
-        SET @Mensagem = 'Jornada não encontrada';
+        SET @Mensagem = 'Round not found';
         RETURN;
     END
 
@@ -62,5 +62,5 @@ BEGIN
     END
 
     SET @Resultado = 1;
-    SET @Mensagem = 'Pontuação atualizada com sucesso: ' + CAST(@PontuacaoJornada AS NVARCHAR(10));
+    SET @Mensagem = 'Pontuation updated successfully: ' + CAST(@PontuacaoJornada AS NVARCHAR(10));
 END;

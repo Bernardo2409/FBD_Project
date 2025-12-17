@@ -15,14 +15,14 @@ BEGIN
     -- Verificar se o jogador existe
     IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Jogador WHERE ID = @ID_Jogador)
     BEGIN
-        SET @Mensagem = 'Jogador não encontrado';
+        SET @Mensagem = 'Player not found';
         RETURN;
     END
 
     -- Verificar se a jornada existe
     IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Jornada WHERE ID = @ID_Jornada)
     BEGIN
-        SET @Mensagem = 'Jornada não encontrada';
+        SET @Mensagem = 'Round not found';
         RETURN;
     END
 
@@ -44,7 +44,7 @@ BEGIN
     BEGIN
         SET @Pontuacao = 0;
         SET @Resultado = 1;
-        SET @Mensagem = 'Jogador não tem estatísticas nesta jornada';
+        SET @Mensagem = 'Player has no statistics for this round';
         RETURN;
     END
 
@@ -63,5 +63,5 @@ BEGIN
         SET @Pontuacao = 0;
 
     SET @Resultado = 1;
-    SET @Mensagem = 'Pontuação calculada com sucesso';
+    SET @Mensagem = 'Pontuation calculated successfully';
 END;

@@ -96,7 +96,7 @@ BEGIN
             Nome;
 
         SET @Resultado = 1;
-        SET @Mensagem = 'Dados obtidos com sucesso';
+        SET @Mensagem = 'Data retrieved successfully';
 
         -- Limpar tabela temporária
         DROP TABLE #Resultados;
@@ -105,7 +105,7 @@ BEGIN
     BEGIN CATCH
         SET @Resultado = 0;
         SET @PontuacaoTotal = 0;
-        SET @Mensagem = 'Erro: ' + ERROR_MESSAGE();
+        SET @Mensagem = 'Error: ' + ERROR_MESSAGE();
 
         -- Limpeza em caso de erro
         IF OBJECT_ID('tempdb..#Resultados') IS NOT NULL

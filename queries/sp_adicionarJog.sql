@@ -24,7 +24,7 @@ BEGIN
                WHERE ID_Equipa = @ID_Equipa AND ID_Jogador = @ID_Jogador)
     BEGIN
         SET @Resultado = 0;
-        SET @Mensagem = 'Jogador já está na equipa';
+        SET @Mensagem = 'Player already in team';
         ROLLBACK TRANSACTION;
         RETURN;
     END
@@ -38,7 +38,7 @@ BEGIN
     IF @Preco IS NULL OR @Posicao IS NULL
     BEGIN
         SET @Resultado = 0;
-        SET @Mensagem = 'Jogador não encontrado';
+        SET @Mensagem = 'Player not found';
         ROLLBACK TRANSACTION;
         RETURN;
     END
@@ -49,7 +49,7 @@ BEGIN
     IF @Orcamento < @Preco
     BEGIN
         SET @Resultado = 0;
-        SET @Mensagem = 'Orçamento insuficiente';
+        SET @Mensagem = 'Insufficient money';
         ROLLBACK TRANSACTION;
         RETURN;
     END
@@ -156,8 +156,8 @@ BEGIN
 
     SET @Resultado = 1;
     SET @Mensagem = CASE WHEN @BenchedStatus = 1
-                        THEN 'Jogador adicionado ao banco'
-                        ELSE 'Jogador adicionado ao campo' END;
+                        THEN 'Player added to bench'
+                        ELSE 'Player added to field' END;
 
     COMMIT TRANSACTION;
 END;
