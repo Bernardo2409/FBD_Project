@@ -258,9 +258,7 @@ def obter_pontuacoes_jornadas(id_equipa: str):
 
 # Função para calcular e atualizar pontuações de forma otimizada
 def atualizar_pontuacoes_otimizado():
-    """
-    Atualiza pontuações de forma otimizada usando stored procedures em batch.
-    """
+ 
     with create_connection() as conn:
         cursor = conn.cursor()
         
@@ -297,9 +295,7 @@ def atualizar_pontuacoes_otimizado():
             print(f"Erro: {str(e)}")
 
 def obter_equipa_com_pontuacoes_jornada(id_equipa: str, id_jornada: str):
-    """
-    Obtém todos os dados da equipa para uma jornada específica.
-    """
+
     with create_connection() as conn:
         cursor = conn.cursor()
         
@@ -348,9 +344,7 @@ def obter_equipa_com_pontuacoes_jornada(id_equipa: str, id_jornada: str):
             raise e
 
 def obter_jornada_info(id_jornada: str):
-    """
-    Obtém informações de uma jornada específica.
-    """
+
     with create_connection() as conn:
         cursor = conn.cursor()
         

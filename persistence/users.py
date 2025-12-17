@@ -146,10 +146,7 @@ def create_user_with_ligas(first, last, email, password, country, nationality, b
 
 # Mantém a função antiga para compatibilidade
 def create_user(first, last, email, password, country, nationality, birthdate):
-    """
-    Função compatível com o código existente.
-    Usa a nova stored procedure por baixo.
-    """
+
     try:
         return create_user_with_ligas(first, last, email, password, country, nationality, birthdate)
     except Exception as e:
@@ -157,10 +154,7 @@ def create_user(first, last, email, password, country, nationality, birthdate):
         return None
 
 def create_liga_pais(country, creator_id):
-    """
-    Cria uma liga para um país se não existir.
-    Retorna o ID da liga.
-    """
+
     conn = None
     try:
         conn = create_connection()
@@ -198,38 +192,9 @@ def create_liga_pais(country, creator_id):
             conn.close()
 
 def juntar_liga_automatico(user_id, liga_id):
-    """
-    Adiciona um utilizador a uma liga.
-    """
-    conn = None
-    try:
-        conn = create_connection()
+    with create_connection() as conn:
         cursor = conn.cursor()
         
-        # Verificar se já pertence
-        cursor.execute("""
-            SELECT 1 FROM FantasyChamp.Participa
-            WHERE ID_Utilizador = ? AND ID_Liga = ?
-        """, user_id, liga_id)
-        
-        if cursor.fetchone():
-            print(f"Utilizador já pertence à liga {liga_id}")
-            return True
-        
-        # Adicionar à liga
-        cursor.execute("""
-            INSERT INTO FantasyChamp.Participa (ID_Utilizador, ID_Liga)
-            VALUES (?, ?)
-        """, user_id, liga_id)
-        
+        cursor.execute("EXEC FantasyChamp.sp_JuntarLigaAutomatico ?, ?", user_id, liga_id)
         conn.commit()
         return True
-        
-    except pyodbc.Error as e:
-        if conn:
-            conn.rollback()
-        print(f"Erro ao juntar liga: {e}")
-        return False
-    finally:
-        if conn:
-            conn.close()
