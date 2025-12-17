@@ -27,68 +27,69 @@ class TipoLiga(NamedTuple):
     tipo: str
 
 
-# --------------------------------------------------------------------
-# ⚡ Criar liga privada
-# --------------------------------------------------------------------
-def criar_liga(nome: str, data_inicio: str, data_fim: str,
-               id_tipo_liga: str = 'LT02', id_criador: str = None,
-               codigo_convite: Optional[str] = None) -> str:
 
+# Criar liga privada
+
+def criar_liga(
+    nome: str, 
+    data_inicio: str, 
+    data_fim: str,
+    id_tipo_liga: str = 'LT02', 
+    id_criador: Optional[str] = None,
+    codigo_convite: Optional[str] = None
+) -> dict:
+    """Versão simplificada"""
     with create_connection() as conn:
         cursor = conn.cursor()
-
-        liga_id = str(uuid.uuid4())
-
-        # Use placeholders for all values and use CONVERT to ensure proper date parsing
+        
         cursor.execute("""
-            INSERT INTO FantasyChamp.Liga
-            (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
-            VALUES (?, ?, CONVERT(DATE, ?, 23), CONVERT(DATE, ?, 23), ?, ?, ?)
-        """, liga_id, nome, data_inicio, data_fim, id_tipo_liga, id_criador, codigo_convite)
+            EXEC FantasyChamp.CriarLiga
+                @Nome = ?,
+                @Data_Inicio = ?,
+                @Data_Fim = ?,
+                @ID_tipoLiga = ?,
+                @ID_criador = ?,
+                @Codigo_Convite = ?;
+        """, nome, data_inicio, data_fim, id_tipo_liga, id_criador, codigo_convite)
+        
+        row = cursor.fetchone()
+        
+        if row:
+            return {
+                'id': str(row.ID),
+                'codigo_convite': row.Codigo_Convite,
+                'sucesso': bool(row.Sucesso)
+            }
+        
+        return {'sucesso': False, 'erro': 'Falha ao criar liga'}
 
-        # Criador entra automaticamente (se fornecido)
-        if id_criador:
-            cursor.execute("""
-                INSERT INTO FantasyChamp.Participa (ID_Utilizador, ID_Liga)
-                VALUES (?, ?)
-            """, id_criador, liga_id)
-
-        conn.commit()
-
-        return liga_id
 
 
-# --------------------------------------------------------------------
-# ⚡ Criar liga pública "automática" (Mundial e país do utilizador)
-# --------------------------------------------------------------------
+# Criar liga pública (Mundial e país do utilizador)
+
 def criar_liga_publica(nome_liga: str, id_criador: str = None) -> str:
-    """Cria liga pública sem código, usada para Mundial + países."""
     with create_connection() as conn:
         cursor = conn.cursor()
-
-        liga_id = str(uuid.uuid4())
-
+        
+        # Executar SP
         cursor.execute("""
-            INSERT INTO FantasyChamp.Liga
-            (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
-            VALUES (?, ?, GETDATE(), CONVERT(DATE, '2026-05-30', 23), 'LT01', ?, NULL)
-        """, liga_id, nome_liga, id_criador)
-
-        # Criador entra automaticamente (se existir)
-        if id_criador:
-            cursor.execute("""
-                INSERT INTO FantasyChamp.Participa (ID_Utilizador, ID_Liga)
-                VALUES (?, ?)
-            """, id_criador, liga_id)
-
+            DECLARE @LigaID UNIQUEIDENTIFIER;
+            EXEC FantasyChamp.CriarLigaPublica 
+                @Nome = ?,
+                @ID_criador = ?,
+                @LigaID = @LigaID OUTPUT;
+            SELECT @LigaID;
+        """, nome_liga, id_criador)
+        
+        liga_id = cursor.fetchone()[0]
         conn.commit()
+        
+        return str(liga_id)
 
-        return liga_id
 
 
-# --------------------------------------------------------------------
-# ⚡ Obter tipos de liga
-# --------------------------------------------------------------------
+# Obter tipos de liga
+
 def obter_tipos_liga() -> List[TipoLiga]:
     with create_connection() as conn:
         cursor = conn.cursor()
@@ -101,18 +102,17 @@ def obter_tipos_liga() -> List[TipoLiga]:
         return [TipoLiga(row.ID, row.Tipo) for row in cursor]
 
 
-# --------------------------------------------------------------------
-# ⚡ Obter ligas onde o utilizar participa
-# --------------------------------------------------------------------
+
+# Obter ligas onde o utilizar participa
+
 def obter_ligas_por_utilizador(id_utilizador: str) -> List[Liga]:
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT L.ID, L.Nome, L.Data_Inicio, L.Data_Fim,
-                   L.ID_tipoLiga, L.ID_criador, L.Código_Convite
-            FROM FantasyChamp.Liga L
-            JOIN FantasyChamp.Participa P ON L.ID = P.ID_Liga
-            WHERE P.ID_Utilizador = ?
+            SELECT ID, Nome, Data_Inicio, Data_Fim,
+                   ID_tipoLiga, ID_criador, Código_Convite
+            FROM FantasyChamp.LigasDoUtilizador
+            WHERE ID_Utilizador = ?
         """, id_utilizador)
 
         return [
@@ -122,9 +122,8 @@ def obter_ligas_por_utilizador(id_utilizador: str) -> List[Liga]:
         ]
 
 
-# --------------------------------------------------------------------
-# ⚡ Obter liga por ID
-# --------------------------------------------------------------------
+# Obter liga por ID
+
 def obter_liga_por_id(id_liga: str) -> Optional[Liga]:
     with create_connection() as conn:
         cursor = conn.cursor()
@@ -139,9 +138,9 @@ def obter_liga_por_id(id_liga: str) -> Optional[Liga]:
         return Liga(*row) if row else None
 
 
-# --------------------------------------------------------------------
-# ⚡ Obter liga pelo nome (ex: "Portugal" ou "Mundial")
-# --------------------------------------------------------------------
+
+# Obter liga pelo nome
+
 def obter_liga_pelo_pais(nome_liga: str) -> Optional[Liga]:
     with create_connection() as conn:
         cursor = conn.cursor()
@@ -157,146 +156,91 @@ def obter_liga_pelo_pais(nome_liga: str) -> Optional[Liga]:
         return Liga(*row) if row else None
 
 
-# --------------------------------------------------------------------
-# ⚡ User junta-se automaticamente a uma liga
-# --------------------------------------------------------------------
-def juntar_liga_automatico(id_utilizador: str, liga: Liga):
+
+# User junta-se automaticamente a uma liga
+
+def juntar_liga_automatico(id_utilizador: str, liga_id: str):
     with create_connection() as conn:
         cursor = conn.cursor()
-
         cursor.execute("""
-            SELECT 1 FROM FantasyChamp.Participa
-            WHERE ID_Utilizador = ? AND ID_Liga = ?
-        """, id_utilizador, liga.id)
-
-        if cursor.fetchone():
-            return  # já está na liga
-
-        cursor.execute("""
-            INSERT INTO FantasyChamp.Participa (ID_Utilizador, ID_Liga)
-            VALUES (?, ?)
-        """, id_utilizador, liga.id)
-
+            EXEC FantasyChamp.JuntarLigaAutomatico ?, ?
+        """, id_utilizador, liga_id)
         conn.commit()
 
 
-# --------------------------------------------------------------------
-# ⚡ Juntar a liga manual (com código, se privado)
-# --------------------------------------------------------------------
+# Juntar a liga manual
+
 def juntar_liga(id_utilizador: str, id_liga: str, codigo: Optional[str]) -> bool:
     with create_connection() as conn:
         cursor = conn.cursor()
-
-        # Verificar se já está
+        
         cursor.execute("""
-            SELECT 1 FROM FantasyChamp.Participa
-            WHERE ID_Utilizador = ? AND ID_Liga = ?
-        """, id_utilizador, id_liga)
-
-        if cursor.fetchone():
-            return False
-
-        # Verificar tipo + código
-        cursor.execute("""
-            SELECT ID_tipoLiga, Código_Convite
-            FROM FantasyChamp.Liga
-            WHERE ID = ?
-        """, id_liga)
-
-        info = cursor.fetchone()
-
-        if info.ID_tipoLiga == 'LT02':  # privada
-            if not codigo or codigo != info.Código_Convite:
-                return False
-
-        # Entrar
-        cursor.execute("""
-            INSERT INTO FantasyChamp.Participa (ID_Utilizador, ID_Liga)
-            VALUES (?, ?)
-        """, id_utilizador, id_liga)
-
+            DECLARE @Resultado BIT;
+            EXEC FantasyChamp.JuntarLiga 
+                @ID_Utilizador = ?,
+                @ID_Liga = ?,
+                @Codigo = ?,
+                @Resultado = @Resultado OUTPUT;
+            SELECT @Resultado;
+        """, id_utilizador, id_liga, codigo)
+        
+        resultado = cursor.fetchone()[0]
         conn.commit()
-        return True
+        
+        return bool(resultado)
 
 
-# --------------------------------------------------------------------
-# ⚡ Obter participantes de uma liga
-# --------------------------------------------------------------------
+# Obter participantes de uma liga
+
 def obter_participantes_liga(id_liga):
-    """
-    Obtém a lista de participantes de uma liga.
-    """
+
     with create_connection() as conn:
         cursor = conn.cursor()
         
-        try:
-            cursor.execute("""
-                SELECT 
-                    U.PrimeiroNome + ' ' + U.Apelido AS nome,
-                    E.Nome AS equipa,
-                    E.ID AS id_equipa
-                FROM FantasyChamp.Participa P
-                JOIN FantasyChamp.Utilizador U ON P.ID_Utilizador = U.ID
-                LEFT JOIN FantasyChamp.Equipa E ON U.ID = E.ID_utilizador
-                WHERE P.ID_Liga = ?
-                ORDER BY U.PrimeiroNome, U.Apelido
-            """, id_liga)
-            
-            rows = cursor.fetchall()
-            
-            participantes = []
-            for row in rows:
-                participantes.append({
-                    'nome': row.nome,
-                    'equipa': row.equipa,
-                    'id_equipa': row.id_equipa
-                })
-            
-            return participantes
-            
-        except pyodbc.Error as e:
-            print(f"Erro ao obter participantes da liga: {e}")
-            return []
+        cursor.execute("""
+            SELECT 
+                nome,
+                equipa,
+                id_equipa
+            FROM FantasyChamp.ParticipantesLiga
+            WHERE ID_Liga = ?
+            ORDER BY nome
+        """, id_liga)
+        
+        return [
+            {
+                'nome': row.nome,
+                'equipa': row.equipa,
+                'id_equipa': row.id_equipa
+            }
+            for row in cursor.fetchall()
+        ]
 
 
 
-# --------------------------------------------------------------------
-# ⚡ Ligas públicas visíveis para o utilizador
-#    → Mundial + Liga do país do user
-#    → EXCLUINDO ligas onde o user já participa
-# --------------------------------------------------------------------
+
+# Ligas públicas visíveis para o utilizador
+# Mundial + Liga do país do user
+
 def obter_ligas_publicas_para_utilizador(user_country: str, id_user: str):
     with create_connection() as conn:
         cursor = conn.cursor()
-
+        
         cursor.execute("""
-            SELECT L.ID, L.Nome, L.Data_Inicio, L.Data_Fim,
-                   L.ID_tipoLiga, L.ID_criador, L.Código_Convite,
-                   U.PrimeiroNome
-            FROM FantasyChamp.Liga L
-            JOIN FantasyChamp.Utilizador U ON L.ID_criador = U.ID
-            WHERE 
-                L.ID_tipoLiga = 'LT01'
-                AND L.Data_Fim > GETDATE()
-                AND L.Nome IN ('Mundial', ?)
-                AND L.ID NOT IN (
-                    SELECT ID_Liga FROM FantasyChamp.Participa
-                    WHERE ID_Utilizador = ?
-                )
-            ORDER BY L.Nome
+            EXEC FantasyChamp.ObterLigasPublicasParaUtilizador ?, ?
         """, user_country, id_user)
-
+        
         return [
             Liga(row.ID, row.Nome, row.Data_Inicio, row.Data_Fim,
                  row.ID_tipoLiga, row.ID_criador,
                  row.Código_Convite, row.PrimeiroNome)
-            for row in cursor
+            for row in cursor.fetchall()
         ]
 
 
-# --------------------------------------------------------------------
-# ⚡ Obter ID da liga a partir do código de convite
-# --------------------------------------------------------------------
+
+# Obter ID da liga a partir do código de convite
+
 def obter_liga_id_por_codigo(codigo: str) -> Optional[str]:
     with create_connection() as conn:
         cursor = conn.cursor()
@@ -308,33 +252,32 @@ def obter_liga_id_por_codigo(codigo: str) -> Optional[str]:
         return row.ID if row else None
 
 
-# --------------------------------------------------------------------
-# ⚡ Abandonar liga
-# --------------------------------------------------------------------
+
+# Abandonar liga
+
 def abandonar_liga(id_utilizador: str, id_liga: str) -> bool:
     with create_connection() as conn:
         cursor = conn.cursor()
-
+        
         cursor.execute("""
             SELECT 1 FROM FantasyChamp.Participa
             WHERE ID_Utilizador = ? AND ID_Liga = ?
         """, id_utilizador, id_liga)
-
+        
         if not cursor.fetchone():
             return False
-
+        
         cursor.execute("""
-            DELETE FROM FantasyChamp.Participa
-            WHERE ID_Utilizador = ? AND ID_Liga = ?
+            EXEC FantasyChamp.AbandonarLiga ?, ?
         """, id_utilizador, id_liga)
-
+        
         conn.commit()
         return True
 
+# Obter Ranking
+
 def obter_ranking_liga(id_liga, id_jornada=None):
-    """
-    Obtém o ranking da liga (apenas participantes com equipa).
-    """
+
     with create_connection() as conn:
         cursor = conn.cursor()
         
@@ -342,7 +285,7 @@ def obter_ranking_liga(id_liga, id_jornada=None):
             cursor.execute("""
                 DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
                 
-                EXEC sp_ObterRankingLigaComEquipas 
+                EXEC ObterRankingLigaComEquipas 
                     @ID_Liga = ?,
                     @ID_Jornada = ?,
                     @Resultado = @Resultado OUTPUT,
@@ -372,10 +315,11 @@ def obter_ranking_liga(id_liga, id_jornada=None):
         except pyodbc.Error as e:
             print(f"Erro ao obter ranking da liga: {e}")
 
+
+# Obter Jornadas Disponiveis
+
 def obter_jornadas_disponiveis():
-    """
-    Obtém todas as jornadas disponíveis no sistema
-    """
+
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
@@ -387,33 +331,31 @@ def obter_jornadas_disponiveis():
         return [row.ID_jornada for row in cursor.fetchall()]
 
 
+# Historico equipa liga
+
 def obter_historico_equipa_liga(id_liga: str, id_equipa: str):
-    """
-    Obtém o histórico de pontuações de uma equipa numa liga
-    """
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
             SELECT 
-                PE.ID_jornada,
-                PE.pontuação_jornada,
-                PE.pontuação_acumulada
-            FROM FantasyChamp.Pontuação_Equipa PE
-            JOIN FantasyChamp.Equipa E ON PE.ID_Equipa = E.ID
-            JOIN FantasyChamp.Participa P ON E.ID_Utilizador = P.ID_Utilizador
-            WHERE P.ID_Liga = ? AND PE.ID_Equipa = ?
-            ORDER BY PE.ID_jornada
+                ID_jornada,
+                pontuação_jornada,
+                pontuação_acumulada
+            FROM FantasyChamp.HistoricoEquipasLiga
+            WHERE ID_Liga = ? AND ID_Equipa = ?
+            ORDER BY ID_jornada
         """, id_liga, id_equipa)
         
-        historico = []
-        for row in cursor:
-            historico.append({
+        return [
+            {
                 'jornada': row.ID_jornada,
                 'pontos_jornada': row.pontuação_jornada,
                 'pontos_acumulados': row.pontuação_acumulada
-            })
-        
-        return historico
+            }
+            for row in cursor.fetchall()
+        ]
+
+# Verificar participação na liga
 
 def verificar_participacao_liga(id_utilizador, id_liga):
     """
