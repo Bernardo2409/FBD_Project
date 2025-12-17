@@ -16,7 +16,6 @@
             <table class="table table-zebra w-full">
                 <thead class="bg-primary text-primary-content">
                     <tr>
-                        <th class="py-3 px-4 rounded-tl-lg text-center">ID</th>
                         <th class="py-3 px-4 text-center">Name</th>
                         <th class="py-3 px-4 text-center">Country</th>
                         <th class="py-3 px-4 text-center">Image</th>
@@ -27,7 +26,6 @@
                 <tbody>
                 {% for clube in clubes %}
                     <tr class="hover:bg-base-200 transition duration-150">
-                        <td class="py-3 px-4 font-mono text-center">{{ clube.id }}</td>
                         <td class="py-3 px-4 font-semibold text-center">{{ clube.nome }}</td>
                         <td class="py-3 px-4 text-gray-600 text-center">{{ clube.pais }}</td>
 

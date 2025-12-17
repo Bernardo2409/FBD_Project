@@ -24,13 +24,13 @@
 
             <!-- Nome e Apelido -->
             <div class="flex gap-3">
-                <input name="first" placeholder="First Name" class="input input-bordered w-1/2">
-                <input name="last" placeholder="Surname" class="input input-bordered w-1/2">
+                <input name="first" placeholder="First Name" required class="input input-bordered w-1/2">
+                <input name="last" placeholder="Surname" required class="input input-bordered w-1/2">
             </div>
 
             <!-- Email e Password -->
-            <input type="email" name="email" placeholder="E-mail" class="input input-bordered w-full">
-            <input type="password" name="password" placeholder="Palavra-passe" class="input input-bordered w-full">
+            <input type="email" name="email" placeholder="E-mail" required class="input input-bordered w-full">
+            <input type="password" name="password" placeholder="Palavra-passe" required class="input input-bordered w-full">
 
             <!-- Dropdown para Seleção de País -->
             <div class="dropdown w-full">
@@ -41,7 +41,7 @@
                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto">
                     {% for country in pais %}
                         <li>
-                            <button type="button" class="flex items-center gap-2" onclick="setCountry('{{ country.nome }}')">
+                            <button type="button" class="flex items-center gap-2" required onclick="setCountry('{{ country.nome }}')">
                                 <img src="{{ country.imagem }}" alt="{{ country.nome }}" class="w-6 h-6 object-cover">
                                 <span>{{ country.nome }}</span>
                             </button>
@@ -49,13 +49,13 @@
                     {% endfor %}
                 </ul>
             </div>
-              <input name="nationality" placeholder="Nacionality" class="input input-bordered w-full">
+              <input name="nationality" placeholder="Nacionality" required class="input input-bordered w-full">
               <!-- Campo oculto para guardar o país selecionado-->
               <input type="hidden" name="country" id="country-input">
 
             <!-- Data de Nascimento -->
             <label class="font-semibold">Born date</label>
-            <input type="date" name="birthdate" class="input input-bordered w-full">
+            <input type="date" name="birthdate" required class="input input-bordered w-full">
 
             <!-- Botão de Submissão -->
             <button class="btn btn-success w-full" type="submit">Create Account</button>

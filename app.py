@@ -83,6 +83,105 @@ def signup_submit():
     nationality = request.form.get("nationality")
     birthdate = request.form.get("birthdate")
 
+    # Validações server-side
+    if not first or not first.strip():
+        pais = get_pais()
+        return render_template("signup.html", 
+                             pais=pais, 
+                             error="Primeiro nome é obrigatório.",
+                             form_data={
+                                 "first": first,
+                                 "last": last,
+                                 "email": email,
+                                 "country": country,
+                                 "nationality": nationality,
+                                 "birthdate": birthdate
+                             })
+    
+    if not last or not last.strip():
+        pais = get_pais()
+        return render_template("signup.html", 
+                             pais=pais, 
+                             error="Apelido é obrigatório.",
+                             form_data={
+                                 "first": first,
+                                 "last": last,
+                                 "email": email,
+                                 "country": country,
+                                 "nationality": nationality,
+                                 "birthdate": birthdate
+                             })
+    
+    if not email or not email.strip():
+        pais = get_pais()
+        return render_template("signup.html", 
+                             pais=pais, 
+                             error="Email é obrigatório.",
+                             form_data={
+                                 "first": first,
+                                 "last": last,
+                                 "email": email,
+                                 "country": country,
+                                 "nationality": nationality,
+                                 "birthdate": birthdate
+                             })
+    
+    if not password or not password.strip():
+        pais = get_pais()
+        return render_template("signup.html", 
+                             pais=pais, 
+                             error="Senha é obrigatória.",
+                             form_data={
+                                 "first": first,
+                                 "last": last,
+                                 "email": email,
+                                 "country": country,
+                                 "nationality": nationality,
+                                 "birthdate": birthdate
+                             })
+    
+    if not country or not country.strip():
+        pais = get_pais()
+        return render_template("signup.html", 
+                             pais=pais, 
+                             error="País é obrigatório.",
+                             form_data={
+                                 "first": first,
+                                 "last": last,
+                                 "email": email,
+                                 "country": country,
+                                 "nationality": nationality,
+                                 "birthdate": birthdate
+                             })
+    
+    if not nationality or not nationality.strip():
+        pais = get_pais()
+        return render_template("signup.html", 
+                             pais=pais, 
+                             error="Nacionalidade é obrigatória.",
+                             form_data={
+                                 "first": first,
+                                 "last": last,
+                                 "email": email,
+                                 "country": country,
+                                 "nationality": nationality,
+                                 "birthdate": birthdate
+                             })
+    
+    if not birthdate or not birthdate.strip():
+        pais = get_pais()
+        return render_template("signup.html", 
+                             pais=pais, 
+                             error="Data de nascimento é obrigatória.",
+                             form_data={
+                                 "first": first,
+                                 "last": last,
+                                 "email": email,
+                                 "country": country,
+                                 "nationality": nationality,
+                                 "birthdate": birthdate
+                             })
+
     try:
         user_id = create_user(first, last, email, password, country, nationality, birthdate)
         

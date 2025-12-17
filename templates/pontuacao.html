@@ -1,87 +1,94 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <title>Team Pontuation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
+
 <body class="bg-gray-900 text-white">
 
-<div class="container mx-auto p-6">
+    <div class="container mx-auto p-6">
 
-    <!-- TÍTULO -->
-    <h1 class="text-4xl font-bold text-center mb-6">
-        Pontuation of my SUPERTEAM
-    </h1>
-    
+        <!-- TÍTULO -->
+        <h1 class="text-4xl font-bold text-center mb-6">
+            Pontuation of my SUPERTEAM
+        </h1>
 
-   {% if session.get('error') %}
-    <div class="alert alert-error mb-4 shadow-lg">
-        <div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>{{ session.pop('error') }}</span>
-        </div>
-    </div>
-    {% endif %}
 
-    <!-- Nome Equipa -->
-    <h1 class="text-4xl font-bold text-center text-primary mb-6 text-white">
-        {{ equipa.info.nome }}
-    </h1>
-
-    <!-- JORNADAS -->
-    <div class="bg-gray-800 rounded-lg shadow-lg p-6">
-        <h2 class="text-2xl font-bold mb-4 text-center">
-            Points per Round
-        </h2>
-
-        {% if pontuacoes_jornadas %}
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full text-white">
-                <thead>
-                    <tr class="text-center">
-                        <th>Round</th>
-                        <th>Points per round</th>
-                        <th>total points</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for j in pontuacoes_jornadas %}
-                    <tr class="text-center hover">
-                        <td class="font-semibold">
-                            {{ j.jornada | replace('jornada_', 'Jornada ') }}
-                        </td>
-                        <td>
-                            <span class="badge badge-primary badge-lg">
-                                {{ j.pontuacao }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge badge-secondary badge-lg">
-                                {{ j.pontuacao_acumulada }}
-                            </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="text-center py-6 text-gray-400">
-            Unknown pontuations
+        {% if session.get('error') %}
+        <div class="alert alert-error mb-4 shadow-lg">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ session.pop('error') }}</span>
+            </div>
         </div>
         {% endif %}
-    </div>
 
-    <!-- BOTÃO VOLTAR -->
-    <div class="mt-10 text-center">
-        <a href="/equipa" class="btn btn-primary rounded-full px-8">
-            Back to my team
-        </a>
-    </div>
+        <!-- Nome Equipa -->
+        <h1 class="text-4xl font-bold text-center text-primary mb-6 text-white">
+            {{ equipa.info.nome }}
+        </h1>
 
-</div>
+        <!-- JORNADAS -->
+        <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-center">
+                Points per Round
+            </h2>
+
+            {% if pontuacoes_jornadas %}
+            <div class="overflow-x-auto">
+                <table class="table table-zebra w-full text-white">
+                    <thead>
+                        <tr class="text-center">
+                            <th>Round</th>
+                            <th>Points per round</th>
+                            <th>total points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for j in pontuacoes_jornadas %}
+                        <tr class="text-center hover">
+                            <td class="font-semibold">
+                                Jornada {{ j.jornada_numero }}
+                            </td>
+                            <td>
+                                <span class="badge badge-primary badge-lg">
+                                    {{ j.pontuacao }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge badge-secondary badge-lg">
+                                    {{ j.pontuacao_acumulada }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-6 text-gray-400">
+                Unknown pontuations
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- BOTÃO VOLTAR -->
+        <div class="mt-10 text-center">
+            <a href="/equipa" class="btn btn-primary rounded-full px-8">
+                Back to my team
+            </a>
+        </div>
+
+    </div>
 
 </body>
+
 </html>

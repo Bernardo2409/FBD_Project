@@ -32,6 +32,14 @@ BEGIN
         RETURN;
     END
 
+    -- Verificar se a senha foi fornecida e não está vazia
+    IF @Senha IS NULL OR LTRIM(RTRIM(@Senha)) = ''
+    BEGIN
+        SET @Mensagem = 'Password is required';
+        RETURN;
+    END
+
+
     -- Verificar se o país existe na tabela de países
     IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Pais WHERE Pais.nome = @Pais OR ID = @Pais)
     BEGIN

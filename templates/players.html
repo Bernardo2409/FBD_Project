@@ -15,7 +15,6 @@
         <table class="table table-zebra w-full">
             <thead class="bg-primary text-primary-content">
                 <tr>
-                    <th class="py-3 px-4 rounded-tl-lg text-center">ID</th>
                     <th class="py-3 px-4 text-center">Name</th>
                     <th class="py-3 px-4 text-center">Position</th>
                     <th class="py-3 px-4 text-center">Price</th>
@@ -27,7 +26,6 @@
             <tbody>
             {% for jogador in jogadores %}
                 <tr class="hover:bg-base-200 transition duration-150">
-                    <td class="py-3 px-4 font-mono text-center">{{ jogador.id }}</td>
                     <td class="py-3 px-4 font-semibold text-center">{{ jogador.nome }}</td>
                     <td class="py-3 px-4 text-accent font-medium text-center">{{ jogador.posicao }}</td>
                     <td class="py-3 px-4 font-mono text-center">{{ "%.1f"|format(jogador.preco)}}€</td>

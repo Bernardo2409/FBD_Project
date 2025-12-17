@@ -91,6 +91,10 @@ def create_user_with_ligas(first, last, email, password, country, nationality, b
     Cria um utilizador e adiciona automaticamente às ligas Mundial e do País.
     Retorna o ID do utilizador se sucesso, None se falhar.
     """
+    # Validação adicional de segurança
+    if not password or not password.strip():
+        raise Exception("Password is required")
+    
     conn = None
     try:
         conn = create_connection()
