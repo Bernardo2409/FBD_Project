@@ -87,10 +87,7 @@ def calcular_pontuacao_equipa(id_equipa: str, id_jornada: str) -> int:
 
 # Função para atualizar pontuação na tabela Pontuação_Equipa usando stored procedure
 def atualizar_pontuacao_equipa_tabela(id_equipa: str, id_jornada: str):
-    """
-    Atualiza a pontuação de uma equipa na tabela Pontuação_Equipa
-    usando a stored procedure sp_AtualizarPontuacaoEquipa.
-    """
+
     with create_connection() as conn:
         cursor = conn.cursor()
         
@@ -98,7 +95,7 @@ def atualizar_pontuacao_equipa_tabela(id_equipa: str, id_jornada: str):
             cursor.execute("""
                 DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
                 
-                EXEC sp_AtualizarPontuacaoEquipa 
+                EXEC AtualizarPontuacaoEquipa 
                     @ID_Equipa = ?,
                     @ID_Jornada = ?,
                     @Resultado = @Resultado OUTPUT,
@@ -131,9 +128,7 @@ def atualizar_pontuacao_equipa_tabela(id_equipa: str, id_jornada: str):
 
 # Função para atualizar a pontuação de todos os jogadores e equipas
 def atualizar_pontuacoes():
-    """
-    Calcula e atualiza a pontuação de todas as equipas e jogadores para todas as jornadas.
-    """
+
     with create_connection() as conn:
         cursor = conn.cursor()
         
@@ -180,9 +175,7 @@ def atualizar_pontuacoes():
 
 # Função para calcular a pontuação de um jogador específico para todas as suas jornadas
 def calcular_pontuacao_jogador_especifico(id_jogador: str):
-    """
-    Calcula a pontuação total de um jogador para todas as suas jornadas.
-    """
+
     with create_connection() as conn:
         cursor = conn.cursor()
         
@@ -223,53 +216,11 @@ def calcular_pontuacao_jogador_especifico(id_jogador: str):
 
 # Função para obter as pontuações por jornada de uma equipa usando stored procedure
 def obter_pontuacoes_jornadas(id_equipa: str):
-    """
-    Retorna a pontuação de uma equipa para cada jornada.
-    Usa a stored procedure sp_ObterPontuacoesJornadasEquipa.
-    """
+
     with create_connection() as conn:
         cursor = conn.cursor()
         
         try:
-            # Primeiro, criar a stored procedure se não existir
-            cursor.execute("""
-                IF NOT EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_ObterPontuacoesJornadasEquipa')
-                BEGIN
-                    EXEC('
-                    CREATE PROCEDURE sp_ObterPontuacoesJornadasEquipa
-                        @ID_Equipa UNIQUEIDENTIFIER,
-                        @Resultado BIT OUTPUT,
-                        @Mensagem NVARCHAR(200) OUTPUT
-                    AS
-                    BEGIN
-                        SET NOCOUNT ON;
-                        
-                        BEGIN TRY
-                            -- Ler da tabela Pontuação_Equipa
-                            SELECT 
-                                J.ID AS JornadaID,
-                                J.Numero AS JornadaNumero,
-                                ISNULL(PE.pontuação_jornada, 0) AS PontuacaoJornada,
-                                ISNULL(PE.pontuação_acumulada, 0) AS PontuacaoAcumulada,
-                                J.Data_Inicio,
-                                J.Data_Fim
-                            FROM FantasyChamp.Jornada J
-                            LEFT JOIN FantasyChamp.Pontuação_Equipa PE 
-                                ON J.ID = PE.ID_jornada AND PE.ID_Equipa = @ID_Equipa
-                            ORDER BY J.Numero;
-                            
-                            SET @Resultado = 1;
-                            SET @Mensagem = ''Dados obtidos com sucesso'';
-                        END TRY
-                        BEGIN CATCH
-                            SET @Resultado = 0;
-                            SET @Mensagem = ''Erro: '' + ERROR_MESSAGE();
-                        END CATCH
-                    END')
-                END
-            """)
-            
-            # Agora usar a stored procedure
             cursor.execute("""
                 DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
                 
@@ -314,72 +265,6 @@ def atualizar_pontuacoes_otimizado():
         cursor = conn.cursor()
         
         try:
-            # Criar stored procedure para atualização em batch se não existir
-            cursor.execute("""
-                IF NOT EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_AtualizarPontuacoesBatch')
-                BEGIN
-                    EXEC('
-                    CREATE PROCEDURE sp_AtualizarPontuacoesBatch
-                        @Resultado BIT OUTPUT,
-                        @Mensagem NVARCHAR(200) OUTPUT
-                    AS
-                    BEGIN
-                        SET NOCOUNT ON;
-                        
-                        DECLARE @ID_Equipa UNIQUEIDENTIFIER;
-                        DECLARE @ID_Jornada VARCHAR(16);
-                        DECLARE @CountEquipas INT = 0;
-                        DECLARE @CountJornadas INT = 0;
-                        DECLARE @CountTotal INT = 0;
-                        
-                        BEGIN TRY
-                            -- Criar cursor para todas as equipas e jornadas
-                            DECLARE cursor_equipas_jornadas CURSOR FOR
-                                SELECT E.ID, J.ID
-                                FROM FantasyChamp.Equipa E
-                                CROSS JOIN FantasyChamp.Jornada J
-                                ORDER BY E.ID, J.ID;
-                            
-                            OPEN cursor_equipas_jornadas;
-                            FETCH NEXT FROM cursor_equipas_jornadas INTO @ID_Equipa, @ID_Jornada;
-                            
-                            WHILE @@FETCH_STATUS = 0
-                            BEGIN
-                                -- Atualizar pontuação para esta equipa e jornada
-                                EXEC sp_AtualizarPontuacaoEquipa 
-                                    @ID_Equipa = @ID_Equipa,
-                                    @ID_Jornada = @ID_Jornada,
-                                    @Resultado = @Resultado OUTPUT,
-                                    @Mensagem = @Mensagem OUTPUT;
-                                
-                                SET @CountTotal = @CountTotal + 1;
-                                IF @CountTotal % 100 = 0
-                                    PRINT ''Processados '' + CAST(@CountTotal AS NVARCHAR(10)) + '' registos...'';
-                                
-                                FETCH NEXT FROM cursor_equipas_jornadas INTO @ID_Equipa, @ID_Jornada;
-                            END
-                            
-                            CLOSE cursor_equipas_jornadas;
-                            DEALLOCATE cursor_equipas_jornadas;
-                            
-                            SET @Resultado = 1;
-                            SET @Mensagem = ''Atualização concluída. '' + CAST(@CountTotal AS NVARCHAR(10)) + '' registos processados.'';
-                            
-                        END TRY
-                        BEGIN CATCH
-                            SET @Resultado = 0;
-                            SET @Mensagem = ''Erro: '' + ERROR_MESSAGE();
-                            
-                            IF CURSOR_STATUS(''global'', ''cursor_equipas_jornadas'') >= 0
-                            BEGIN
-                                CLOSE cursor_equipas_jornadas;
-                                DEALLOCATE cursor_equipas_jornadas;
-                            END
-                        END CATCH
-                    END')
-                END
-            """)
-            
             # Executar a stored procedure de batch
             cursor.execute("""
                 DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
@@ -411,8 +296,6 @@ def atualizar_pontuacoes_otimizado():
             conn.rollback()
             print(f"Erro: {str(e)}")
 
-# Adicionar estas funções ao arquivo pontuacoes.py
-
 def obter_equipa_com_pontuacoes_jornada(id_equipa: str, id_jornada: str):
     """
     Obtém todos os dados da equipa para uma jornada específica.
@@ -421,76 +304,6 @@ def obter_equipa_com_pontuacoes_jornada(id_equipa: str, id_jornada: str):
         cursor = conn.cursor()
         
         try:
-            # Primeiro, verificar se existe uma stored procedure específica
-            cursor.execute("""
-                IF NOT EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_ObterEquipaJornadaCompleta')
-                BEGIN
-                    EXEC('
-                    CREATE PROCEDURE sp_ObterEquipaJornadaCompleta
-                        @ID_Equipa UNIQUEIDENTIFIER,
-                        @ID_Jornada VARCHAR(16),
-                        @Resultado BIT OUTPUT,
-                        @Mensagem NVARCHAR(200) OUTPUT
-                    AS
-                    BEGIN
-                        SET NOCOUNT ON;
-                        
-                        DECLARE @PontuacaoTotal INT = 0;
-                        DECLARE @CountJogadores INT = 0;
-                        
-                        BEGIN TRY
-                            -- Obter lista de jogadores com pontuações
-                            SELECT 
-                                J.ID AS JogadorID,
-                                J.Nome AS Nome,
-                                P.Posição AS Posicao,
-                                C.Nome AS Clube,
-                                C.clube_imagem AS ImagemClube,
-                                J.jogador_imagem AS ImagemJogador,
-                                PE.benched AS NoBanco,
-                                ISNULL(PJ.GolosMarcados, 0) AS GolosMarcados,
-                                ISNULL(PJ.Assistencias, 0) AS Assistencias,
-                                ISNULL(PJ.CartoesAmarelos, 0) AS CartoesAmarelos,
-                                ISNULL(PJ.CartoesVermelhos, 0) AS CartoesVermelhos,
-                                ISNULL(PJ.TempoJogo, 0) AS TempoJogo,
-                                dbo.fn_CalcularPontuacaoJogador(J.ID, @ID_Jornada) AS Pontuacao
-                            FROM FantasyChamp.Pertence PE
-                            JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
-                            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-                            JOIN FantasyChamp.Clube C ON J.ID_clube = C.ID
-                            LEFT JOIN FantasyChamp.Pontuação_Jogador PJ 
-                                ON J.ID = PJ.ID_Jogador AND PJ.ID_jornada = @ID_Jornada
-                            WHERE PE.ID_Equipa = @ID_Equipa
-                            ORDER BY 
-                                CASE WHEN P.Posição = ''Goalkeeper'' THEN 1
-                                     WHEN P.Posição = ''Defender'' THEN 2
-                                     WHEN P.Posição = ''Midfielder'' THEN 3
-                                     WHEN P.Posição = ''Forward'' THEN 4
-                                     ELSE 5 END,
-                                CASE WHEN PE.benched = 0 THEN 1 ELSE 2 END,
-                                J.Nome;
-                            
-                            -- Calcular pontuação total
-                            SELECT @PontuacaoTotal = SUM(dbo.fn_CalcularPontuacaoJogador(PE.ID_Jogador, @ID_Jornada))
-                            FROM FantasyChamp.Pertence PE
-                            WHERE PE.ID_Equipa = @ID_Equipa AND PE.benched = 0;
-                            
-                            -- Retornar pontuação total separadamente
-                            SELECT @PontuacaoTotal AS PontuacaoTotal;
-                            
-                            SET @Resultado = 1;
-                            SET @Mensagem = ''Dados obtidos com sucesso'';
-                            
-                        END TRY
-                        BEGIN CATCH
-                            SET @Resultado = 0;
-                            SET @Mensagem = ''Erro: '' + ERROR_MESSAGE();
-                        END CATCH
-                    END')
-                END
-            """)
-            
-            # Executar a stored procedure
             cursor.execute("""
                 DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
                 
