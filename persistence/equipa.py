@@ -295,50 +295,35 @@ def trocar_jogador_banco_campo(id_equipa: str, id_jogador_banco: str, id_jogador
         return False, f"Erro: {str(e)}"
 
 
-def obter_jogadores_banco_por_posicao(id_equipa: str, posicao: str):
-    """Obter jogadores do banco de uma determinada posição"""
+def obter_jogadores_banco_por_posicao(id_equipa: str, posicao: str) -> list:
+
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT J.ID, J.Nome, J.Preço, J.jogador_imagem, E.Estado
-            FROM FantasyChamp.Jogador J
-            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-            JOIN FantasyChamp.Pertence PE ON J.ID = PE.ID_Jogador
-            JOIN FantasyChamp.Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
-            WHERE PE.ID_Equipa = ? AND PE.benched = 1 AND P.Posição = ?
+            SELECT * FROM FantasyChamp.fn_ObterJogadoresBancoPorPosicao(?, ?)
         """, id_equipa, posicao)
         
-        jogadores = []
-        for row in cursor:
-            jogadores.append({
+        return [
+            {
                 'id': row.ID,
                 'nome': row.Nome,
-                'preco': row.Preço,
+                'preco': float(row.Preço),
                 'jogador_imagem': row.jogador_imagem if row.jogador_imagem 
                           else '/static/images/Image-not-found.png',
                 'estado': row.Estado
-            })
-        
-        return jogadores
+            }
+            for row in cursor.fetchall()
+        ]
     
-def obter_detalhes_equipa_para_visualizacao(id_equipa):
-    """
-    Obtém todos os detalhes de uma equipa para visualização.
-    """
+def obter_detalhes_equipa_para_visualizacao(id_equipa: str) -> dict:
+
     with create_connection() as conn:
         cursor = conn.cursor()
         
         try:
-            cursor.execute("""
-                DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
-                
-                EXEC sp_ObterDetalhesEquipaParaVisualizacao 
-                    @ID_Equipa = ?,
-                    @Resultado = @Resultado OUTPUT,
-                    @Mensagem = @Mensagem OUTPUT;
-            """, id_equipa)
+            cursor.execute("EXEC FantasyChamp.ObterDetalhesEquipaParaVisualizacao ?", id_equipa)
             
-            # Obter informações da equipa
+            # 1. Informações da equipa
             equipa_info = None
             if cursor.description:
                 columns = [column[0] for column in cursor.description]
@@ -349,49 +334,50 @@ def obter_detalhes_equipa_para_visualizacao(id_equipa):
             if not equipa_info:
                 raise Exception("Equipa não encontrada")
             
-            # Obter jogadores por posição
-            jogadores_agrupados = {
-                'gr': [],
-                'defesas': [],
-                'medios': [],
-                'avancados': []
-            }
-            
-            # Goalkeepers
-            if cursor.nextset() and cursor.description:
+            # 2. Guarda-Redes
+            cursor.nextset()
+            gr = []
+            if cursor.description:
                 columns = [column[0] for column in cursor.description]
-                rows = cursor.fetchall()
-                for row in rows:
+                for row in cursor.fetchall():
                     jogador = dict(zip(columns, row))
-                    jogadores_agrupados['gr'].append(jogador)
+                    jogador['benched'] = bool(jogador['benched'])
+                    gr.append(jogador)
             
-            # Defenders
-            if cursor.nextset() and cursor.description:
+            # 3. Defesas
+            cursor.nextset()
+            defesas = []
+            if cursor.description:
                 columns = [column[0] for column in cursor.description]
-                rows = cursor.fetchall()
-                for row in rows:
+                for row in cursor.fetchall():
                     jogador = dict(zip(columns, row))
-                    jogadores_agrupados['defesas'].append(jogador)
+                    jogador['benched'] = bool(jogador['benched'])
+                    defesas.append(jogador)
             
-            # Midfielders
-            if cursor.nextset() and cursor.description:
+            # 4. Médios
+            cursor.nextset()
+            medios = []
+            if cursor.description:
                 columns = [column[0] for column in cursor.description]
-                rows = cursor.fetchall()
-                for row in rows:
+                for row in cursor.fetchall():
                     jogador = dict(zip(columns, row))
-                    jogadores_agrupados['medios'].append(jogador)
+                    jogador['benched'] = bool(jogador['benched'])
+                    medios.append(jogador)
             
-            # Forwards
-            if cursor.nextset() and cursor.description:
+            # 5. Avançados
+            cursor.nextset()
+            avancados = []
+            if cursor.description:
                 columns = [column[0] for column in cursor.description]
-                rows = cursor.fetchall()
-                for row in rows:
+                for row in cursor.fetchall():
                     jogador = dict(zip(columns, row))
-                    jogadores_agrupados['avancados'].append(jogador)
+                    jogador['benched'] = bool(jogador['benched'])
+                    avancados.append(jogador)
             
-            # Estatísticas
+            # 6. Estatísticas
+            cursor.nextset()
             estatisticas = {}
-            if cursor.nextset() and cursor.description:
+            if cursor.description:
                 columns = [column[0] for column in cursor.description]
                 row = cursor.fetchone()
                 if row:
@@ -399,7 +385,12 @@ def obter_detalhes_equipa_para_visualizacao(id_equipa):
             
             return {
                 'info': equipa_info,
-                'jogadores': jogadores_agrupados,
+                'jogadores': {
+                    'gr': gr,
+                    'defesas': defesas,
+                    'medios': medios,
+                    'avancados': avancados
+                },
                 'estatisticas': estatisticas
             }
             
