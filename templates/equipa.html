@@ -9,7 +9,7 @@
 </head>
 
 <body class="text-gray-900 bg-cover bg-center bg-no-repeat min-h-screen" data-theme="corporate"
-    style="background-image: url('/static/images/stadium2.jpg');">
+    style="background-image: url('/static/images/stadium3.png');">
 
     <div class="container mx-auto p-6">
 
@@ -32,7 +32,7 @@
         </h1>
 
         <div class="text-center mb-8 text-white bg-blue-800 bg-opacity-50 p-4 rounded-lg">
-            <p class="text-xl">My Money: <strong>{{ "%.2f"|format(equipa.info.orcamento) }}€</strong></p>
+            <p class="text-xl">My Money: <strong>{{ "%.2f"|format(equipa.info.orcamento) }}M€</strong></p>
             <p class="text-lg">Total Pontuation: <strong>{{ equipa.info.pontuacao_total }}</strong></p>
         </div>
 
@@ -71,7 +71,7 @@
                                             class="font-bold {% if avancado.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
                                             {{ avancado.nome }}
                                         </div>
-                                        <div class="text-xs font-bold text-white-500">{{ avancado.preco }}€ {{
+                                        <div class="text-xs font-bold text-white-500">{{ avancado.preco }}M€ {{
                                             avancado.estado }}</div>
                                         {% if avancado.preco > equipa.info.orcamento %}
                                         <div class="text-xs text-red-500 font-semibold">No Money</div>
@@ -105,7 +105,7 @@
                         <div>
                             <div class="font-bold text-lg text-white">{{ j.nome }}</div>
                             <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                            <div class="text-sm text-white">{{ j.preco }}€</div>
+                            <div class="text-sm text-white">{{ j.preco }}M€</div>
                             {% if j.benched %}
                             <div class="badge badge-warning text-xs mt-1">Benched</div>
                             {% endif %}
@@ -156,7 +156,7 @@
                                             class="font-bold {% if medio.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
                                             {{ medio.nome }}
                                         </div>
-                                        <div class="text-xs font-bold text-white-500">{{ medio.preco }}€ {{ medio.estado
+                                        <div class="text-xs font-bold text-white-500">{{ medio.preco }}M€ {{ medio.estado
                                             }}</div>
                                         {% if medio.preco > equipa.info.orcamento %}
                                         <div class="text-xs text-red-500 font-semibold">No money</div>
@@ -190,7 +190,7 @@
                         <div>
                             <div class="font-bold text-lg text-white">{{ j.nome }}</div>
                             <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                            <div class="text-sm text-white">{{ j.preco }}€</div>
+                            <div class="text-sm text-white">{{ j.preco }}M€</div>
                             {% if j.benched %}
                             <div class="badge badge-warning text-xs mt-1">Bench</div>
                             {% endif %}
@@ -240,7 +240,7 @@
                                             class="font-bold {% if defesa.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
                                             {{ defesa.nome }}
                                         </div>
-                                        <div class="text-xs font-bold text-white-500">{{ defesa.preco }}€ {{
+                                        <div class="text-xs font-bold text-white-500">{{ defesa.preco }}M€ {{
                                             defesa.estado }}</div>
                                         {% if defesa.preco > equipa.info.orcamento %}
                                         <div class="text-xs text-red-500 font-semibold">No Money</div>
@@ -274,7 +274,7 @@
                         <div>
                             <div class="font-bold text-lg text-white">{{ j.nome }}</div>
                             <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                            <div class="text-sm text-white">{{ j.preco }}€</div>
+                            <div class="text-sm text-white">{{ j.preco }}M€</div>
                             {% if j.benched %}
                             <div class="badge badge-warning text-xs mt-1">Bench</div>
                             {% endif %}
@@ -324,7 +324,7 @@
                                             class="font-bold {% if gr.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
                                             {{ gr.nome }}
                                         </div>
-                                        <div class="text-xs font-bold text-white-500">{{ gr.preco }}€ {{ gr.estado }}
+                                        <div class="text-xs font-bold text-white-500">{{ gr.preco }}M€ {{ gr.estado }}
                                         </div>
                                         {% if gr.preco > equipa.info.orcamento %}
                                         <div class="text-xs text-red-500 font-semibold">No Money</div>
@@ -358,7 +358,7 @@
                         <div>
                             <div class="font-bold text-lg text-white">{{ j.nome }}</div>
                             <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                            <div class="text-sm text-white">{{ j.preco }}€</div>
+                            <div class="text-sm text-white">{{ j.preco }}M€</div>
                             {% if j.benched %}
                             <div class="badge badge-warning text-xs mt-1">Bench</div>
                             {% endif %}
@@ -385,7 +385,7 @@
         <!-- SEÇÃO: BANCO DE RESERVAS -->
         <!-- ================================ -->
         <div class="mt-16 mb-10">
-            <h2 class="text-3xl text-center mb-2 text-white font-bold"> Bench(4) </h2>
+            <h2 class="text-3xl text-center mb-2 text-black font-bold"> Bench(4) </h2>
 
 
             <!-- Grid de 4 slots fixos (1 por posição) -->
@@ -396,7 +396,7 @@
                 <div class="slot-banco-gr">
                     {% if gr_banco %}
                     <!-- Card do GR Suplente -->
-                    <div class="card shadow-xl p-4 bg-yellow-600 relative h-56" data-jogador-id="{{ gr_banco.id }}">
+                    <div class="card shadow-xl p-4 bg-stone-300 relative h-56" data-jogador-id="{{ gr_banco.id }}">
                         <!-- Botão remover -->
                         <a href="/equipa/remover/{{ gr_banco.id }}"
                             class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
@@ -408,9 +408,9 @@
                             <div class="flex flex-col items-center gap-2">
                                 <img src="{{ gr_banco.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
                                 <div class="text-center">
-                                    <div class="font-bold text-white text-sm">{{ gr_banco.nome }}</div>
-                                    <div class="badge badge-sm mt-1 badge-info">GR</div>
-                                    <div class="text-xs text-white mt-1">{{ gr_banco.preco }}€</div>
+                                    <div class="font-bold text-black text-sm">{{ gr_banco.nome }}</div>
+                                    <div class="badge badge-sm mt-1 badge-info">Goalkeeper</div>
+                                    <div class="text-xs text-black mt-1">{{ gr_banco.preco }}M€</div>
                                 </div>
                             </div>
                         </a>
@@ -418,7 +418,7 @@
                         <!-- Botão para trocar GR (troca direta) -->
                         <button onclick="trocarGR('{{ gr_banco.id }}')"
                             class="btn btn-xs mt-2 w-full bg-blue-600 text-white hover:bg-blue-700 border-none">
-                            ↕️ Trocar com Titular
+                             Swap with Starter
                         </button>
                     </div>
                     {% else %}
@@ -427,8 +427,8 @@
                         class="card shadow-xl p-6 bg-gray-700 bg-opacity-50 border-2 border-dashed border-gray-400 h-56 flex items-center justify-center">
                         <div class="text-center text-gray-300">
                             <div class="text-4xl mb-2">🧤</div>
-                            <div class="text-sm font-bold">Slot Vazio</div>
-                            <div class="text-xs text-gray-400 mt-1">Guarda-Redes</div>
+                            <div class="text-sm font-bold">Empty Spot</div>
+                            <div class="text-xs text-gray-400 mt-1">Goalkeeper</div>
                         </div>
                     </div>
                     {% endif %}
@@ -458,7 +458,7 @@
                 <div class="slot-banco-linha">
                     {% if i < jogadores_linha_banco|length %} {% set jogador=jogadores_linha_banco[i] %} <!-- Card do
                         Jogador Suplente -->
-                        <div class="card shadow-xl p-4 bg-yellow-600 relative h-56">
+                        <div class="card shadow-xl p-4 bg-stone-300 relative h-56">
                             <a href="/equipa/remover/{{ jogador.id }}"
                                 class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
                                 ✕
@@ -468,25 +468,25 @@
                                 <div class="flex flex-col items-center gap-2">
                                     <img src="{{ jogador.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
                                     <div class="text-center">
-                                        <div class="font-bold text-white text-sm">{{ jogador.nome }}</div>
+                                        <div class="font-bold text-black text-sm">{{ jogador.nome }}</div>
                                         <div class="badge badge-sm mt-1 
                                         {% if jogador.posicao == 'Defender' %}badge-warning
                                         {% elif jogador.posicao == 'Midfielder' %}badge-success
                                         {% elif jogador.posicao == 'Forward' %}badge-error
                                         {% endif %}">
-                                            {% if jogador.posicao == 'Defender' %}Defesa
-                                            {% elif jogador.posicao == 'Midfielder' %}Médio
-                                            {% elif jogador.posicao == 'Forward' %}Avançado
+                                            {% if jogador.posicao == 'Defender' %}Defender
+                                            {% elif jogador.posicao == 'Midfielder' %}Midfielder
+                                            {% elif jogador.posicao == 'Forward' %}Forward
                                             {% endif %}
                                         </div>
-                                        <div class="text-xs text-white mt-1">{{ jogador.preco }}€</div>
+                                        <div class="text-xs text-black mt-1">{{ jogador.preco }}M€</div>
                                     </div>
                                 </div>
                             </a>
 
                             <button onclick="abrirModalTrocaBanco('{{ jogador.id }}', '{{ jogador.nome }}')"
                                 class="btn btn-xs mt-2 w-full bg-orange-600 text-white hover:bg-orange-700 border-none">
-                                ⬆️ Para Campo
+                                To Field
                             </button>
                         </div>
                         {% else %}
@@ -494,9 +494,8 @@
                         <div
                             class="card shadow-xl p-6 bg-gray-700 bg-opacity-50 border-2 border-dashed border-gray-400 h-56 flex items-center justify-center">
                             <div class="text-center text-gray-300">
-                                <div class="text-4xl mb-2">⚽</div>
-                                <div class="text-sm font-bold">Slot Vazio</div>
-                                <div class="text-xs text-gray-400 mt-1">Qualquer Posição</div>
+                                <div class="text-sm font-bold">Empty spot</div>
+                                <div class="text-xs text-gray-400 mt-1">Any Position</div>
                             </div>
                         </div>
                         {% endif %}
@@ -518,8 +517,8 @@
     <!-- Modal de Troca -->
     <div id="modalTroca" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 class="text-xl font-bold mb-4">Trocar Jogador</h3>
-            <p class="mb-4">Seleciona um titular para trocar com <strong id="nomeJogadorCampo"></strong>:</p>
+            <h3 class="text-xl font-bold mb-4">Trade Player</h3>
+            <p class="mb-4">Select a player to trade with <strong id="nomeJogadorCampo"></strong>:</p>
 
             <div id="listaJogadoresBanco" class="max-h-64 overflow-y-auto mb-4">
                 <!-- Será preenchido dinamicamente -->
@@ -541,8 +540,20 @@
             jogadorCampoSelecionado = idJogadorCampo;
             document.getElementById('nomeJogadorCampo').textContent = nomeJogadorCampo;
 
-            // Buscar TODOS jogadores do banco EXCETO GR (igual ao UEFA Fantasy)
-            const jogadoresBanco = [
+            let jogadoresBanco = [];
+
+            // Se for Goalkeeper titular, mostrar APENAS o GR do banco
+            if (posicao === 'Goalkeeper') {
+                jogadoresBanco = [
+                    {% for j in equipa.gr %}
+            {% if j.benched %}
+            { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Goalkeeper', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
+            {% endif %}
+            {% endfor %}
+                ];
+        } else {
+            // Para outras posições, mostrar todos jogadores do banco EXCETO GR
+            jogadoresBanco = [
                 {% for j in equipa.avancados %}
         {% if j.benched %}
         { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Forward', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
@@ -555,31 +566,35 @@
         {% endfor %}
         {% for j in equipa.defesas %}
         {% if j.benched %}
-        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Defesa', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
+        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Defender', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
         {% endif %}
         {% endfor %}
-    ];
+                ];
+            }
 
-        console.log('Jogadores no banco (exceto GR):', jogadoresBanco);
+        console.log('Jogadores no banco disponíveis:', jogadoresBanco);
 
         const listaHTML = jogadoresBanco.map(j => `
-        <div class="border rounded p-3 mb-2 hover:bg-gray-100 cursor-pointer flex items-center gap-3"
-             onclick="confirmarTroca('${j.id}')">
-            <img src="${j.imagem}" class="w-12 h-12 rounded-full object-cover">
-            <div class="flex-1">
-                <div class="font-bold">${j.nome}</div>
-                <div class="text-sm text-gray-500">${j.posicao} - ${j.estado}</div>
-            </div>
-            <div class="text-blue-600 font-bold">Trocar →</div>
-        </div>
-    `).join('');
+                <div class="border rounded p-3 mb-2 hover:bg-gray-100 cursor-pointer flex items-center gap-3"
+                     onclick="confirmarTroca('${j.id}')">
+                    <img src="${j.imagem}" class="w-12 h-12 rounded-full object-cover">
+                    <div class="flex-1">
+                        <div class="font-bold">${j.nome}</div>
+                        <div class="text-sm text-gray-500">${j.posicao} - ${j.estado}</div>
+                    </div>
+                    <div class="text-blue-600 font-bold">Swap </div>
+                </div>
+            `).join('');
 
-        document.getElementById('listaJogadoresBanco').innerHTML =
-            listaHTML || '<p class="text-gray-500">Não há jogadores no banco (exceto GR).</p>';
+        const mensagemVazio = posicao === 'Goalkeeper'
+            ? '<p class="text-gray-500">Não há guarda-redes no banco.</p>'
+            : '<p class="text-gray-500">Não há jogadores no banco (exceto GR).</p>';
+
+        document.getElementById('listaJogadoresBanco').innerHTML = listaHTML || mensagemVazio;
 
         document.getElementById('modalTroca').classList.remove('hidden');
         document.getElementById('modalTroca').classList.add('flex');
-}
+        }
 
         function fecharModalTroca() {
             console.log('Fechando modal');

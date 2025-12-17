@@ -120,10 +120,86 @@ BEGIN
             -- (mantém 1 em campo e 1 no banco, apenas trocam de lugar)
         END
 
-        -- 5. Para TODAS AS OUTRAS POSIÇÕES (Defender, Midfielder, Forward):
-        --    Como é uma TROCA da mesma posição, o total em campo NÃO MUDA!
-        --    Portanto, se tinha 1+ Forward em campo antes, terá 1+ depois.
-        --    NÃO É NECESSÁRIA validação adicional!
+        -- 5. VALIDAÇÃO DE NÚMEROS MÍNIMOS POR POSIÇÃO NA EQUIPA TITULAR
+        --    Garantir que após a troca existem:
+        --    - Pelo menos 3 Defesas
+        --    - Pelo menos 2 Médios
+        --    - Pelo menos 1 Avançado
+        
+        -- Apenas validar se NÃO for troca entre GRs (já validado acima)
+        IF @Posicao_Campo != 'Goalkeeper'
+        BEGIN
+            DECLARE @Count_Defenders_Campo INT, @Count_Midfielders_Campo INT, @Count_Forwards_Campo INT;
+            DECLARE @Count_After_Defenders INT, @Count_After_Midfielders INT, @Count_After_Forwards INT;
+            
+            -- Contar jogadores em campo POR POSIÇÃO (ANTES da troca)
+            SELECT @Count_Defenders_Campo = COUNT(*)
+            FROM FantasyChamp.Pertence PE
+            JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
+            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+            WHERE PE.ID_Equipa = @ID_Equipa
+              AND PE.benched = 0
+              AND P.Posição = 'Defender';
+            
+            SELECT @Count_Midfielders_Campo = COUNT(*)
+            FROM FantasyChamp.Pertence PE
+            JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
+            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+            WHERE PE.ID_Equipa = @ID_Equipa
+              AND PE.benched = 0
+              AND P.Posição = 'Midfielder';
+            
+            SELECT @Count_Forwards_Campo = COUNT(*)
+            FROM FantasyChamp.Pertence PE
+            JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
+            JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+            WHERE PE.ID_Equipa = @ID_Equipa
+              AND PE.benched = 0
+              AND P.Posição = 'Forward';
+            
+            -- Simular contagens DEPOIS da troca
+            SET @Count_After_Defenders = @Count_Defenders_Campo;
+            SET @Count_After_Midfielders = @Count_Midfielders_Campo;
+            SET @Count_After_Forwards = @Count_Forwards_Campo;
+            
+            -- Jogador do banco vai para campo (adiciona)
+            IF @Posicao_Banco = 'Defender'
+                SET @Count_After_Defenders = @Count_After_Defenders + 1;
+            ELSE IF @Posicao_Banco = 'Midfielder'
+                SET @Count_After_Midfielders = @Count_After_Midfielders + 1;
+            ELSE IF @Posicao_Banco = 'Forward'
+                SET @Count_After_Forwards = @Count_After_Forwards + 1;
+            
+            -- Jogador do campo vai para banco (remove)
+            IF @Posicao_Campo = 'Defender'
+                SET @Count_After_Defenders = @Count_After_Defenders - 1;
+            ELSE IF @Posicao_Campo = 'Midfielder'
+                SET @Count_After_Midfielders = @Count_After_Midfielders - 1;
+            ELSE IF @Posicao_Campo = 'Forward'
+                SET @Count_After_Forwards = @Count_After_Forwards - 1;
+            
+            -- VALIDAR NÚMEROS MÍNIMOS
+            IF @Count_After_Defenders < 3
+            BEGIN
+                SET @Sucesso = 0;
+                SET @Mensagem = 'Team need at least 3 defenders';
+                RETURN;
+            END
+            
+            IF @Count_After_Midfielders < 2
+            BEGIN
+                SET @Sucesso = 0;
+                SET @Mensagem = 'Team need at least 2 midfielders';
+                RETURN;
+            END
+            
+            IF @Count_After_Forwards < 1
+            BEGIN
+                SET @Sucesso = 0;
+                SET @Mensagem = 'Team need at least 1 forward';
+                RETURN;
+            END
+        END
 
         -- 6. Fazer a troca (transação atômica)
         BEGIN TRANSACTION;
