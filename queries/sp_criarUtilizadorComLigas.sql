@@ -1,4 +1,4 @@
-CREATE PROCEDURE sp_CriarUtilizadorComLigas
+CREATE OR ALTER PROCEDURE sp_CriarUtilizadorComLigas
     @PrimeiroNome NVARCHAR(100),
     @Apelido NVARCHAR(100),
     @Email NVARCHAR(255),
@@ -14,30 +14,33 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
+    -- Inicializar outputs
+    SET @UserID = NULL;
+    SET @Sucesso = 0;
+    SET @Mensagem = '';
+
     DECLARE @LigaMundialID UNIQUEIDENTIFIER;
     DECLARE @LigaPaisID UNIQUEIDENTIFIER;
     DECLARE @LigaTipoPublica VARCHAR(16) = 'LT01';
 
+    -- VALIDAÇÕES ANTES DE ABRIR TRANSAÇÃO (evita transaction mismatch)
+    
+    -- Verificar email duplicado
+    IF EXISTS (SELECT 1 FROM FantasyChamp.Utilizador WHERE Email = @Email)
+    BEGIN
+        SET @Mensagem = 'Email already exists';
+        RETURN;
+    END
+
+    -- Verificar se o país existe na tabela de países
+    IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Pais WHERE Pais.nome = @Pais OR ID = @Pais)
+    BEGIN
+        SET @Mensagem = 'Invalid Country';
+        RETURN;
+    END
+
     BEGIN TRY
         BEGIN TRANSACTION;
-
-        -- Verificar email duplicado
-        IF EXISTS (SELECT 1 FROM FantasyChamp.Utilizador WHERE Email = @Email)
-        BEGIN
-            SET @Sucesso = 0;
-            SET @Mensagem = 'Este email já está registado';
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-
-        -- Verificar se o país existe na tabela de países
-        IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Pais WHERE Pais.nome = @Pais OR ID = @Pais)
-        BEGIN
-            SET @Sucesso = 0;
-            SET @Mensagem = 'País inválido';
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
 
         -- Criar utilizador
         SET @UserID = NEWID();
@@ -78,7 +81,7 @@ BEGIN
         -- Verificar se já existe liga do país
         SELECT @LigaPaisID = ID
         FROM FantasyChamp.Liga
-        WHERE Nome = @Pais AND ID_tipoLiga = @LigaTipoPublica;
+        WHERE Nome = 'Liga ' + @Pais AND ID_tipoLiga = @LigaTipoPublica;
 
         -- Se não existe, criar
         IF @LigaPaisID IS NULL
@@ -94,7 +97,7 @@ BEGIN
             INSERT INTO FantasyChamp.Liga
                 (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
             VALUES
-                (@LigaPaisID, @Pais, GETDATE(),
+                (@LigaPaisID, 'Liga ' + @Pais, GETDATE(),
                 CONVERT(DATE, '2026-05-30', 23),
                 @LigaTipoPublica, '00000000-0000-0000-0000-000000000000', @CodigoPais);
         END
@@ -108,7 +111,7 @@ BEGIN
         END
 
         SET @Sucesso = 1;
-        SET @Mensagem = 'Utilizador criado com sucesso e adicionado às ligas';
+        SET @Mensagem = 'Account created successfully';
 
         COMMIT TRANSACTION;
 
@@ -118,7 +121,7 @@ BEGIN
             ROLLBACK TRANSACTION;
 
         SET @Sucesso = 0;
-        SET @Mensagem = 'Erro: ' + ERROR_MESSAGE();
+        SET @Mensagem = 'Error: ' + ERROR_MESSAGE();
         SET @UserID = NULL;
     END CATCH
 END;
