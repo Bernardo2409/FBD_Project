@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <title>Team</title>
@@ -7,516 +8,722 @@
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
 </head>
 
-<body
-    class="text-gray-900 bg-cover bg-center bg-no-repeat min-h-screen"
-    data-theme="corporate"
+<body class="text-gray-900 bg-cover bg-center bg-no-repeat min-h-screen" data-theme="corporate"
     style="background-image: url('/static/images/stadium2.jpg');">
 
-<div class="container mx-auto p-6">
+    <div class="container mx-auto p-6">
 
-    {% if session.get('error') %}
-    <div class="alert alert-error mb-4 shadow-lg">
-        <div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>{{ session.pop('error') }}</span>
+        {% if session.get('error') %}
+        <div class="alert alert-error mb-4 shadow-lg">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ session.pop('error') }}</span>
+            </div>
         </div>
-    </div>
-    {% endif %}
+        {% endif %}
 
-    <!-- Nome Equipa -->
-    <h1 class="text-4xl font-bold text-center text-primary mb-6 text-white">
-        {{ equipa.info.nome }}
-    </h1>
+        <!-- Nome Equipa -->
+        <h1 class="text-4xl font-bold text-center text-primary mb-6 text-white">
+            {{ equipa.info.nome }}
+        </h1>
 
-    <div class="text-center mb-8 text-white bg-blue-800 bg-opacity-50 p-4 rounded-lg">
-        <p class="text-xl">My Money: <strong>{{ "%.2f"|format(equipa.info.orcamento) }}€</strong></p>
-        <p class="text-lg">Total Pontuation: <strong>{{ equipa.info.pontuacao_total }}</strong></p>
-    </div>
-        
-    <!-- Botão Ver Pontuação -->
-    <div class="text-center mb-6">
-        <a href="/pontuacao" class="btn btn-primary mt-4 px-8 py-2 text-white bg-green-500 rounded-md hover:bg-green-600">
-            See Pontuation
-        </a>
-    </div>
-    
-    <!-- SECÇÃO: AVANÇADOS -->
-    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Forwards(3)</h2>
+        <div class="text-center mb-8 text-white bg-blue-800 bg-opacity-50 p-4 rounded-lg">
+            <p class="text-xl">My Money: <strong>{{ "%.2f"|format(equipa.info.orcamento) }}€</strong></p>
+            <p class="text-lg">Total Pontuation: <strong>{{ equipa.info.pontuacao_total }}</strong></p>
+        </div>
 
-    <div class="mb-6 flex justify-center">
-        <div class="dropdown dropdown-bottom">
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
-                <div class="p-2 border-b border-gray-200">
-                    <input 
-                        type="text" 
-                        placeholder="Procurar avançado..." 
-                        class="input input-bordered input-sm w-full search-input"
-                        onkeyup="filterPlayers(this, 'avancados-list')"
-                    >
-                </div>
-                
-                <div id="avancados-list">
-                    {% for avancado in todos_jogadores.Forward %}
-                    {% if avancado.id not in equipa.avancados|map(attribute='id') %}
-                    <li class="player-item">
-                        <a href="/equipa/adicionar/avancados/{{ avancado.id }}" 
-                        class="substituir-jogador {% if avancado.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
-                            <div class="flex items-center gap-3">
-                                <img src="{{ avancado.jogador_imagem }}" 
-                                    class="w-8 h-8 rounded-full object-cover {% if avancado.preco > equipa.info.orcamento %}opacity-50{% endif %}">
-                                <div class="flex-1">
-                                    <div class="font-bold {% if avancado.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
-                                        {{ avancado.nome }}
+        <!-- Botão Ver Pontuação -->
+        <div class="text-center mb-6">
+            <a href="/pontuacao"
+                class="btn btn-primary mt-4 px-8 py-2 text-white bg-green-500 rounded-md hover:bg-green-600">
+                See Pontuation
+            </a>
+        </div>
+
+        <!-- SECÇÃO: AVANÇADOS -->
+        <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Forwards(3)</h2>
+
+        <div class="mb-6 flex justify-center">
+            <div class="dropdown dropdown-bottom">
+                <ul tabindex="0"
+                    class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
+                    <div class="p-2 border-b border-gray-200">
+                        <input type="text" placeholder="Procurar avançado..."
+                            class="input input-bordered input-sm w-full search-input"
+                            onkeyup="filterPlayers(this, 'avancados-list')">
+                    </div>
+
+                    <div id="avancados-list">
+                        {% for avancado in todos_jogadores.Forward %}
+                        {% if avancado.id not in equipa.avancados|map(attribute='id') %}
+                        <li class="player-item">
+                            <a href="/equipa/adicionar/avancados/{{ avancado.id }}"
+                                class="substituir-jogador {% if avancado.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
+                                <div class="flex items-center gap-3">
+                                    <img src="{{ avancado.jogador_imagem }}"
+                                        class="w-8 h-8 rounded-full object-cover {% if avancado.preco > equipa.info.orcamento %}opacity-50{% endif %}">
+                                    <div class="flex-1">
+                                        <div
+                                            class="font-bold {% if avancado.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
+                                            {{ avancado.nome }}
+                                        </div>
+                                        <div class="text-xs font-bold text-white-500">{{ avancado.preco }}€ {{
+                                            avancado.estado }}</div>
+                                        {% if avancado.preco > equipa.info.orcamento %}
+                                        <div class="text-xs text-red-500 font-semibold">No Money</div>
+                                        {% endif %}
                                     </div>
-                                    <div class="text-xs font-bold text-white-500">{{ avancado.preco }}€ {{ avancado.estado }}</div>
-                                    {% if avancado.preco > equipa.info.orcamento %}
-                                    <div class="text-xs text-red-500 font-semibold">No Money</div>
-                                    {% endif %}
                                 </div>
-                            </div>
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-            </ul>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </ul>
+            </div>
         </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 place-items-center">
-    {% for j in equipa.avancados %}
-    <div class="card shadow-xl p-4 w-64 flex flex-col relative
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 place-items-center">
+            {% for j in equipa.avancados %}
+            {% if not j.benched %}
+            <div class="card shadow-xl p-4 w-64 flex flex-col relative
         {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}
         {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
-        
-        <a href="/equipa/remover/{{ j.id }}"
-            class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
-                ✕
-        </a>
-        
-        <a href="/players/{{ j.id }}" class="flex-1 mb-2">
-            <div class="flex items-center gap-4">
-                <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
-                <div>
-                    <div class="font-bold text-lg text-white">{{ j.nome }}</div>
-                    <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                    <div class="text-sm text-white">{{ j.preco }}€</div>
-                    {% if j.benched %}
-                    <div class="badge badge-warning text-xs mt-1">Benched</div>
+
+                <a href="/equipa/remover/{{ j.id }}"
+                    class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
+                    ✕
+                </a>
+
+                <a href="/players/{{ j.id }}" class="flex-1 mb-2">
+                    <div class="flex items-center gap-4">
+                        <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                        <div>
+                            <div class="font-bold text-lg text-white">{{ j.nome }}</div>
+                            <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
+                            <div class="text-sm text-white">{{ j.preco }}€</div>
+                            {% if j.benched %}
+                            <div class="badge badge-warning text-xs mt-1">Benched</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+
+                <div class="mt-2 flex justify-center">
+                    {% if not j.benched %}
+                    <!-- Botão para trocar jogador do campo com jogador do banco -->
+                    <button type="button" onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Forward')"
+                        class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
+                        Trade with Bench
+                    </button>
+                    {% else %}
+                    <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
                     {% endif %}
                 </div>
             </div>
-        </a>
-        
-        <div class="mt-2 flex justify-center">
-            {% if not j.benched %}
-            <!-- Botão para trocar jogador do campo com jogador do banco -->
-            <button type="button"
-                    onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Forward')" 
-                    class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
-                Trade with Bench
-            </button>
-            {% else %}
-            <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
             {% endif %}
+            {% endfor %}
         </div>
-    </div>
-    {% endfor %}
-</div>
 
-    <!-- SECÇÃO: MÉDIOS -->
-    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Mediums (5)</h2>
+        <!-- SECÇÃO: MÉDIOS -->
+        <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Mediums (5)</h2>
 
-    <div class="mb-6 flex justify-center">
-        <div class="dropdown dropdown-bottom">
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
-                <div class="p-2 border-b border-gray-200">
-                    <input 
-                        type="text" 
-                        placeholder="Procurar médio..." 
-                        class="input input-bordered input-sm w-full search-input"
-                        onkeyup="filterPlayers(this, 'medios-list')"
-                    >
-                </div>
-                
-                <div id="medios-list">
-                    {% for medio in todos_jogadores.Midfielder %}
-                    {% if medio.id not in equipa.medios|map(attribute='id') %}
-                    <li class="player-item">
-                        <a href="/equipa/adicionar/medios/{{ medio.id }}" 
-                        class="substituir-jogador {% if medio.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
-                            <div class="flex items-center gap-3">
-                                <img src="{{ medio.jogador_imagem }}" 
-                                    class="w-8 h-8 rounded-full object-cover {% if medio.preco > equipa.info.orcamento %}opacity-50{% endif %}">
-                                <div class="flex-1">
-                                    <div class="font-bold {% if medio.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
-                                        {{ medio.nome }}
+        <div class="mb-6 flex justify-center">
+            <div class="dropdown dropdown-bottom">
+                <ul tabindex="0"
+                    class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
+                    <div class="p-2 border-b border-gray-200">
+                        <input type="text" placeholder="Procurar médio..."
+                            class="input input-bordered input-sm w-full search-input"
+                            onkeyup="filterPlayers(this, 'medios-list')">
+                    </div>
+
+                    <div id="medios-list">
+                        {% for medio in todos_jogadores.Midfielder %}
+                        {% if medio.id not in equipa.medios|map(attribute='id') %}
+                        <li class="player-item">
+                            <a href="/equipa/adicionar/medios/{{ medio.id }}"
+                                class="substituir-jogador {% if medio.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
+                                <div class="flex items-center gap-3">
+                                    <img src="{{ medio.jogador_imagem }}"
+                                        class="w-8 h-8 rounded-full object-cover {% if medio.preco > equipa.info.orcamento %}opacity-50{% endif %}">
+                                    <div class="flex-1">
+                                        <div
+                                            class="font-bold {% if medio.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
+                                            {{ medio.nome }}
+                                        </div>
+                                        <div class="text-xs font-bold text-white-500">{{ medio.preco }}€ {{ medio.estado
+                                            }}</div>
+                                        {% if medio.preco > equipa.info.orcamento %}
+                                        <div class="text-xs text-red-500 font-semibold">No money</div>
+                                        {% endif %}
                                     </div>
-                                    <div class="text-xs font-bold text-white-500">{{ medio.preco }}€ {{ medio.estado }}</div>
-                                    {% if medio.preco > equipa.info.orcamento %}
-                                    <div class="text-xs text-red-500 font-semibold">No money</div>
-                                    {% endif %}
                                 </div>
-                            </div>
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-            </ul>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </ul>
+            </div>
         </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
-        {% for j in equipa.medios %}
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
+            {% for j in equipa.medios %}
+            {% if not j.benched %}
             <div class="card shadow-xl p-4 w-64 flex flex-col relative
             {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}
             {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
 
-            <a href="/equipa/remover/{{ j.id }}"
-                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
+                <a href="/equipa/remover/{{ j.id }}"
+                    class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
                     ✕
-            </a>
-            
-            <a href="/players/{{ j.id }}" class="flex-1 mb-2">
-                <div class="flex items-center gap-4">
-                    <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
-                    <div>
-                        <div class="font-bold text-lg text-white">{{ j.nome }}</div>
-                        <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                        <div class="text-sm text-white">{{ j.preco }}€</div>
-                        {% if j.benched %}
-                        <div class="badge badge-warning text-xs mt-1">Bench</div>
-                        {% endif %}
+                </a>
+
+                <a href="/players/{{ j.id }}" class="flex-1 mb-2">
+                    <div class="flex items-center gap-4">
+                        <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                        <div>
+                            <div class="font-bold text-lg text-white">{{ j.nome }}</div>
+                            <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
+                            <div class="text-sm text-white">{{ j.preco }}€</div>
+                            {% if j.benched %}
+                            <div class="badge badge-warning text-xs mt-1">Bench</div>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-            </a>
-            
-            <div class="mt-2 flex justify-center">
-                {% if not j.benched %}
-                <button type="button"
-                        onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Midfielder')" 
+                </a>
+
+                <div class="mt-2 flex justify-center">
+                    {% if not j.benched %}
+                    <button type="button" onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Midfielder')"
                         class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
-                    Trade with Bench
-                </button>
-                {% else %}
-                <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
-                {% endif %}
+                        Trade with Bench
+                    </button>
+                    {% else %}
+                    <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- SECÇÃO: DEFESAS -->
+        <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Defenders (5)</h2>
+
+        <div class="mb-6 flex justify-center">
+            <div class="dropdown dropdown-bottom">
+                <ul tabindex="0"
+                    class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
+                    <div class="p-2 border-b border-gray-200">
+                        <input type="text" placeholder="Procurar defesa..."
+                            class="input input-bordered input-sm w-full search-input"
+                            onkeyup="filterPlayers(this, 'defesas-list')">
+                    </div>
+
+                    <div id="defesas-list">
+                        {% for defesa in todos_jogadores.Defender %}
+                        {% if defesa.id not in equipa.defesas|map(attribute='id') %}
+                        <li class="player-item">
+                            <a href="/equipa/adicionar/defesas/{{ defesa.id }}"
+                                class="substituir-jogador {% if defesa.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
+                                <div class="flex items-center gap-3">
+                                    <img src="{{ defesa.jogador_imagem }}"
+                                        class="w-8 h-8 rounded-full object-cover {% if defesa.preco > equipa.info.orcamento %}opacity-50{% endif %}">
+                                    <div class="flex-1">
+                                        <div
+                                            class="font-bold {% if defesa.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
+                                            {{ defesa.nome }}
+                                        </div>
+                                        <div class="text-xs font-bold text-white-500">{{ defesa.preco }}€ {{
+                                            defesa.estado }}</div>
+                                        {% if defesa.preco > equipa.info.orcamento %}
+                                        <div class="text-xs text-red-500 font-semibold">No Money</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </ul>
             </div>
         </div>
-        {% endfor %}
-    </div>
 
-    <!-- SECÇÃO: DEFESAS -->
-    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Defenders (5)</h2>
-
-    <div class="mb-6 flex justify-center">
-        <div class="dropdown dropdown-bottom">
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
-                <div class="p-2 border-b border-gray-200">
-                    <input 
-                        type="text" 
-                        placeholder="Procurar defesa..." 
-                        class="input input-bordered input-sm w-full search-input"
-                        onkeyup="filterPlayers(this, 'defesas-list')"
-                    >
-                </div>
-                
-                <div id="defesas-list">
-                    {% for defesa in todos_jogadores.Defender %}
-                    {% if defesa.id not in equipa.defesas|map(attribute='id') %}
-                    <li class="player-item">
-                        <a href="/equipa/adicionar/defesas/{{ defesa.id }}" 
-                        class="substituir-jogador {% if defesa.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
-                            <div class="flex items-center gap-3">
-                                <img src="{{ defesa.jogador_imagem }}" 
-                                    class="w-8 h-8 rounded-full object-cover {% if defesa.preco > equipa.info.orcamento %}opacity-50{% endif %}">
-                                <div class="flex-1">
-                                    <div class="font-bold {% if defesa.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
-                                        {{ defesa.nome }}
-                                    </div>
-                                    <div class="text-xs font-bold text-white-500">{{ defesa.preco }}€ {{ defesa.estado }}</div>
-                                    {% if defesa.preco > equipa.info.orcamento %}
-                                    <div class="text-xs text-red-500 font-semibold">No Money</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-            </ul>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
-        {% for j in equipa.defesas %}
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10 place-items-center">
+            {% for j in equipa.defesas %}
+            {% if not j.benched %}
             <div class="card shadow-xl p-4 w-64 flex flex-col relative
             {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}
             {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
 
-            <a href="/equipa/remover/{{ j.id }}"
-                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
+                <a href="/equipa/remover/{{ j.id }}"
+                    class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
                     ✕
-            </a>
-            
-            <a href="/players/{{ j.id }}" class="flex-1 mb-2">
-                <div class="flex items-center gap-4">
-                    <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
-                    <div>
-                        <div class="font-bold text-lg text-white">{{ j.nome }}</div>
-                        <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                        <div class="text-sm text-white">{{ j.preco }}€</div>
-                        {% if j.benched %}
-                        <div class="badge badge-warning text-xs mt-1">Bench</div>
-                        {% endif %}
+                </a>
+
+                <a href="/players/{{ j.id }}" class="flex-1 mb-2">
+                    <div class="flex items-center gap-4">
+                        <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                        <div>
+                            <div class="font-bold text-lg text-white">{{ j.nome }}</div>
+                            <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
+                            <div class="text-sm text-white">{{ j.preco }}€</div>
+                            {% if j.benched %}
+                            <div class="badge badge-warning text-xs mt-1">Bench</div>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
-            </a>
-            
-            <div class="mt-2 flex justify-center">
-                {% if not j.benched %}
-                <button type="button"
-                        onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Defender')" 
+                </a>
+
+                <div class="mt-2 flex justify-center">
+                    {% if not j.benched %}
+                    <button type="button" onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Defender')"
                         class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
-                    Trade with bench
-                </button>
-                {% else %}
-                <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
-                {% endif %}
+                        Trade with bench
+                    </button>
+                    {% else %}
+                    <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- SECÇÃO: GUARDA-REDES -->
+        <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Goalkeeper(2)</h2>
+
+        <div class="mb-6 flex justify-center">
+            <div class="dropdown dropdown-bottom">
+                <ul tabindex="0"
+                    class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
+                    <div class="p-2 border-b border-gray-200">
+                        <input type="text" placeholder="Procurar guarda-redes..."
+                            class="input input-bordered input-sm w-full search-input"
+                            onkeyup="filterPlayers(this, 'gr-list')">
+                    </div>
+
+                    <div id="gr-list">
+                        {% for gr in todos_jogadores.Goalkeeper %}
+                        {% if gr.id not in equipa.gr|map(attribute='id') %}
+                        <li class="player-item">
+                            <a href="/equipa/adicionar/gr/{{ gr.id }}"
+                                class="substituir-jogador {% if gr.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
+                                <div class="flex items-center gap-3">
+                                    <img src="{{ gr.jogador_imagem }}"
+                                        class="w-8 h-8 rounded-full object-cover {% if gr.preco > equipa.info.orcamento %}opacity-50{% endif %}">
+                                    <div class="flex-1">
+                                        <div
+                                            class="font-bold {% if gr.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
+                                            {{ gr.nome }}
+                                        </div>
+                                        <div class="text-xs font-bold text-white-500">{{ gr.preco }}€ {{ gr.estado }}
+                                        </div>
+                                        {% if gr.preco > equipa.info.orcamento %}
+                                        <div class="text-xs text-red-500 font-semibold">No Money</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </ul>
             </div>
         </div>
-        {% endfor %}
-    </div>
 
-    <!-- SECÇÃO: GUARDA-REDES -->
-    <h2 class="text-2xl text-center mb-4 text-secondary text-white font-bold">Goalkeeper(2)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 place-items-center">
+            {% for j in equipa.gr %}
+            {% if not j.benched %}
+            <div class="card shadow-xl p-4 w-64 flex flex-col relative
+            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}
+            {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
 
-    <div class="mb-6 flex justify-center">
-        <div class="dropdown dropdown-bottom">
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
-                <div class="p-2 border-b border-gray-200">
-                    <input 
-                        type="text" 
-                        placeholder="Procurar guarda-redes..." 
-                        class="input input-bordered input-sm w-full search-input"
-                        onkeyup="filterPlayers(this, 'gr-list')"
-                    >
+                <a href="/equipa/remover/{{ j.id }}"
+                    class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
+                    ✕
+                </a>
+
+                <a href="/players/{{ j.id }}" class="flex-1 mb-2">
+                    <div class="flex items-center gap-4">
+                        <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                        <div>
+                            <div class="font-bold text-lg text-white">{{ j.nome }}</div>
+                            <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
+                            <div class="text-sm text-white">{{ j.preco }}€</div>
+                            {% if j.benched %}
+                            <div class="badge badge-warning text-xs mt-1">Bench</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+
+                <div class="mt-2 flex justify-center">
+                    {% if not j.benched %}
+                    <button type="button" onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Goalkeeper')"
+                        class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
+                        Trade with bench
+                    </button>
+                    {% else %}
+                    <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
+                    {% endif %}
                 </div>
-                
-                <div id="gr-list">
-                    {% for gr in todos_jogadores.Goalkeeper %}
-                    {% if gr.id not in equipa.gr|map(attribute='id') %}
-                    <li class="player-item">
-                        <a href="/equipa/adicionar/gr/{{ gr.id }}" 
-                        class="substituir-jogador {% if gr.preco > equipa.info.orcamento %}opacity-50 cursor-not-allowed{% endif %}">
-                            <div class="flex items-center gap-3">
-                                <img src="{{ gr.jogador_imagem }}" 
-                                    class="w-8 h-8 rounded-full object-cover {% if gr.preco > equipa.info.orcamento %}opacity-50{% endif %}">
-                                <div class="flex-1">
-                                    <div class="font-bold {% if gr.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
-                                        {{ gr.nome }}
-                                    </div>
-                                    <div class="text-xs font-bold text-white-500">{{ gr.preco }}€ {{ gr.estado }}</div>
-                                    {% if gr.preco > equipa.info.orcamento %}
-                                    <div class="text-xs text-red-500 font-semibold">No Money</div>
-                                    {% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ================================ -->
+        <!-- SEÇÃO: BANCO DE RESERVAS -->
+        <!-- ================================ -->
+        <div class="mt-16 mb-10">
+            <h2 class="text-3xl text-center mb-2 text-white font-bold"> Bench(4) </h2>
+
+
+            <!-- Grid de 4 slots fixos (1 por posição) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-6xl mx-auto">
+
+                <!-- SLOT 1: Guarda-Redes Suplente -->
+                {% set gr_banco = equipa.gr | selectattr('benched', 'equalto', true) | first %}
+                <div class="slot-banco-gr">
+                    {% if gr_banco %}
+                    <!-- Card do GR Suplente -->
+                    <div class="card shadow-xl p-4 bg-yellow-600 relative h-56" data-jogador-id="{{ gr_banco.id }}">
+                        <!-- Botão remover -->
+                        <a href="/equipa/remover/{{ gr_banco.id }}"
+                            class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
+                            ✕
+                        </a>
+
+                        <!-- Info do jogador -->
+                        <a href="/players/{{ gr_banco.id }}" class="block mb-2">
+                            <div class="flex flex-col items-center gap-2">
+                                <img src="{{ gr_banco.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                                <div class="text-center">
+                                    <div class="font-bold text-white text-sm">{{ gr_banco.nome }}</div>
+                                    <div class="badge badge-sm mt-1 badge-info">GR</div>
+                                    <div class="text-xs text-white mt-1">{{ gr_banco.preco }}€</div>
                                 </div>
                             </div>
                         </a>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
-                </div>
-            </ul>
-        </div>
-    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 place-items-center">
-        {% for j in equipa.gr %}
-         <div class="card shadow-xl p-4 w-64 flex flex-col relative
-            {% if j.estado == 'Active' %}bg-green-500{% elif j.estado == 'On doubt' %}bg-blue-500{% elif j.estado == 'Unavailable' %}bg-black{% elif j.estado == 'Benched' %}bg-yellow-500{% elif j.estado == 'Injured' %}bg-red-500{% else %}bg-gray-200{% endif %}
-            {% if j.benched %}opacity-60 border-4 border-yellow-400{% endif %}">
-            
-            <a href="/equipa/remover/{{ j.id }}"
-                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
-                    ✕
-            </a>
-            
-            <a href="/players/{{ j.id }}" class="flex-1 mb-2">
-                <div class="flex items-center gap-4">
-                    <img src="{{ j.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
-                    <div>
-                        <div class="font-bold text-lg text-white">{{ j.nome }}</div>
-                        <div class="badge badge-primary badge-outline">{{ j.estado }}</div>
-                        <div class="text-sm text-white">{{ j.preco }}€</div>
-                        {% if j.benched %}
-                        <div class="badge badge-warning text-xs mt-1">Bench</div>
-                        {% endif %}
+                        <!-- Botão para trocar GR (troca direta) -->
+                        <button onclick="trocarGR('{{ gr_banco.id }}')"
+                            class="btn btn-xs mt-2 w-full bg-blue-600 text-white hover:bg-blue-700 border-none">
+                            ↕️ Trocar com Titular
+                        </button>
                     </div>
+                    {% else %}
+                    <!-- Slot vazio -->
+                    <div
+                        class="card shadow-xl p-6 bg-gray-700 bg-opacity-50 border-2 border-dashed border-gray-400 h-56 flex items-center justify-center">
+                        <div class="text-center text-gray-300">
+                            <div class="text-4xl mb-2">🧤</div>
+                            <div class="text-sm font-bold">Slot Vazio</div>
+                            <div class="text-xs text-gray-400 mt-1">Guarda-Redes</div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
-            </a>
-            
-            <div class="mt-2 flex justify-center">
-                {% if not j.benched %}
-                <button type="button"
-                        onclick="abrirModalTroca('{{ j.id }}', '{{ j.nome }}', 'Goalkeeper')" 
-                        class="btn btn-xs bg-orange-600 text-white hover:bg-orange-700 border-none">
-                    Trade with bench
-                </button>
-                {% else %}
-                <div class="text-xs text-yellow-100 font-semibold">In Bench</div>
+
+
+                <!-- SLOTS 2, 3, 4: Jogadores de Linha (qualquer posição) -->
+                {% set jogadores_linha_banco = [] %}
+                {% for j in equipa.defesas %}
+                {% if j.benched %}
+                {% set _ = jogadores_linha_banco.append(j) %}
                 {% endif %}
+                {% endfor %}
+                {% for j in equipa.medios %}
+                {% if j.benched %}
+                {% set _ = jogadores_linha_banco.append(j) %}
+                {% endif %}
+                {% endfor %}
+                {% for j in equipa.avancados %}
+                {% if j.benched %}
+                {% set _ = jogadores_linha_banco.append(j) %}
+                {% endif %}
+                {% endfor %}
+
+                <!-- Renderizar até 3 slots genéricos -->
+                {% for i in range(3) %}
+                <div class="slot-banco-linha">
+                    {% if i < jogadores_linha_banco|length %} {% set jogador=jogadores_linha_banco[i] %} <!-- Card do
+                        Jogador Suplente -->
+                        <div class="card shadow-xl p-4 bg-yellow-600 relative h-56">
+                            <a href="/equipa/remover/{{ jogador.id }}"
+                                class="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full border border-red-600 bg-white text-red-600 font-bold hover:bg-red-100 z-10">
+                                ✕
+                            </a>
+
+                            <a href="/players/{{ jogador.id }}" class="block mb-2">
+                                <div class="flex flex-col items-center gap-2">
+                                    <img src="{{ jogador.jogador_imagem }}" class="w-16 h-16 rounded-full object-cover">
+                                    <div class="text-center">
+                                        <div class="font-bold text-white text-sm">{{ jogador.nome }}</div>
+                                        <div class="badge badge-sm mt-1 
+                                        {% if jogador.posicao == 'Defender' %}badge-warning
+                                        {% elif jogador.posicao == 'Midfielder' %}badge-success
+                                        {% elif jogador.posicao == 'Forward' %}badge-error
+                                        {% endif %}">
+                                            {% if jogador.posicao == 'Defender' %}Defesa
+                                            {% elif jogador.posicao == 'Midfielder' %}Médio
+                                            {% elif jogador.posicao == 'Forward' %}Avançado
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-xs text-white mt-1">{{ jogador.preco }}€</div>
+                                    </div>
+                                </div>
+                            </a>
+
+                            <button onclick="abrirModalTrocaBanco('{{ jogador.id }}', '{{ jogador.nome }}')"
+                                class="btn btn-xs mt-2 w-full bg-orange-600 text-white hover:bg-orange-700 border-none">
+                                ⬆️ Para Campo
+                            </button>
+                        </div>
+                        {% else %}
+                        <!-- Slot vazio -->
+                        <div
+                            class="card shadow-xl p-6 bg-gray-700 bg-opacity-50 border-2 border-dashed border-gray-400 h-56 flex items-center justify-center">
+                            <div class="text-center text-gray-300">
+                                <div class="text-4xl mb-2">⚽</div>
+                                <div class="text-sm font-bold">Slot Vazio</div>
+                                <div class="text-xs text-gray-400 mt-1">Qualquer Posição</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                </div>
+                {% endfor %}
+
             </div>
         </div>
-        {% endfor %}
-    </div>
+        <!-- ================================ -->
 
-    <div class="mt-12 text-center">
-        <a href="/index"
-        class="btn px-8"
-        style="background-color: white; color: black; border: 1px solid #ccc;">
-        Back
-        </a>
-    </div>
-
-</div>
-
-<!-- Modal de Troca -->
-<div id="modalTroca" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-xl font-bold mb-4">Trade Player</h3>
-        <p class="mb-4">Select a player from bench to trade with <strong id="nomeJogadorCampo"></strong>:</p>
-        
-        <div id="listaJogadoresBanco" class="max-h-64 overflow-y-auto mb-4">
-            <!-- Será preenchido dinamicamente -->
+        <div class="mt-12 text-center">
+            <a href="/index" class="btn px-8" style="background-color: white; color: black; border: 1px solid #ccc;">
+                Back
+            </a>
         </div>
-        
-        <div class="flex justify-end gap-2">
-            <button onclick="fecharModalTroca()" class="btn bg-gray-500 text-white hover:bg-gray-600">
-                Cancel
-            </button>
+
+    </div>
+
+    <!-- Modal de Troca -->
+    <div id="modalTroca" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Trocar Jogador</h3>
+            <p class="mb-4">Seleciona um titular para trocar com <strong id="nomeJogadorCampo"></strong>:</p>
+
+            <div id="listaJogadoresBanco" class="max-h-64 overflow-y-auto mb-4">
+                <!-- Será preenchido dinamicamente -->
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button onclick="fecharModalTroca()" class="btn bg-gray-500 text-white hover:bg-gray-600">
+                    Cancel
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-let jogadorCampoSelecionado = null;
+    <script>
+        let jogadorCampoSelecionado = null;
 
-function abrirModalTroca(idJogadorCampo, nomeJogadorCampo, posicao) {
-    console.log('Abrindo modal para trocar:', idJogadorCampo, nomeJogadorCampo, posicao);
-    jogadorCampoSelecionado = idJogadorCampo;
-    document.getElementById('nomeJogadorCampo').textContent = nomeJogadorCampo;
-    
-    // Buscar jogadores do banco da mesma posição
-    const jogadoresBanco = [
-        {% for j in equipa.avancados %}
+        function abrirModalTroca(idJogadorCampo, nomeJogadorCampo, posicao) {
+            console.log('Abrindo modal para trocar:', idJogadorCampo, nomeJogadorCampo, posicao);
+            jogadorCampoSelecionado = idJogadorCampo;
+            document.getElementById('nomeJogadorCampo').textContent = nomeJogadorCampo;
+
+            // Buscar TODOS jogadores do banco EXCETO GR (igual ao UEFA Fantasy)
+            const jogadoresBanco = [
+                {% for j in equipa.avancados %}
         {% if j.benched %}
-        {id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Forward', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}'},
+        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Forward', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
         {% endif %}
         {% endfor %}
         {% for j in equipa.medios %}
         {% if j.benched %}
-        {id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Midfielder', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}'},
+        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Midfielder', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
         {% endif %}
         {% endfor %}
         {% for j in equipa.defesas %}
         {% if j.benched %}
-        {id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Defender', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}'},
-        {% endif %}
-        {% endfor %}
-        {% for j in equipa.gr %}
-        {% if j.benched %}
-        {id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Goalkeeper', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}'},
+        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Defesa', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
         {% endif %}
         {% endfor %}
     ];
-    
-    console.log('Jogadores no banco:', jogadoresBanco);
-    const jogadoresMesmaPosicao = jogadoresBanco.filter(j => j.posicao === posicao);
-    console.log('Jogadores da mesma posição:', jogadoresMesmaPosicao);
-    
-    const listaHTML = jogadoresMesmaPosicao.map(j => `
+
+        console.log('Jogadores no banco (exceto GR):', jogadoresBanco);
+
+        const listaHTML = jogadoresBanco.map(j => `
         <div class="border rounded p-3 mb-2 hover:bg-gray-100 cursor-pointer flex items-center gap-3"
              onclick="confirmarTroca('${j.id}')">
             <img src="${j.imagem}" class="w-12 h-12 rounded-full object-cover">
             <div class="flex-1">
                 <div class="font-bold">${j.nome}</div>
-                <div class="text-sm text-gray-500">${j.estado}</div>
+                <div class="text-sm text-gray-500">${j.posicao} - ${j.estado}</div>
             </div>
             <div class="text-blue-600 font-bold">Trocar →</div>
         </div>
     `).join('');
-    
-    document.getElementById('listaJogadoresBanco').innerHTML = 
-        listaHTML || '<p class="text-gray-500">Não há jogadores desta posição no banco.</p>';
-    
-    document.getElementById('modalTroca').classList.remove('hidden');
-    document.getElementById('modalTroca').classList.add('flex');
+
+        document.getElementById('listaJogadoresBanco').innerHTML =
+            listaHTML || '<p class="text-gray-500">Não há jogadores no banco (exceto GR).</p>';
+
+        document.getElementById('modalTroca').classList.remove('hidden');
+        document.getElementById('modalTroca').classList.add('flex');
 }
 
-function fecharModalTroca() {
-    console.log('Fechando modal');
-    document.getElementById('modalTroca').classList.add('hidden');
-    document.getElementById('modalTroca').classList.remove('flex');
-    jogadorCampoSelecionado = null;
-}
-
-function confirmarTroca(idJogadorBanco) {
-    console.log('Confirmando troca:', jogadorCampoSelecionado, '<->', idJogadorBanco);
-    // Criar formulário e submeter diretamente, sem confirmação
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/equipa/trocar/${jogadorCampoSelecionado}/${idJogadorBanco}`;
-    console.log('Submetendo formulário para:', form.action);
-    document.body.appendChild(form);
-    form.submit();
-}
-
-// Fechar modal ao clicar fora
-document.addEventListener('click', function(e) {
-    const modal = document.getElementById('modalTroca');
-    if (modal && e.target === modal) {
-        fecharModalTroca();
-    }
-});
-
-function filterPlayers(input, listId) {
-    const filter = input.value.toLowerCase();
-    const list = document.getElementById(listId);
-    const items = list.getElementsByClassName('player-item');
-    
-    for (let i = 0; i < items.length; i++) {
-        const playerName = items[i].querySelector('.player-name').textContent.toLowerCase();
-        if (playerName.includes(filter)) {
-            items[i].style.display = '';
-        } else {
-            items[i].style.display = 'none';
+        function fecharModalTroca() {
+            console.log('Fechando modal');
+            document.getElementById('modalTroca').classList.add('hidden');
+            document.getElementById('modalTroca').classList.remove('flex');
+            jogadorCampoSelecionado = null;
         }
-    }
-}
 
-// Fechar dropdown quando clicar fora
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.dropdown')) {
-        const dropdowns = document.querySelectorAll('.dropdown-content');
-        dropdowns.forEach(dropdown => {
-            dropdown.parentElement.classList.remove('dropdown-open');
-        });
-    }
-});
+        function confirmarTroca(idJogadorBanco) {
+            console.log('Confirmando troca:', jogadorCampoSelecionado, '<->', idJogadorBanco);
+            // Criar formulário e submeter diretamente, sem confirmação
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/equipa/trocar/${jogadorCampoSelecionado}/${idJogadorBanco}`;
+            console.log('Submetendo formulário para:', form.action);
+            document.body.appendChild(form);
+            form.submit();
+        }
 
-// Prevenir clique em jogadores sem orçamento
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.substituir-jogador.opacity-50').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Orçamento insuficiente para adicionar este jogador!');
+        // ========================================
+        // NOVAS FUNÇÕES PARA BANCO DE RESERVAS
+        // ========================================
+
+        // Função para trocar GR titular com GR suplente (troca direta)
+        function trocarGR(idGRBanco) {
+            console.log('Troca direta de GR:', idGRBanco);
+
+            // Encontrar GR titular
+            const grTitular = document.querySelector('.slot-banco-gr').closest('div').previousElementSibling;
+
+            // Pegar ID do GR titular dos dados
+            const grTitulares = [
+                {% for j in equipa.gr %}
+        {% if not j.benched %}
+        '{{ j.id }}',
+            {% endif %}
+        {% endfor %}
+            ];
+
+        if (grTitulares.length > 0) {
+            const idGRTitular = grTitulares[0];
+            console.log('Trocando GR titular:', idGRTitular, 'com suplente:', idGRBanco);
+
+            // Criar formulário e enviar POST
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/equipa/trocar/${idGRTitular}/${idGRBanco}`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+        }
+
+        // Função para trocar jogador do banco com qualquer titular (exceto GR)
+        function abrirModalTrocaBanco(idJogadorBanco, nomeJogadorBanco) {
+            // Armazenar ID do jogador do BANCO na variável global
+            // (o nome da variável é enganador, mas é assim que funciona no código original)
+            jogadorCampoSelecionado = idJogadorBanco;
+
+            document.getElementById('nomeJogadorCampo').textContent = nomeJogadorBanco + ' (do Banco)';
+
+            // Listar TODOS os jogadores titulares exceto GR
+            const jogadoresCampo = [
+                {% for j in equipa.avancados %}
+        {% if not j.benched %}
+        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Avançado', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
+        {% endif %}
+        {% endfor %}
+        {% for j in equipa.medios %}
+        {% if not j.benched %}
+        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Médio', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
+        {% endif %}
+        {% endfor %}
+        {% for j in equipa.defesas %}
+        {% if not j.benched %}
+        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Defesa', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
+        {% endif %}
+        {% endfor %}
+            ];
+
+        const listaHTML = jogadoresCampo.map(j => `
+                <div class="border rounded p-3 mb-2 hover:bg-gray-100 cursor-pointer flex items-center gap-3"
+                     onclick="confirmarTroca('${j.id}')">
+                    <img src="${j.imagem}" class="w-12 h-12 rounded-full object-cover">
+                    <div class="flex-1">
+                        <div class="font-bold">${j.nome}</div>
+                        <div class="text-sm text-gray-500">${j.posicao} - ${j.estado}</div>
+                    </div>
+                    <div class="text-blue-600 font-bold">Trocar →</div>
+                </div>
+            `).join('');
+
+        document.getElementById('listaJogadoresBanco').innerHTML =
+            listaHTML || '<p class="text-gray-500">Não há jogadores disponíveis para trocar.</p>';
+
+        document.getElementById('modalTroca').classList.remove('hidden');
+        document.getElementById('modalTroca').classList.add('flex');
+        }
+
+        // ========================================
+
+        // Fechar modal ao clicar fora
+        document.addEventListener('click', function (e) {
+            const modal = document.getElementById('modalTroca');
+            if (modal && e.target === modal) {
+                fecharModalTroca();
+            }
         });
-    });
-});
-</script>
+
+        function filterPlayers(input, listId) {
+            const filter = input.value.toLowerCase();
+            const list = document.getElementById(listId);
+            const items = list.getElementsByClassName('player-item');
+
+            for (let i = 0; i < items.length; i++) {
+                const playerName = items[i].querySelector('.player-name').textContent.toLowerCase();
+                if (playerName.includes(filter)) {
+                    items[i].style.display = '';
+                } else {
+                    items[i].style.display = 'none';
+                }
+            }
+        }
+
+        // Fechar dropdown quando clicar fora
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.dropdown')) {
+                const dropdowns = document.querySelectorAll('.dropdown-content');
+                dropdowns.forEach(dropdown => {
+                    dropdown.parentElement.classList.remove('dropdown-open');
+                });
+            }
+        });
+
+        // Prevenir clique em jogadores sem orçamento
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.substituir-jogador.opacity-50').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    alert('Orçamento insuficiente para adicionar este jogador!');
+                });
+            });
+        });
+    </script>
 
 </body>
+
 </html>

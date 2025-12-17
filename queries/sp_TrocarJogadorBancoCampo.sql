@@ -71,17 +71,21 @@ BEGIN
         JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
         WHERE J.ID = @ID_Jogador_Campo;
 
-        -- Verificar se são da mesma posição
-        IF @Posicao_Banco != @Posicao_Campo
+        -- NOVA LÓGICA: Permitir trocas entre TODAS as posições, EXCETO:
+        -- 1. GR só pode trocar com GR
+        -- 2. Outras posições NÃO podem trocar com GR
+        
+        -- Verificar se um é GR e outro não é
+        IF (@Posicao_Banco = 'Goalkeeper' AND @Posicao_Campo != 'Goalkeeper') OR
+           (@Posicao_Banco != 'Goalkeeper' AND @Posicao_Campo = 'Goalkeeper')
         BEGIN
             SET @Sucesso = 0;
-            SET @Mensagem = 'Players must be in the same position to swap. ' +
-                           @Posicao_Banco + ' ≠ ' + @Posicao_Campo;
+            SET @Mensagem = 'Goalkeepers can only swap with other goalkeepers. Other positions cannot swap with goalkeepers.';
             RETURN;
         END
 
         -- 4. VALIDAÇÕES ESPECIAIS APENAS PARA GOALKEEPERS
-        --    (Para outras posições, a troca é sempre válida pois mantém o total)
+        --    (Para outras posições, a troca é sempre válida mesmo entre posições diferentes)
 
         IF @Posicao_Campo = 'Goalkeeper'
         BEGIN

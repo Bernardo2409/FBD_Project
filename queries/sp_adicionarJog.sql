@@ -96,53 +96,74 @@ BEGIN
       AND P.Posição = @Posicao;
 
     -- Lógica de atribuição banco/campo
-    SET @BenchedStatus = 1; -- Default: vai para banco
-
-    -- REGRA 1: GR sem GR no banco vai para banco
-    IF @Posicao = 'Goalkeeper' AND @ContadorGR_Banco = 0
-        SET @BenchedStatus = 1;
-    -- REGRA 2: GR com GR no banco vai para campo
-    ELSE IF @Posicao = 'Goalkeeper' AND @ContadorGR_Banco >= 1
-        SET @BenchedStatus = 0;
-    -- REGRA 3: Banco cheio (4 jogadores) vai para campo
-    ELSE IF @TotalBanco >= 4
-        SET @BenchedStatus = 0;
-    -- REGRA 4: Se tem 3 no banco mas não tem GR, este vai para campo
-    -- (para deixar espaço para o GR obrigatório)
-    ELSE IF @TotalBanco = 3 AND @ContadorGR_Banco = 0 AND @Posicao != 'Goalkeeper'
-        SET @BenchedStatus = 0;
-    -- REGRA 5: Para avançados - se já tem 2 avançados no banco, este vai para campo
-    ELSE IF @Posicao = 'Forward' AND @ContadorAvancados_Banco >= 2
-        SET @BenchedStatus = 0;
-    -- REGRA 6: Se ainda tem espaço no banco (menos de 3) e já tem GR no banco
-    ELSE IF @TotalBanco < 3 AND @ContadorGR_Banco >= 1
+    -- NOVA LÓGICA CORRETA: Primeiro preenche o CAMPO, depois o BANCO
+    SET @BenchedStatus = 0; -- Default: vai para CAMPO (invertido!)
+    
+    DECLARE @ContadorGR_Total INT;
+    DECLARE @ContadorDefesas_Total INT;
+    DECLARE @ContadorMedios_Total INT;
+    DECLARE @ContadorAvancados_Total INT;
+    
+    -- Contar totais de cada posição
+    SELECT @ContadorGR_Total = COUNT(*)
+    FROM FantasyChamp.Pertence PE
+    JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
+    JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Goalkeeper';
+    
+    SELECT @ContadorDefesas_Total = COUNT(*)
+    FROM FantasyChamp.Pertence PE
+    JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
+    JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Defender';
+    
+    SELECT @ContadorMedios_Total = COUNT(*)
+    FROM FantasyChamp.Pertence PE
+    JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
+    JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Midfielder';
+    
+    SELECT @ContadorAvancados_Total = COUNT(*)
+    FROM FantasyChamp.Pertence PE
+    JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
+    JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
+    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Forward';
+    
+    -- REGRAS CORRETAS: O último de cada posição vai para o banco
+    -- GR: 2 total (1º campo, 2º banco)
+    IF @Posicao = 'Goalkeeper'
     BEGIN
-        -- Verifica se ao adicionar este jogador ao banco, ainda sobra pelo menos 1 avançado para o campo
-        IF @Posicao = 'Forward'
-        BEGIN
-            SET @TotalAvancados = @ContadorAvancados_Banco + @ContadorAvancados_Campo;
-            -- Se já tem 2 no banco e este é o 3º avançado, vai para o campo
-            IF @TotalAvancados >= 2 AND @ContadorAvancados_Banco >= 2
-                SET @BenchedStatus = 0;
-            ELSE
-                SET @BenchedStatus = 1;
-        END
+        IF @ContadorGR_Total >= 1  -- Já tem 1 GR (no campo)
+            SET @BenchedStatus = 1; -- 2º GR vai para o banco
         ELSE
-            SET @BenchedStatus = 1;
+            SET @BenchedStatus = 0; -- 1º GR vai para o campo
     END
-    -- REGRA 7: Se tem menos de 4 no banco, tem GR, e não quebra outras regras
-    ELSE IF @TotalBanco < 4 AND @ContadorGR_Banco >= 1
+    
+    -- Defesas: 5 total (primeiros 4 campototal, 5º banco)
+    ELSE IF @Posicao = 'Defender'
     BEGIN
-        IF @Posicao = 'Forward'
-        BEGIN
-            -- Máximo 2 avançados no banco
-            IF @ContadorAvancados_Banco >= 2
-                SET @BenchedStatus = 0;
-            ELSE
-                SET @BenchedStatus = 1;
-        END
+        IF @ContadorDefesas_Total >= 4  -- Já tem 4 defesas (no campo)
+            SET @BenchedStatus = 1; -- 5º defesa vai para o banco
         ELSE
-            SET @BenchedStatus = 1;
+            SET @BenchedStatus = 0; -- Primeiros 4 vão para o campo
+    END
+    
+    -- Médios: 5 total (primeiros 4 campo, 5º banco)
+    ELSE IF @Posicao = 'Midfielder'
+    BEGIN
+        IF @ContadorMedios_Total >= 4  -- Já tem 4 médios (no campo)
+            SET @BenchedStatus = 1; -- 5º médio vai para o banco
+        ELSE
+            SET @BenchedStatus = 0; -- Primeiros 4 vão para o campo
+    END
+    
+    -- Avançados: 3 total (primeiros 2 campo, 3º banco)
+    ELSE IF @Posicao = 'Forward'
+    BEGIN
+        IF @ContadorAvancados_Total >= 2  -- Já tem 2 avançados (no campo)
+            SET @BenchedStatus = 1; -- 3º avançado vai para o banco
+        ELSE
+            SET @BenchedStatus = 0; -- Primeiros 2 vão para o campo
     END
 
     -- Inserir jogador
