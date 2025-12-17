@@ -21,7 +21,7 @@ def list_all_matches():
             matches.append({
                 "id": row.ID,
                 "date": row.Data.strftime('%Y-%m-%d') if row.Data else "N/A",
-                "round": f"Jornada {row.Jornada}",
+                "round": f"Round {row.Jornada}",
                 "club1": row.Clube1,
                 "club1_image": imagem_clube1,
                 "club2": row.Clube2,
@@ -92,7 +92,7 @@ def read_match(match_id):
         return {
             "id": row.ID,
             "data": row.Data.strftime('%d/%m/%Y') if row.Data else "N/A",
-            "jornada": f"Jornada {row.Jornada}",
+            "jornada": f"Round {row.Jornada}",
             "jornada_numero": row.Jornada,
             "clube1": {
                 "id": row.Clube1_ID,
@@ -145,7 +145,7 @@ def list_paginated_matches(page: int, per_page: int):
             matches.append({
                 "id": row.ID,
                 "date": row.Data.strftime('%Y-%m-%d') if row.Data else "N/A",
-                "round": f"Jornada {row.Jornada}",
+                "round": f"Round {row.Jornada}",
                 "club1": row.Clube1,
                 "club1_image": imagem_clube1,
                 "club2": row.Clube2,

@@ -30,7 +30,7 @@
 
     <div class="text-center mb-8 text-white bg-blue-800 bg-opacity-50 p-4 rounded-lg">
         <p class="text-xl">Manager: <strong>{{ dados_equipa.info.NomeManager }}</strong></p>
-        <p class="text-lg">Budget: <strong>{{ "%.2f"|format(dados_equipa.info.Orcamento) }}€</strong></p>
+        <p class="text-lg">Budget: <strong>{{ "%.2f"|format(dados_equipa.info.Orcamento) }}M€</strong></p>
         <p class="text-lg">Total Points: <strong>{{ dados_equipa.info.PontuacaoTotal }}</strong></p>
     </div>
     
@@ -55,7 +55,7 @@
                     <div>
                         <div class="font-bold text-lg text-white">{{ j.Nome }}</div>
                         <div class="badge badge-primary badge-outline">{{ j.Estado }}</div>
-                        <div class="text-sm text-white">{{ j.Preço }}€</div>
+                        <div class="text-sm text-white">{{ j.Preço }}M€</div>
                         {% if j.benched %}
                         <div class="badge badge-warning text-xs mt-1">Bench</div>
                         {% endif %}
@@ -95,7 +95,7 @@
                     <div>
                         <div class="font-bold text-lg text-white">{{ j.Nome }}</div>
                         <div class="badge badge-primary badge-outline">{{ j.Estado }}</div>
-                        <div class="text-sm text-white">{{ j.Preço }}€</div>
+                        <div class="text-sm text-white">{{ j.Preço }}M€</div>
                         {% if j.benched %}
                         <div class="badge badge-warning text-xs mt-1">Bench</div>
                         {% endif %}
@@ -135,7 +135,7 @@
                     <div>
                         <div class="font-bold text-lg text-white">{{ j.Nome }}</div>
                         <div class="badge badge-primary badge-outline">{{ j.Estado }}</div>
-                        <div class="text-sm text-white">{{ j.Preço }}€</div>
+                        <div class="text-sm text-white">{{ j.Preço }}M€</div>
                         {% if j.benched %}
                         <div class="badge badge-warning text-xs mt-1">Bench</div>
                         {% endif %}
@@ -175,7 +175,7 @@
                     <div>
                         <div class="font-bold text-lg text-white">{{ j.Nome }}</div>
                         <div class="badge badge-primary badge-outline">{{ j.Estado }}</div>
-                        <div class="text-sm text-white">{{ j.Preço }}€</div>
+                        <div class="text-sm text-white">{{ j.Preço }}M€</div>
                         {% if j.benched %}
                         <div class="badge badge-warning text-xs mt-1">Bench</div>
                         {% endif %}
