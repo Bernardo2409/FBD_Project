@@ -16,7 +16,7 @@ load_dotenv()
 API_KEY = os.getenv('FOOTBALL_DATA_KEY')
 API_URL = "https://api.football-data.org/v4"
 CHAMPIONS_LEAGUE_ID = "CL"
-SEASON = 2024
+SEASON = 2025
 
 # Database Configuration
 DB_SERVER = os.getenv('DB_SERVER', 'localhost')
@@ -65,6 +65,10 @@ class FootballDataClient:
     def get_matches(self, competition_code: str, season: int) -> List[Dict]:
         data = self._make_request(f"competitions/{competition_code}/matches?season={season}")
         return data.get("matches", []) if data else []
+    
+    def get_match_details(self, match_id: int) -> Optional[Dict]:
+        """Get detailed match info including lineup, goals, assists, bookings"""
+        return self._make_request(f"matches/{match_id}")
 
 
 class DatabaseManager:
@@ -192,23 +196,13 @@ class DatabaseManager:
         self.estado_cache[estado_name] = estado_id
         return estado_id
     
-    def insert_country(self, country_name: str, country_id: str) -> bool:
-        query = """
-            IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Pais WHERE ID = ?)
-            INSERT INTO FantasyChamp.Pais (ID, nome, imagem)
-            VALUES (?, ?, '')
-        """
-        return self.execute_query(query, (country_id, country_id, country_name))
-    
+
     def insert_team(self, team_data: Dict) -> bool:
         team_id = str(team_data['id'])
         name = team_data['name']
         crest = team_data.get('crest', '')
         
         country_code = team_data.get('area', {}).get('code', 'EU')
-        country_name = team_data.get('area', {}).get('name', 'Europe')
-        
-        self.insert_country(country_name, country_code)
         
         query = """
             IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Clube WHERE ID = ?)
@@ -263,19 +257,19 @@ class DatabaseManager:
         """
         return self.execute_query(query, (jornada_id, jornada_id, numero, data_inicio, data_fim))
     
-    def insert_match(self, match_data: Dict) -> bool:
-        """Insert match - ONLY matchdays 1-4"""
+    def insert_match(self, match_data: Dict, match_details: Optional[Dict] = None) -> Optional[str]:
+        """Insert match and return match_id for later processing - ONLY matchdays 1-4"""
         matchday = match_data.get('matchday', 1)
         
         # 🔥 CRITICAL: Skip anything not matchday 1-4
         if matchday < 1 or matchday > 4:
-            return False
+            return None
         
         home_team = match_data['homeTeam']
         away_team = match_data['awayTeam']
         score = match_data.get('score', {}).get('fullTime', {})
         
-        match_date = match_data.get('utcDate', '2024-09-01')[:10]
+        match_date = match_data.get('utcDate', '2025-09-01')[:10]
         jornada_id = f"J{matchday:03d}"
         
         self.insert_jornada(jornada_id, matchday, match_date, match_date)
@@ -284,9 +278,9 @@ class DatabaseManager:
         away_team_id = str(away_team['id'])
         
         if not self.fetch_one("SELECT 1 FROM FantasyChamp.Clube WHERE ID = ?", (home_team_id,)):
-            return False
+            return None
         if not self.fetch_one("SELECT 1 FROM FantasyChamp.Clube WHERE ID = ?", (away_team_id,)):
-            return False
+            return None
         
         import uuid
         match_id = str(uuid.uuid4())
@@ -299,10 +293,110 @@ class DatabaseManager:
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """
         
-        return self.execute_query(
-            query,
-            (match_id, match_date, home_team_id, away_team_id, jornada_id, home_goals, away_goals)
-        )
+        if self.execute_query(query, (match_id, match_date, home_team_id, away_team_id, jornada_id, home_goals, away_goals)):
+            # Process real player statistics if details available
+            if match_details and home_goals is not None and away_goals is not None:
+                self._process_match_statistics(match_details, jornada_id, home_team_id, away_team_id)
+            return match_id
+        return None
+    
+    def _process_match_statistics(self, match_details: Dict, jornada_id: str, home_team_id: str, away_team_id: str):
+        """Process REAL match statistics from API data"""
+        match_data = match_details.get('match', match_details)
+        
+        # Extract data
+        goals = match_data.get('goals', [])
+        bookings = match_data.get('bookings', [])
+        substitutions = match_data.get('substitutions', [])
+        home_lineup = match_data.get('homeTeam', {}).get('lineup', [])
+        away_lineup = match_data.get('awayTeam', {}).get('lineup', [])
+        
+        # Process both teams
+        self._process_team_statistics(home_lineup, home_team_id, jornada_id, goals, bookings, substitutions, True)
+        self._process_team_statistics(away_lineup, away_team_id, jornada_id, goals, bookings, substitutions, False)
+    
+    def _process_team_statistics(self, lineup: List[Dict], team_id: str, jornada_id: str, 
+                                  goals: List[Dict], bookings: List[Dict], substitutions: List[Dict], is_home: bool):
+        """Process statistics for one team"""
+        if not lineup:
+            return
+        
+        # Get team name for filtering
+        cursor = self.conn.cursor()
+        
+        for player in lineup:
+            player_id = str(player.get('id'))
+            
+            # Check if player exists in our database
+            if not self.fetch_one("SELECT 1 FROM FantasyChamp.Jogador WHERE ID = ?", (player_id,)):
+                continue
+            
+            stats = {
+                'TempoJogo': 90,  # Default to full match
+                'GolosSofridos': 0,
+                'GolosMarcados': 0,
+                'Assistencias': 0,
+                'CartoesAmarelos': 0,
+                'CartoesVermelhos': 0
+            }
+            
+            # Count goals scored by this player
+            for goal in goals:
+                scorer = goal.get('scorer', {})
+                if scorer and str(scorer.get('id')) == player_id:
+                    stats['GolosMarcados'] += 1
+                
+                # Count assists
+                assist = goal.get('assist')
+                if assist and str(assist.get('id')) == player_id:
+                    stats['Assistencias'] += 1
+            
+            # Count cards
+            for booking in bookings:
+                booking_player = booking.get('player', {})
+                if booking_player and str(booking_player.get('id')) == player_id:
+                    card_type = booking.get('card', '')
+                    if card_type == 'YELLOW_CARD':
+                        stats['CartoesAmarelos'] += 1
+                    elif card_type == 'RED_CARD':
+                        stats['CartoesVermelhos'] += 1
+                        # Reduce playing time on red card
+                        minute = booking.get('minute', 90)
+                        stats['TempoJogo'] = min(stats['TempoJogo'], minute)
+            
+            # Check substitutions
+            for sub in substitutions:
+                player_out = sub.get('playerOut', {})
+                player_in = sub.get('playerIn', {})
+                minute = sub.get('minute', 0)
+                
+                if player_out and str(player_out.get('id')) == player_id:
+                    # Player was substituted out
+                    stats['TempoJogo'] = min(stats['TempoJogo'], minute)
+                elif player_in and str(player_in.get('id')) == player_id:
+                    # Player came on as substitute
+                    stats['TempoJogo'] = 90 - minute
+            
+            # Goals conceded (for GK/Defenders who played most of the match)
+            position = player.get('position', '')
+            if position in ['Goalkeeper', 'Defender'] and stats['TempoJogo'] >= 60:
+                # Get opponent's goals from the match
+                cursor.execute("""
+                    SELECT golos_clube1, golos_clube2, ID_Clube1, ID_Clube2
+                    FROM FantasyChamp.Jogo
+                    WHERE ID_jornada = ? AND (ID_Clube1 = ? OR ID_Clube2 = ?)
+                """, jornada_id, team_id, team_id)
+                
+                match_result = cursor.fetchone()
+                if match_result:
+                    golos_clube1, golos_clube2, clube1, clube2 = match_result
+                    if clube1 == team_id:
+                        stats['GolosSofridos'] = golos_clube2 if golos_clube2 else 0
+                    else:
+                        stats['GolosSofridos'] = golos_clube1 if golos_clube1 else 0
+            
+            # Insert player statistics
+            self.insert_player_pontuacao(player_id, jornada_id, stats)
     
     def populate_player_statistics_for_matchdays(self):
         """Generate REALISTIC statistics for matchdays 1-4 ONLY"""
@@ -512,19 +606,46 @@ def main():
         matches = api.get_matches(CHAMPIONS_LEAGUE_ID, SEASON)
         
         # 🔥 Filter to ONLY matchdays 1-4
-        matches_1_to_4 = [m for m in matches if 1 <= m.get('matchday', 0) <= 4]
+        matches_1_to_4 = [m for m in matches if 1 <= (m.get('matchday') or 0) <= 4]
         print(f"✓ Found {len(matches_1_to_4)} matches in matchdays 1-4")
         
-        print("\n💾 Inserting matches...")
+        print("\n💾 Inserting matches with REAL player statistics...")
         matches_inserted = 0
-        for match in matches_1_to_4:
-            if db.insert_match(match):
-                matches_inserted += 1
+        stats_processed = 0
         
-        print(f"✓ Inserted {matches_inserted} matches")
+        for i, match in enumerate(matches_1_to_4, 1):
+            match_id_api = match.get('id')
+            
+            # Check if match has finished (has scores)
+            score = match.get('score', {}).get('fullTime', {})
+            if score.get('home') is None or score.get('away') is None:
+                print(f"  [{i}/{len(matches_1_to_4)}] Skipping unfinished match")
+                continue
+            
+            print(f"  [{i}/{len(matches_1_to_4)}] {match['homeTeam']['name']} vs {match['awayTeam']['name']}", end="")
+            
+            # Get detailed match data (lineup, goals, assists, cards)
+            match_details = api.get_match_details(match_id_api)
+            
+            if match_details:
+                match_db_id = db.insert_match(match, match_details)
+                if match_db_id:
+                    matches_inserted += 1
+                    stats_processed += 1
+                    print(f" ✓ (with real stats)")
+                else:
+                    print(f" ✗")
+            else:
+                # Insert match without detailed stats
+                match_db_id = db.insert_match(match)
+                if match_db_id:
+                    matches_inserted += 1
+                    print(f" ✓ (no details available)")
+                else:
+                    print(f" ✗")
         
-        # Generate statistics
-        stats_generated = db.populate_player_statistics_for_matchdays()
+        print(f"\n✓ Inserted {matches_inserted} matches")
+        print(f"✓ Processed {stats_processed} matches with real player statistics")
         
         print(f"\n" + "=" * 70)
         print("✅ COMPLETE!")
@@ -532,7 +653,7 @@ def main():
         print(f"Teams: {len(teams)}")
         print(f"Players: {total_players}")
         print(f"Matches: {matches_inserted} (Matchdays 1-4 ONLY)")
-        print(f"Player Stats: {stats_generated}")
+        print(f"Matches with REAL player stats: {stats_processed}")
         print("=" * 70)
         
     except Exception as e:
