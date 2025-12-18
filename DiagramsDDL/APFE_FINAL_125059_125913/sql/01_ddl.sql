@@ -137,6 +137,8 @@ CREATE TABLE FantasyChamp.Jogo (
     ID_Clube1 VARCHAR(16) NOT NULL,
     ID_Clube2 VARCHAR(16) NOT NULL,
     ID_jornada VARCHAR(16) NOT NULL,
+    golos_clube1 INT DEFAULT 0,
+    golos_clube2 INT DEFAULT 0,
 
     FOREIGN KEY (ID_Clube1) 
 		REFERENCES FantasyChamp.Clube(ID),

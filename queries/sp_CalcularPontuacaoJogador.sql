@@ -51,8 +51,8 @@ BEGIN
     SET @Pontuacao =
         (@GolosMarcados * 5) +
         (@Assistencias * 3) -
-        (@CartoesAmarelos * 2) -
-        (@CartoesVermelhos * 5);
+        (@CartoesAmarelos * 1) -
+        (@CartoesVermelhos * 3);
 
     IF @TempoJogo >= 60
         SET @Pontuacao = @Pontuacao + 2;
