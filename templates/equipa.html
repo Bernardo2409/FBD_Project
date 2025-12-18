@@ -52,7 +52,7 @@
                 <ul tabindex="0"
                     class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
                     <div class="p-2 border-b border-gray-200">
-                        <input type="text" placeholder="Procurar avançado..."
+                        <input type="text" placeholder="Search forward..."
                             class="input input-bordered input-sm w-full search-input"
                             onkeyup="filterPlayers(this, 'avancados-list')">
                     </div>
@@ -137,7 +137,7 @@
                 <ul tabindex="0"
                     class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
                     <div class="p-2 border-b border-gray-200">
-                        <input type="text" placeholder="Procurar médio..."
+                        <input type="text" placeholder="Search midfielder..."
                             class="input input-bordered input-sm w-full search-input"
                             onkeyup="filterPlayers(this, 'medios-list')">
                     </div>
@@ -156,7 +156,8 @@
                                             class="font-bold {% if medio.preco > equipa.info.orcamento %}text-red-500{% else %}text-white{% endif %} player-name">
                                             {{ medio.nome }}
                                         </div>
-                                        <div class="text-xs font-bold text-white-500">{{ medio.preco }}M€ {{ medio.estado
+                                        <div class="text-xs font-bold text-white-500">{{ medio.preco }}M€ {{
+                                            medio.estado
                                             }}</div>
                                         {% if medio.preco > equipa.info.orcamento %}
                                         <div class="text-xs text-red-500 font-semibold">No money</div>
@@ -221,7 +222,7 @@
                 <ul tabindex="0"
                     class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
                     <div class="p-2 border-b border-gray-200">
-                        <input type="text" placeholder="Procurar defesa..."
+                        <input type="text" placeholder="Search defender..."
                             class="input input-bordered input-sm w-full search-input"
                             onkeyup="filterPlayers(this, 'defesas-list')">
                     </div>
@@ -305,7 +306,7 @@
                 <ul tabindex="0"
                     class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80 max-h-96 overflow-y-auto">
                     <div class="p-2 border-b border-gray-200">
-                        <input type="text" placeholder="Procurar guarda-redes..."
+                        <input type="text" placeholder="Search goalkeeper..."
                             class="input input-bordered input-sm w-full search-input"
                             onkeyup="filterPlayers(this, 'gr-list')">
                     </div>
@@ -415,7 +416,7 @@
                             </div>
                         </a>
 
-                        
+
                     </div>
                     {% else %}
                     <!-- Slot vazio -->
@@ -578,8 +579,8 @@
             `).join('');
 
         const mensagemVazio = posicao === 'Goalkeeper'
-            ? '<p class="text-gray-500">Não há guarda-redes no banco.</p>'
-            : '<p class="text-gray-500">Não há jogadores no banco (exceto GR).</p>';
+            ? '<p class="text-gray-500">No goalkeepers on the bench.</p>'
+            : '<p class="text-gray-500">No players on the bench (except GK).</p>';
 
         document.getElementById('listaJogadoresBanco').innerHTML = listaHTML || mensagemVazio;
 
@@ -644,23 +645,23 @@
             // (o nome da variável é enganador, mas é assim que funciona no código original)
             jogadorCampoSelecionado = idJogadorBanco;
 
-            document.getElementById('nomeJogadorCampo').textContent = nomeJogadorBanco + ' (do Banco)';
+            document.getElementById('nomeJogadorCampo').textContent = nomeJogadorBanco + ' (from Bench)';
 
             // Listar TODOS os jogadores titulares exceto GR
             const jogadoresCampo = [
                 {% for j in equipa.avancados %}
         {% if not j.benched %}
-        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Avançado', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
+        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Forward', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
         {% endif %}
         {% endfor %}
         {% for j in equipa.medios %}
         {% if not j.benched %}
-        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Médio', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
+        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Midfielder', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
         {% endif %}
         {% endfor %}
         {% for j in equipa.defesas %}
         {% if not j.benched %}
-        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Defesa', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
+        { id: '{{ j.id }}', nome: '{{ j.nome }}', posicao: 'Defender', imagem: '{{ j.jogador_imagem }}', estado: '{{ j.estado }}' },
         {% endif %}
         {% endfor %}
             ];
@@ -673,12 +674,12 @@
                         <div class="font-bold">${j.nome}</div>
                         <div class="text-sm text-gray-500">${j.posicao} - ${j.estado}</div>
                     </div>
-                    <div class="text-blue-600 font-bold">Trocar →</div>
+                    <div class="text-blue-600 font-bold">Swap →</div>
                 </div>
             `).join('');
 
         document.getElementById('listaJogadoresBanco').innerHTML =
-            listaHTML || '<p class="text-gray-500">Não há jogadores disponíveis para trocar.</p>';
+            listaHTML || '<p class="text-gray-500">No players available to swap.</p>';
 
         document.getElementById('modalTroca').classList.remove('hidden');
         document.getElementById('modalTroca').classList.add('flex');
@@ -724,7 +725,7 @@
             document.querySelectorAll('.substituir-jogador.opacity-50').forEach(link => {
                 link.addEventListener('click', function (e) {
                     e.preventDefault();
-                    alert('Orçamento insuficiente para adicionar este jogador!');
+                    alert('Insufficient budget to add this player!');
                 });
             });
         });

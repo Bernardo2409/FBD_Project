@@ -85,7 +85,7 @@ def obter_jogadores_clube(clube_id):
                     WHEN 'Midfielder' THEN 3
                     WHEN 'Forward' THEN 4
                 END
-        """)
+        """, clube_id)
         
         jogadores = []
         for row in cursor:
@@ -137,7 +137,11 @@ def gerar_estatisticas_equipa(jogadores, golos_marcados, golos_sofridos, jornada
         # Cada golo pode ou não ter assistência (70% de probabilidade)
         for _ in range(golos_marcados):
             if random.random() < 0.7:
-                assistente = random.choice([j for j in titulares if j['posicao'] in ['Midfielder', 'Forward']])
+                # Preferir médios/atacantes para assistência, mas aceitar qualquer titular se não houver
+                assistentes_possiveis = [j for j in titulares if j['posicao'] in ['Midfielder', 'Forward']]
+                if not assistentes_possiveis:
+                    assistentes_possiveis = titulares
+                assistente = random.choice(assistentes_possiveis)
                 assistentes.append(assistente)
     
     # Gerar stats para titulares
@@ -181,57 +185,62 @@ def gerar_estatisticas_equipa(jogadores, golos_marcados, golos_sofridos, jornada
     return stats_list
 
 
-def calcular_pontuacao(stats):
-    """Calcula a pontuação total de um jogador baseado nas estatísticas"""
-    pontuacao = 0
-    
-    # Pontos por tempo de jogo
-    if stats['tempo_jogo'] >= 60:
-        pontuacao += 2
-    elif stats['tempo_jogo'] >= 30:
-        pontuacao += 1
-    
-    # Pontos por golos
-    pontuacao += stats['golos_marcados'] * 5
-    
-    # Pontos por assistências
-    pontuacao += stats['assistencias'] * 3
-    
-    # Penalização por golos sofridos (GR/Defesas)
-    if stats['golos_sofridos'] > 0:
-        pontuacao -= min(stats['golos_sofridos'], 2)  # Máximo -2 pontos
-    
-    # Penalização por cartões
-    pontuacao -= stats['cartoes_amarelos'] * 1
-    pontuacao -= stats['cartoes_vermelhos'] * 3
-    
-    return max(0, pontuacao)  # Não pode ser negativo
-
-
 def inserir_estatisticas(stats_list):
-    """Insere estatísticas na base de dados"""
+    """Insere estatísticas usando stored procedures"""
     with create_connection() as conn:
         cursor = conn.cursor()
         
         for stats in stats_list:
-            pontuacao_total = calcular_pontuacao(stats)
-            
-            cursor.execute("""
-                INSERT INTO FantasyChamp.Pontuação_Jogador
-                (ID_jogador, ID_jornada, TempoJogo, GolosSofridos, GolosMarcados,
-                 Assistencias, CartoesAmarelos, CartoesVermelhos, pontuação_total)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, 
-                stats['id_jogador'],
-                stats['id_jornada'],
-                stats['tempo_jogo'],
-                stats['golos_sofridos'],
-                stats['golos_marcados'],
-                stats['assistencias'],
-                stats['cartoes_amarelos'],
-                stats['cartoes_vermelhos'],
-                str(pontuacao_total)
-            )
+            try:
+                # 1. Inserir estatísticas brutas usando SP
+                # Note: Using NULL for OUTPUT params since we handle errors via try/catch
+                cursor.execute("""
+                    DECLARE @Resultado BIT, @Mensagem NVARCHAR(200);
+                    EXEC FantasyChamp.sp_InserirEstatisticasJogador
+                        @ID_Jogador = ?,
+                        @ID_Jornada = ?,
+                        @TempoJogo = ?,
+                        @GolosSofridos = ?,
+                        @GolosMarcados = ?,
+                        @Assistencias = ?,
+                        @CartoesAmarelos = ?,
+                        @CartoesVermelhos = ?,
+                        @Resultado = @Resultado OUTPUT,
+                        @Mensagem = @Mensagem OUTPUT;
+                """, 
+                    str(stats['id_jogador']),
+                    str(stats['id_jornada']),
+                    stats['tempo_jogo'],
+                    stats['golos_sofridos'],
+                    stats['golos_marcados'],
+                    stats['assistencias'],
+                    stats['cartoes_amarelos'],
+                    stats['cartoes_vermelhos']
+                )
+                
+                # 2. Calcular pontuação usando SP existente
+                cursor.execute("""
+                    DECLARE @Pontuacao INT, @Resultado BIT, @Mensagem NVARCHAR(200);
+                    EXEC FantasyChamp.CalcularPontuacaoJogador
+                        @ID_Jogador = ?,
+                        @ID_Jornada = ?,
+                        @Pontuacao = @Pontuacao OUTPUT,
+                        @Resultado = @Resultado OUTPUT,
+                        @Mensagem = @Mensagem OUTPUT;
+                        
+                    -- Atualizar a pontuação calculada
+                    UPDATE FantasyChamp.Pontuação_Jogador
+                    SET pontuação_total = CAST(@Pontuacao AS VARCHAR(10))
+                    WHERE ID_jogador = ? AND ID_jornada = ?;
+                """,
+                    str(stats['id_jogador']),
+                    str(stats['id_jornada']),
+                    str(stats['id_jogador']),
+                    str(stats['id_jornada'])
+                )
+            except Exception as e:
+                print(f"  ⚠️  Erro ao inserir stats para jogador {stats['id_jogador']}: {e}")
+                continue
         
         conn.commit()
 

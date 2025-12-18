@@ -10,20 +10,31 @@ BEGIN
     BEGIN TRY
         IF @ID_Jornada IS NULL
         BEGIN
-            -- Ranking geral (soma de todas as jornadas) - apenas com equipas
+            -- Ranking geral - usar CTE para calcular totais primeiro
+            ;WITH EquipaPontuacoes AS (
+                SELECT
+                    E.ID AS id_equipa,
+                    E.Nome AS nome_equipa,
+                    E.ID_utilizador AS id_utilizador,
+                    U.PrimeiroNome + ' ' + U.Apelido AS nome_utilizador,
+                    ISNULL(MAX(PE.pontuação_acumulada), 0) AS pontuacao_total
+                FROM FantasyChamp.Participa P
+                JOIN FantasyChamp.Utilizador U ON P.ID_Utilizador = U.ID
+                INNER JOIN FantasyChamp.Equipa E ON U.ID = E.ID_utilizador
+                LEFT JOIN FantasyChamp.Pontuação_Equipa PE ON E.ID = PE.ID_equipa
+                WHERE P.ID_Liga = @ID_Liga
+                GROUP BY E.ID, E.Nome, E.ID_utilizador, U.PrimeiroNome, U.Apelido
+            )
             SELECT
-                ROW_NUMBER() OVER (ORDER BY E.PontuaçãoTotal DESC) AS posicao,
-                U.PrimeiroNome + ' ' + U.Apelido AS nome_utilizador,
-                E.Nome AS nome_equipa,
-                E.PontuaçãoTotal AS pontuacao_acumulada,
-                E.ID AS id_equipa,
-                E.ID_utilizador AS id_utilizador,
-                0 AS pontuacao  -- Coluna dummy para compatibilidade
-            FROM FantasyChamp.Participa P
-            JOIN FantasyChamp.Utilizador U ON P.ID_Utilizador = U.ID
-            INNER JOIN FantasyChamp.Equipa E ON U.ID = E.ID_utilizador
-            WHERE P.ID_Liga = @ID_Liga
-            ORDER BY E.PontuaçãoTotal DESC, U.PrimeiroNome;
+                ROW_NUMBER() OVER (ORDER BY pontuacao_total DESC, nome_utilizador) AS posicao,
+                nome_utilizador,
+                nome_equipa,
+                pontuacao_total AS pontuacao_acumulada,
+                id_equipa,
+                id_utilizador,
+                pontuacao_total AS pontuacao
+            FROM EquipaPontuacoes
+            ORDER BY pontuacao_total DESC, nome_utilizador;
         END
         ELSE
         BEGIN

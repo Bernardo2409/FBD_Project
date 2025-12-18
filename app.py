@@ -188,16 +188,12 @@ def signup_submit():
         if not user_id:
             raise Exception("Erro ao criar utilizador")
 
-        user_data = {
-            "id": user_id,
-            "first": first,
-            "last": last,
-            "email": email
-        }
+        # Iniciar sessão automaticamente
+        session['user_id'] = user_id
+        session['user_name'] = first
         
-        session['user'] = user_data
-        
-        return redirect("/")
+        # Redirecionar para index
+        return redirect("/index")
 
     except Exception as e:
         print(f"Erro no registo: {e}")

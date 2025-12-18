@@ -18,6 +18,10 @@ API_URL = "https://api.football-data.org/v4"
 CHAMPIONS_LEAGUE_ID = "CL"
 SEASON = 2025
 
+# Dataset Limits
+MAX_CLUBS = 8
+MAX_PLAYERS_PER_CLUB = 15
+
 # Database Configuration
 DB_SERVER = os.getenv('DB_SERVER', 'localhost')
 DB_NAME = os.getenv('DB_NAME', 'FantasyChamp')
@@ -574,8 +578,12 @@ def main():
             db.clean_game_data()
         
         print(f"\n🔥 Fetching Champions League teams...")
-        teams = api.get_teams(CHAMPIONS_LEAGUE_ID, SEASON)
-        print(f"✓ Found {len(teams)} teams\n")
+        all_teams = api.get_teams(CHAMPIONS_LEAGUE_ID, SEASON)
+        print(f"✓ Found {len(all_teams)} teams from API")
+        
+        # 🎯 LIMIT TO 8 CLUBS
+        teams = all_teams[:MAX_CLUBS]
+        print(f"✓ Using first {len(teams)} teams for database\n")
         
         print("💾 Inserting teams...")
         for team in teams:
@@ -593,67 +601,95 @@ def main():
             team_details = api.get_team_details(team_id)
             
             if team_details and 'squad' in team_details:
-                squad = team_details['squad']
+                full_squad = team_details['squad']
+                
+                # 🎯 LIMIT TO 15 PLAYERS PER CLUB with position distribution
+                # Prioritize: 2 GK, 5 DEF, 5 MID, 3 FWD
+                goalkeepers = [p for p in full_squad if p.get('position') == 'Goalkeeper'][:2]
+                defenders = [p for p in full_squad if p.get('position') == 'Defence'][:5]
+                midfielders = [p for p in full_squad if p.get('position') == 'Midfield'][:5]
+                forwards = [p for p in full_squad if p.get('position') == 'Offence'][:3]
+                
+                squad = goalkeepers + defenders + midfielders + forwards
+                
+                # If we don't have 15, fill with remaining players
+                if len(squad) < MAX_PLAYERS_PER_CLUB:
+                    remaining = [p for p in full_squad if p not in squad]
+                    squad.extend(remaining[:MAX_PLAYERS_PER_CLUB - len(squad)])
+                
+                # Final limit to exactly 15
+                squad = squad[:MAX_PLAYERS_PER_CLUB]
+                
                 for player in squad:
                     if db.insert_player(player, str(team_id)):
                         total_players += 1
                 
-                print(f"  ✓ Inserted {len(squad)} players")
+                print(f"  ✓ Inserted {len(squad)} players (from {len(full_squad)} available)")
         
         print(f"\n✓ Total players: {total_players}")
         
-        print(f"\n⚽ Fetching matches (ONLY matchdays 1-4)...")
-        matches = api.get_matches(CHAMPIONS_LEAGUE_ID, SEASON)
+        print(f"\n⚽ Creating fictional matches for 4 matchdays...")
         
-        # 🔥 Filter to ONLY matchdays 1-4
-        matches_1_to_4 = [m for m in matches if 1 <= (m.get('matchday') or 0) <= 4]
-        print(f"✓ Found {len(matches_1_to_4)} matches in matchdays 1-4")
+        # 🎯 Create fictional matches between our 8 teams
+        # Round-robin style: each team plays different opponents each matchday
+        import itertools
+        import uuid
+        from datetime import datetime, timedelta
         
-        print("\n💾 Inserting matches with REAL player statistics...")
+        team_ids = [str(team['id']) for team in teams]
         matches_inserted = 0
-        stats_processed = 0
         
-        for i, match in enumerate(matches_1_to_4, 1):
-            match_id_api = match.get('id')
+        # Create 4 matchdays
+        for matchday in range(1, 5):
+            jornada_id = f"J{matchday:03d}"
+            match_date = (datetime(2025, 9, 1) + timedelta(days=(matchday-1)*7)).strftime('%Y-%m-%d')
             
-            # Check if match has finished (has scores)
-            score = match.get('score', {}).get('fullTime', {})
-            if score.get('home') is None or score.get('away') is None:
-                print(f"  [{i}/{len(matches_1_to_4)}] Skipping unfinished match")
-                continue
+            # Insert jornada
+            db.insert_jornada(jornada_id, matchday, match_date, match_date)
             
-            print(f"  [{i}/{len(matches_1_to_4)}] {match['homeTeam']['name']} vs {match['awayTeam']['name']}", end="")
+            # Create 4 matches per matchday (8 teams = 4 matches)
+            # Shuffle teams to create variety
+            shuffled_teams = team_ids.copy()
+            random.shuffle(shuffled_teams)
             
-            # Get detailed match data (lineup, goals, assists, cards)
-            match_details = api.get_match_details(match_id_api)
+            matchday_matches = 0
+            for i in range(0, len(shuffled_teams), 2):
+                if i + 1 < len(shuffled_teams):
+                    home_team_id = shuffled_teams[i]
+                    away_team_id = shuffled_teams[i + 1]
+                    
+                    # Generate random scores (0-5 goals each)
+                    home_goals = random.randint(0, 5)
+                    away_goals = random.randint(0, 5)
+                    
+                    match_id = str(uuid.uuid4())
+                    
+                    query = """
+                        INSERT INTO FantasyChamp.Jogo (ID, [Data], ID_Clube1, ID_Clube2, ID_jornada, golos_clube1, golos_clube2)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """
+                    
+                    if db.execute_query(query, (match_id, match_date, home_team_id, away_team_id, jornada_id, home_goals, away_goals)):
+                        matches_inserted += 1
+                        matchday_matches += 1
+                        
+                        # Get team names for display
+                        home_team_name = next(t['name'] for t in teams if str(t['id']) == home_team_id)
+                        away_team_name = next(t['name'] for t in teams if str(t['id']) == away_team_id)
+                        print(f"  ✓ Jornada {matchday}: {home_team_name} {home_goals}-{away_goals} {away_team_name}")
             
-            if match_details:
-                match_db_id = db.insert_match(match, match_details)
-                if match_db_id:
-                    matches_inserted += 1
-                    stats_processed += 1
-                    print(f" ✓ (with real stats)")
-                else:
-                    print(f" ✗")
-            else:
-                # Insert match without detailed stats
-                match_db_id = db.insert_match(match)
-                if match_db_id:
-                    matches_inserted += 1
-                    print(f" ✓ (no details available)")
-                else:
-                    print(f" ✗")
+            print(f"  Created {matchday_matches} matches for matchday {matchday}\n")
         
-        print(f"\n✓ Inserted {matches_inserted} matches")
-        print(f"✓ Processed {stats_processed} matches with real player statistics")
+        print(f"✓ Inserted {matches_inserted} fictional matches")
         
         print(f"\n" + "=" * 70)
         print("✅ COMPLETE!")
         print("=" * 70)
         print(f"Teams: {len(teams)}")
         print(f"Players: {total_players}")
-        print(f"Matches: {matches_inserted} (Matchdays 1-4 ONLY)")
-        print(f"Matches with REAL player stats: {stats_processed}")
+        print(f"Matches: {matches_inserted} (4 matchdays with fictional results)")
+        print("=" * 70)
+        print("\n💡 Next step: Run 'python generate_player_stats.py' to create player statistics")
         print("=" * 70)
         
     except Exception as e:
