@@ -24,8 +24,9 @@ def limpar_estatisticas_jogadores():
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM FantasyChamp.Pontuação_Jogador")
+        apagadas = cursor.rowcount
         conn.commit()
-        print("✅ Estatísticas de jogadores limpas!\n")
+        print(f"✅ Estatísticas de jogadores limpas! ({apagadas} linhas apagadas)\n")
 
 
 def obter_jogos():
@@ -85,8 +86,7 @@ def obter_jogadores_clube(clube_id):
                     WHEN 'Midfielder' THEN 3
                     WHEN 'Forward' THEN 4
                 END
-        """)
-        
+        """, (clube_id,))
         jogadores = []
         for row in cursor:
             jogadores.append({
@@ -94,7 +94,6 @@ def obter_jogadores_clube(clube_id):
                 'nome': row.Nome,
                 'posicao': row.Posição
             })
-        
         return jogadores
 
 
@@ -135,9 +134,10 @@ def gerar_estatisticas_equipa(jogadores, golos_marcados, golos_sofridos, jornada
     if golos_marcados > 0 and atacantes:
         marcadores = random.choices(atacantes, k=golos_marcados)
         # Cada golo pode ou não ter assistência (70% de probabilidade)
+        possiveis_assistentes = [j for j in titulares if j['posicao'] in ['Midfielder', 'Forward']]
         for _ in range(golos_marcados):
-            if random.random() < 0.7:
-                assistente = random.choice([j for j in titulares if j['posicao'] in ['Midfielder', 'Forward']])
+            if random.random() < 0.7 and possiveis_assistentes:
+                assistente = random.choice(possiveis_assistentes)
                 assistentes.append(assistente)
     
     # Gerar stats para titulares
@@ -210,29 +210,31 @@ def calcular_pontuacao(stats):
 
 def inserir_estatisticas(stats_list):
     """Insere estatísticas na base de dados"""
+    import pyodbc
     with create_connection() as conn:
         cursor = conn.cursor()
-        
         for stats in stats_list:
             pontuacao_total = calcular_pontuacao(stats)
-            
-            cursor.execute("""
-                INSERT INTO FantasyChamp.Pontuação_Jogador
-                (ID_jogador, ID_jornada, TempoJogo, GolosSofridos, GolosMarcados,
-                 Assistencias, CartoesAmarelos, CartoesVermelhos, pontuação_total)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, 
-                stats['id_jogador'],
-                stats['id_jornada'],
-                stats['tempo_jogo'],
-                stats['golos_sofridos'],
-                stats['golos_marcados'],
-                stats['assistencias'],
-                stats['cartoes_amarelos'],
-                stats['cartoes_vermelhos'],
-                str(pontuacao_total)
-            )
-        
+            try:
+                cursor.execute("""
+                    INSERT INTO FantasyChamp.Pontuação_Jogador
+                    (ID_jogador, ID_jornada, TempoJogo, GolosSofridos, GolosMarcados,
+                     Assistencias, CartoesAmarelos, CartoesVermelhos, pontuação_total)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                    stats['id_jogador'],
+                    stats['id_jornada'],
+                    stats['tempo_jogo'],
+                    stats['golos_sofridos'],
+                    stats['golos_marcados'],
+                    stats['assistencias'],
+                    stats['cartoes_amarelos'],
+                    stats['cartoes_vermelhos'],
+                    str(pontuacao_total)
+                )
+            except pyodbc.IntegrityError:
+                # Ignorar duplicados
+                continue
         conn.commit()
 
 

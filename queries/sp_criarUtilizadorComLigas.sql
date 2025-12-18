@@ -89,25 +89,19 @@ BEGIN
         -- Verificar se já existe liga do país
         SELECT @LigaPaisID = ID
         FROM FantasyChamp.Liga
-        WHERE Nome = 'Liga ' + @Pais AND ID_tipoLiga = @LigaTipoPublica;
+        WHERE Nome = @Pais AND ID_tipoLiga = @LigaTipoPublica;
 
         -- Se não existe, criar
         IF @LigaPaisID IS NULL
         BEGIN
             SET @LigaPaisID = NEWID();
 
-            -- Obter código do país (pode ser diferente do nome)
-            DECLARE @CodigoPais VARCHAR(16);
-            SELECT TOP 1 @CodigoPais = ID
-            FROM FantasyChamp.Pais
-            WHERE Pais.nome = @Pais OR ID = @Pais;
-
             INSERT INTO FantasyChamp.Liga
                 (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
             VALUES
-                (@LigaPaisID, 'Liga ' + @Pais, GETDATE(),
+                (@LigaPaisID, @Pais, GETDATE(),
                 CONVERT(DATE, '2026-05-30', 23),
-                @LigaTipoPublica, '00000000-0000-0000-0000-000000000000', @CodigoPais);
+                @LigaTipoPublica, '00000000-0000-0000-0000-000000000000', null);
         END
 
         -- Adicionar utilizador à Liga do País
