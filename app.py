@@ -49,7 +49,8 @@ app.secret_key = os.environ.get('SECRET_KEY') or 'chave-temporaria-para-desenvol
 
 @app.route("/", methods=["GET"])
 def login_page():
-    return render_template("login.html")
+    message = session.pop('message', None)
+    return render_template("login.html", message=message)
 
 
 @app.route("/login", methods=["POST"])
@@ -188,12 +189,9 @@ def signup_submit():
         if not user_id:
             raise Exception("Erro ao criar utilizador")
 
-        # Iniciar sessão automaticamente
-        session['user_id'] = user_id
-        session['user_name'] = first
-        
-        # Redirecionar para index
-        return redirect("/index")
+        # Redirecionar para login após registo bem-sucedido
+        session['message'] = "Registo efetuado com sucesso! Por favor, faça login."
+        return redirect("/")
 
     except Exception as e:
         print(f"Erro no registo: {e}")
@@ -235,6 +233,11 @@ def index():
         return render_template("index.html", user_has_team=user_has_team)
     else:
         return redirect("/")
+
+
+@app.route("/help")
+def help_page():
+    return render_template("help.html")
 
 
 @app.route("/players")

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Help - Fantasy Champions League</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-white min-h-screen">
+
+    <div class="container mx-auto p-8 max-w-4xl">
+
+        <!-- Header -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Help & Rules</h1>
+            <p class="text-gray-600">Learn how to play Fantasy Champions League</p>
+        </div>
+
+        <!-- Building Your Team -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-900">Building Your Team</h2>
+
+            <div class="mb-6">
+                <p class="text-lg mb-4"><strong>Starting Budget:</strong> 100M€</p>
+                <p class="text-gray-700 mb-4">You must select 15 players total: 11 starting players and 4 bench players.
+                </p>
+            </div>
+
+            <h3 class="text-2xl font-semibold text-gray-900 mb-4">Formation Requirements</h3>
+
+            <table class="w-full border-collapse mb-6">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border border-gray-300 px-4 py-3 text-left">Position</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left">Starting XI</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left">Total (incl. bench)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2">Goalkeeper (GK)</td>
+                        <td class="border border-gray-300 px-4 py-2">1</td>
+                        <td class="border border-gray-300 px-4 py-2">2</td>
+                    </tr>
+                    <tr class="bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-2">Defender (DEF)</td>
+                        <td class="border border-gray-300 px-4 py-2">3-5</td>
+                        <td class="border border-gray-300 px-4 py-2">5</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2">Midfielder (MID)</td>
+                        <td class="border border-gray-300 px-4 py-2">2-5</td>
+                        <td class="border border-gray-300 px-4 py-2">5</td>
+                    </tr>
+                    <tr class="bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-2">Forward (FWD)</td>
+                        <td class="border border-gray-300 px-4 py-2">1-3</td>
+                        <td class="border border-gray-300 px-4 py-2">3</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="bg-gray-100 p-4 rounded">
+                <p class="font-semibold">Important:</p>
+                <ul class="list-disc list-inside mt-2 space-y-1 text-gray-700">
+                    <li>You must have exactly 11 starting players</li>
+                    <li>You must have exactly 4 bench players</li>
+                    <li>Only starting players earn points</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Scoring System -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-900">Scoring System</h2>
+
+            <h3 class="text-2xl font-semibold text-gray-900 mb-4">Points Earned</h3>
+
+            <table class="w-full border-collapse mb-6">
+                <thead>
+                    <tr class="bg-green-100">
+                        <th class="border border-gray-300 px-4 py-3 text-left">Action</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left">Details</th>
+                        <th class="border border-gray-300 px-4 py-3 text-right">Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2 font-semibold">Goal scored</td>
+                        <td class="border border-gray-300 px-4 py-2">Any player</td>
+                        <td class="border border-gray-300 px-4 py-2 text-right font-bold text-green-700">+5</td>
+                    </tr>
+                    <tr class="bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-2 font-semibold">Assist</td>
+                        <td class="border border-gray-300 px-4 py-2">Any player</td>
+                        <td class="border border-gray-300 px-4 py-2 text-right font-bold text-green-700">+3</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2 font-semibold">Playing time</td>
+                        <td class="border border-gray-300 px-4 py-2">Per 30 minutes played</td>
+                        <td class="border border-gray-300 px-4 py-2 text-right font-bold text-green-700">+1</td>
+                    </tr>
+                    <tr class="bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-2 font-semibold">Clean sheet</td>
+                        <td class="border border-gray-300 px-4 py-2">GK/DEF only, 60+ min, 0 goals conceded</td>
+                        <td class="border border-gray-300 px-4 py-2 text-right font-bold text-green-700">+4</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 class="text-2xl font-semibold text-gray-900 mb-4">Points Lost</h3>
+
+            <table class="w-full border-collapse mb-6">
+                <thead>
+                    <tr class="bg-red-100">
+                        <th class="border border-gray-300 px-4 py-3 text-left">Action</th>
+                        <th class="border border-gray-300 px-4 py-3 text-left">Details</th>
+                        <th class="border border-gray-300 px-4 py-3 text-right">Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2 font-semibold">Yellow card</td>
+                        <td class="border border-gray-300 px-4 py-2">Any player</td>
+                        <td class="border border-gray-300 px-4 py-2 text-right font-bold text-red-700">-1</td>
+                    </tr>
+                    <tr class="bg-gray-50">
+                        <td class="border border-gray-300 px-4 py-2 font-semibold">Red card</td>
+                        <td class="border border-gray-300 px-4 py-2">Any player</td>
+                        <td class="border border-gray-300 px-4 py-2 text-right font-bold text-red-700">-3</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2 font-semibold">Goal conceded</td>
+                        <td class="border border-gray-300 px-4 py-2">GK/DEF only, per goal</td>
+                        <td class="border border-gray-300 px-4 py-2 text-right font-bold text-red-700">-1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Tips -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-900">Tips</h2>
+
+            <ul class="space-y-3 text-gray-700">
+                <li class="flex items-start">
+                    <span class="font-bold mr-2">•</span>
+                    <span>Balance your budget across all positions</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="font-bold mr-2">•</span>
+                    <span>Check player status before selecting (Active players are more likely to play)</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="font-bold mr-2">•</span>
+                    <span>You can swap players between your starting lineup and bench</span>
+                </li>
+                <li class="flex items-start">
+                    <span class="font-bold mr-2">•</span>
+                    <span>Monitor league rankings to track your performance</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Back Button -->
+        <div class="text-center pt-6 border-t">
+            <a href="/index"
+                class="inline-block px-8 py-3 bg-gray-900 text-white font-semibold rounded hover:bg-gray-700 transition">
+                Back to Home
+            </a>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

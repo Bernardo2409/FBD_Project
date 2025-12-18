@@ -1,239 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>{{ liga.nome }} - Fantasy Champ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/daisyui@1.19.0/dist/full.js"></script>
-     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
 </head>
+
 <body class="bg-gray-100 min-h-screen" data-theme="corporate">
 
-<div class="container mx-auto p-6">
-    <!-- HEADER -->
-    <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
-        <div class="flex justify-between items-start">
+    <div class="container mx-auto p-6">
+        <!-- HEADER -->
+        <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
+            <div class="flex justify-between items-start">
 
-            <!-- League Details -->
-            <div>
-                <h1 class="text-3xl font-bold text-primary mb-2">{{ liga.nome }}</h1>
+                <!-- League Details -->
+                <div>
+                    <h1 class="text-3xl font-bold text-primary mb-2">{{ liga.nome }}</h1>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                    <div>
-                        <strong>Start Date:</strong><br>
-                        {{ liga.data_inicio }}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                        <div>
+                            <strong>Start Date:</strong><br>
+                            {{ liga.data_inicio }}
+                        </div>
+                        <div>
+                            <strong>End Date:</strong><br>
+                            {{ liga.data_fim }}
+                        </div>
+                        <div>
+                            <strong>Type:</strong><br>
+                            {{ 'Public' if liga.id_tipo_liga == 'LT01' else 'Private' }}
+                        </div>
                     </div>
-                    <div>
-                        <strong>End Date:</strong><br>
-                        {{ liga.data_fim }}
-                    </div>
-                    <div>
-                        <strong>Type:</strong><br>
-                        {{ 'Public' if liga.id_tipo_liga == 'LT01' else 'Private' }}
-                    </div>
-                </div>
 
-                {% if liga.codigo_convite %}
-                <div class="mt-4 p-3 bg-yellow-100 rounded-lg">
-                    <strong>Invite Code:</strong>
-                    <code class="font-mono text-lg bg-white px-2 py-1 rounded ml-2">
+                    {% if liga.codigo_convite %}
+                    <div class="mt-4 p-3 bg-yellow-100 rounded-lg">
+                        <strong>Invite Code:</strong>
+                        <code class="font-mono text-lg bg-white px-2 py-1 rounded ml-2">
                         {{ liga.codigo_convite }}
                     </code>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Leave League Button -->
+                <button onclick="leaveLeagueModal.showModal()"
+                    class="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-6 font-bold">
+                    Leave League
+                </button>
+
+                <!-- Confirmation Modal -->
+                <dialog id="leaveLeagueModal" class="modal">
+                    <div class="modal-box" style="margin: 10px;">
+                        <h3 class="font-bold text-lg flex justify-center">Are you sure?</h3>
+                        <p class="py-4">Do you really want to leave this league? This action cannot be undone.</p>
+
+                        <div class="modal-action flex justify-center">
+                            <form method="POST" action="/abandonar-liga/{{ liga.id }}">
+                                <button class="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-5"
+                                    style="margin-right: 3px;">
+                                    Yes, leave
+                                </button>
+                            </form>
+
+                            <button class="btn bg-green-600 hover:bg-green-700 text-white border-none rounded-full px-5"
+                                style="margin-left: 3px;" onclick="leaveLeagueModal.close()">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </dialog>
+
+            </div>
+        </div>
+
+        <!-- MESSAGES -->
+        {% if session.get('message') %}
+        <div class="alert alert-success mb-6">
+            <span>{{ session.pop('message', '') }}</span>
+        </div>
+        {% endif %}
+
+        <!-- RANKINGS -->
+        <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Rankings</h2>
+
+                <!-- Filtro de Jornada -->
+                {% if jornadas %}
+                <div class="flex items-center gap-2">
+                    <label class="text-sm font-semibold text-gray-600">View:</label>
+                    <select id="jornadaSelect" class="select select-bordered select-sm" onchange="filtrarJornada()">
+                        <option value="">Overall Ranking</option>
+                        {% for jornada in jornadas %}
+                        <option value="{{ jornada.id }}" {% if jornada_selecionada==jornada.id %}selected{% endif %}>
+                            {{ jornada.numero|string }} - {{ jornada.data_inicio|string }} to {{ jornada.data_fim|string
+                            }}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
                 {% endif %}
             </div>
 
-            <!-- Leave League Button -->
-            <button onclick="leaveLeagueModal.showModal()"
-                class="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-6 font-bold">
-                Leave League
-            </button>
+            <!-- TOP 3 CHART -->
+            {% if ranking and ranking|length >= 3 and not jornada_selecionada %}
+            <div class="mb-8 bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg border-2 border-gray-200">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 text-center">Top 3 Teams</h3>
 
-            <!-- Confirmation Modal -->
-            <dialog id="leaveLeagueModal" class="modal">
-            <div class="modal-box" style="margin: 10px;">
-                <h3 class="font-bold text-lg flex justify-center">Are you sure?</h3>
-                <p class="py-4">Do you really want to leave this league? This action cannot be undone.</p>
+                <div class="flex items-end justify-center gap-4 h-64">
+                    <!-- 2nd Place -->
+                    <div class="flex flex-col items-center w-32">
+                        <div class="mb-2 text-center">
+                            <div class="text-3xl font-bold text-gray-400">2</div>
+                            <div class="text-sm font-semibold text-gray-700 truncate w-32"
+                                title="{{ ranking[1].nome_utilizador }}">{{ ranking[1].nome_utilizador }}</div>
+                            <div class="text-lg font-bold text-blue-600">{{ ranking[1].pontuacao_acumulada }} pts</div>
+                        </div>
+                        <div class="w-full bg-gradient-to-t from-gray-400 to-gray-300 rounded-t-lg shadow-lg"
+                            style="height: {% if ranking[0].pontuacao_acumulada > 0 %}{{ (ranking[1].pontuacao_acumulada / ranking[0].pontuacao_acumulada * 100)|int }}%{% else %}50%{% endif %}; min-height: 80px;">
+                        </div>
+                    </div>
 
-                <div class="modal-action flex justify-center">
-                    <form method="POST" action="/abandonar-liga/{{ liga.id }}">
-                        <button class="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-5" style="margin-right: 3px;">
-                            Yes, leave
-                        </button>
-                    </form>
+                    <!-- 1st Place -->
+                    <div class="flex flex-col items-center w-32">
+                        <div class="mb-2 text-center">
+                            <div class="text-4xl font-bold text-yellow-500">1</div>
+                            <div class="text-sm font-semibold text-gray-700 truncate w-32"
+                                title="{{ ranking[0].nome_utilizador }}">{{ ranking[0].nome_utilizador }}</div>
+                            <div class="text-xl font-bold text-yellow-600">{{ ranking[0].pontuacao_acumulada }} pts
+                            </div>
+                        </div>
+                        <div class="w-full bg-gradient-to-t from-yellow-500 to-yellow-400 rounded-t-lg shadow-xl"
+                            style="height: 100%; min-height: 120px;">
+                        </div>
+                    </div>
 
-                    <button class="btn bg-green-600 hover:bg-green-700 text-white border-none rounded-full px-5" style="margin-left: 3px;" onclick="leaveLeagueModal.close()">
-                        Cancel
-                    </button>
+                    <!-- 3rd Place -->
+                    <div class="flex flex-col items-center w-32">
+                        <div class="mb-2 text-center">
+                            <div class="text-2xl font-bold text-amber-700">3</div>
+                            <div class="text-sm font-semibold text-gray-700 truncate w-32"
+                                title="{{ ranking[2].nome_utilizador }}">{{ ranking[2].nome_utilizador }}</div>
+                            <div class="text-lg font-bold text-amber-800">{{ ranking[2].pontuacao_acumulada }} pts</div>
+                        </div>
+                        <div class="w-full bg-gradient-to-t from-amber-700 to-amber-600 rounded-t-lg shadow-lg"
+                            style="height: {% if ranking[0].pontuacao_acumulada > 0 %}{{ (ranking[2].pontuacao_acumulada / ranking[0].pontuacao_acumulada * 100)|int }}%{% else %}30%{% endif %}; min-height: 60px;">
+                        </div>
+                    </div>
                 </div>
             </div>
-            </dialog>
-
-        </div>
-    </div>
-
-    <!-- MESSAGES -->
-    {% if session.get('message') %}
-        <div class="alert alert-success mb-6">
-            <span>{{ session.pop('message', '') }}</span>
-        </div>
-    {% endif %}
-
-    <!-- RANKINGS -->
-    <div class="bg-white rounded-lg shadow-xl p-6 mb-6">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Rankings</h2>
-            
-            <!-- Filtro de Jornada -->
-            {% if jornadas %}
-            <div class="flex items-center gap-2">
-                <label class="text-sm font-semibold text-gray-600">View:</label>
-                <select id="jornadaSelect" class="select select-bordered select-sm" onchange="filtrarJornada()">
-                    <option value="">Overall Ranking</option>
-                    {% for jornada in jornadas %}
-                    <option value="{{ jornada.id }}" {% if jornada_selecionada == jornada.id %}selected{% endif %}>
-                        {{ jornada.numero|string }} - {{ jornada.data_inicio|string }} to {{ jornada.data_fim|string }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
             {% endif %}
-        </div>
 
-        {% if ranking %}
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-                <thead>
-                    <tr>
-                        <th class="text-center w-16">Pos</th>
-                        <th class="text-left">Manager</th>
-                        <th class="text-left">Team</th>
-                        <th class="text-center">Points</th>
-                        <th class="text-center">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for team in ranking %}
-                    <tr class="hover">
-                        <td class="text-center font-bold">
-                            <span class="text-gray-600">{{ team.posicao }}</span>
-                        </td>
-                        <td class="font-semibold">{{ team.nome_utilizador }}</td>
-                        <td>
-                            {% if team.id_equipa %}
-                            <a href="/liga/{{ liga.id }}/equipa/{{ team.id_equipa }}" class="btn btn-sm btn-outline btn-info hover:btn-info" title="View this team">
-                                {{ team.nome_equipa }}
-                            </a>
-                            {% endif %}
-                        </td>
-                        <td class="text-center">
-                            {% if jornada_selecionada %}
+            {% if ranking %}
+            <div class="overflow-x-auto">
+                <table class="table table-zebra w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-center w-16">Pos</th>
+                            <th class="text-left">Manager</th>
+                            <th class="text-left">Team</th>
+                            <th class="text-center">Points</th>
+                            <th class="text-center">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for team in ranking %}
+                        <tr class="hover">
+                            <td class="text-center font-bold">
+                                <span class="text-gray-600">{{ team.posicao }}</span>
+                            </td>
+                            <td class="font-semibold">{{ team.nome_utilizador }}</td>
+                            <td>
+                                {% if team.id_equipa %}
+                                <a href="/liga/{{ liga.id }}/equipa/{{ team.id_equipa }}"
+                                    class="btn btn-sm btn-outline btn-info hover:btn-info" title="View this team">
+                                    {{ team.nome_equipa }}
+                                </a>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if jornada_selecionada %}
                                 <span class="font-bold text-lg text-primary">
                                     {{ team.pontuacao }}
                                 </span>
-                            {% else %}
+                                {% else %}
                                 <span class="text-gray-400">-</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-center">
-                            <span class="font-bold text-lg text-secondary">
-                                {{ team.pontuacao_acumulada }}
-                            </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <span class="font-bold text-lg text-secondary">
+                                    {{ team.pontuacao_acumulada }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        <div class="mt-4 flex justify-between items-center text-sm text-gray-500">
-            <span>Total teams: {{ ranking|length }}</span>
-            {% if jornada_selecionada %}
-            <span class="badge badge-info">
-                {% for jornada in jornadas %}
+            <div class="mt-4 flex justify-between items-center text-sm text-gray-500">
+                <span>Total teams: {{ ranking|length }}</span>
+                {% if jornada_selecionada %}
+                <span class="badge badge-info">
+                    {% for jornada in jornadas %}
                     {% if jornada.id == jornada_selecionada %}
-                        Showing: Matchday {{ jornada.numero }}
+                    Showing: Matchday {{ jornada.numero }}
                     {% endif %}
-                {% endfor %}
-            </span>
+                    {% endfor %}
+                </span>
+                {% else %}
+                <span class="badge badge-success">Showing: Overall Ranking</span>
+                {% endif %}
+            </div>
             {% else %}
-            <span class="badge badge-success">Showing: Overall Ranking</span>
+            <div class="text-center py-8">
+                <p class="text-gray-500 text-lg">No scores available yet</p>
+                <p class="text-sm text-gray-400 mt-2">Scores will appear here once matchdays are completed</p>
+            </div>
             {% endif %}
         </div>
-        {% else %}
-        <div class="text-center py-8">
-            <p class="text-gray-500 text-lg">No scores available yet</p>
-            <p class="text-sm text-gray-400 mt-2">Scores will appear here once matchdays are completed</p>
-        </div>
-        {% endif %}
-    </div>
 
-    <!-- PARTICIPANTS -->
-    <div class="bg-white rounded-lg shadow-xl p-6">
-        <h2 class="text-2xl font-bold mb-6 text-gray-800">Participants</h2>
-        
-        {% if participantes %}
-        <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-                <thead>
-                    <tr>
-                        <th class="text-left">Player</th>
-                        <th class="text-left">Team</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for participante in participantes %}
-                    <tr>
-                        <td class="font-semibold">{{ participante.nome }}</td>
-                        <td>
-                            {% if participante.equipa %}
-                                <a href="/liga/{{ liga.id }}/equipa/{{ participante.id_equipa }}" 
-                                   class="btn btn-xs btn-outline btn-info hover:btn-info"
-                                   title="View {{ participante.nome }}'s team">
+        <!-- PARTICIPANTS -->
+        <div class="bg-white rounded-lg shadow-xl p-6">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Participants</h2>
+
+            {% if participantes %}
+            <div class="overflow-x-auto">
+                <table class="table table-zebra w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left">Player</th>
+                            <th class="text-left">Team</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participante in participantes %}
+                        <tr>
+                            <td class="font-semibold">{{ participante.nome }}</td>
+                            <td>
+                                {% if participante.equipa %}
+                                <a href="/liga/{{ liga.id }}/equipa/{{ participante.id_equipa }}"
+                                    class="btn btn-xs btn-outline btn-info hover:btn-info"
+                                    title="View {{ participante.nome }}'s team">
                                     {{ participante.equipa }}
                                 </a>
-                            {% else %}
+                                {% else %}
                                 <span class="text-gray-400">No team</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4 text-sm text-gray-500">
+                Total participants: {{ participantes|length }}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <p class="text-gray-500">There are no participants in this league yet.</p>
+            </div>
+            {% endif %}
         </div>
 
-        <div class="mt-4 text-sm text-gray-500">
-            Total participants: {{ participantes|length }}
+        <!-- Back Button -->
+        <div class="flex justify-center" style="margin: 20px;">
+            <a href="/ligas" class="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-6">
+                ← Back to Leagues
+            </a>
         </div>
-        {% else %}
-        <div class="text-center py-8">
-            <p class="text-gray-500">There are no participants in this league yet.</p>
-        </div>
-        {% endif %}
+
     </div>
 
-    <!-- Back Button -->
-    <div class="flex justify-center" style="margin: 20px;">
-        <a href="/ligas"
-           class="btn bg-red-600 hover:bg-red-700 text-white border-none rounded-full px-6">
-            ← Back to Leagues
-        </a>
-    </div>
+    <script>
+        function filtrarJornada() {
+            const select = document.getElementById('jornadaSelect');
+            const jornada = select.value;
 
-</div>
-
-<script>
-function filtrarJornada() {
-    const select = document.getElementById('jornadaSelect');
-    const jornada = select.value;
-    
-    if (jornada) {
-        window.location.href = `?jornada=${jornada}`;
-    } else {
-        window.location.href = window.location.pathname;
-    }
-}
-</script>
+            if (jornada) {
+                window.location.href = `?jornada=${jornada}`;
+            } else {
+                window.location.href = window.location.pathname;
+            }
+        }
+    </script>
 
 </body>
+
 </html>
