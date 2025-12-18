@@ -30,17 +30,12 @@ BEGIN
         BEGIN
             SET @LigaID = NEWID();
 
-            -- Obter código do país
-            SELECT TOP 1 @CodigoPais = ID
-            FROM FantasyChamp.Pais
-            WHERE Pais.nome = @Pais OR ID = @Pais;
-
             INSERT INTO FantasyChamp.Liga
                 (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
             VALUES
                 (@LigaID, @Pais, GETDATE(),
                 CONVERT(DATE, '2026-05-30', 23),
-                @LigaTipoPublica, @CriadorID, @CodigoPais);
+                @LigaTipoPublica, '00000000-0000-0000-0000-000000000000', null);
 
             SET @Sucesso = 1;
             SET @Mensagem = 'League created successfully';

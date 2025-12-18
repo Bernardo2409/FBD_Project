@@ -24,8 +24,9 @@ def limpar_estatisticas_jogadores():
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM FantasyChamp.Pontuação_Jogador")
+        apagadas = cursor.rowcount
         conn.commit()
-        print("✅ Estatísticas de jogadores limpas!\n")
+        print(f"✅ Estatísticas de jogadores limpas! ({apagadas} linhas apagadas)\n")
 
 
 def obter_jogos():
@@ -94,7 +95,6 @@ def obter_jogadores_clube(clube_id):
                 'nome': row.Nome,
                 'posicao': row.Posição
             })
-        
         return jogadores
 
 
@@ -135,6 +135,7 @@ def gerar_estatisticas_equipa(jogadores, golos_marcados, golos_sofridos, jornada
     if golos_marcados > 0 and atacantes:
         marcadores = random.choices(atacantes, k=golos_marcados)
         # Cada golo pode ou não ter assistência (70% de probabilidade)
+        possiveis_assistentes = [j for j in titulares if j['posicao'] in ['Midfielder', 'Forward']]
         for _ in range(golos_marcados):
             if random.random() < 0.7:
                 # Preferir médios/atacantes para assistência, mas aceitar qualquer titular se não houver
@@ -189,7 +190,6 @@ def inserir_estatisticas(stats_list):
     """Insere estatísticas usando stored procedures"""
     with create_connection() as conn:
         cursor = conn.cursor()
-        
         for stats in stats_list:
             try:
                 # 1. Inserir estatísticas brutas usando SP
