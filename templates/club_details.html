@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <title>{{ clube.nome }}</title>
@@ -18,15 +19,14 @@
 
             <div class="card-body items-center text-center">
                 {% if clube.imagem %}
-                    <figure class="mb-4 p-4 lg:p-0 flex justify-center items-center">
-                        <img src="{{ clube.imagem }}" 
-                             alt="Logo {{ clube.nome }}" 
-                             class="w-32 h-32 object-cover rounded-full mask mask-hexagon shadow-lg border-4 border-base-200">
-                    </figure>
+                <figure class="mb-4 p-4 lg:p-0 flex justify-center items-center">
+                    <img src="{{ clube.imagem }}" alt="Logo {{ clube.nome }}"
+                        class="w-32 h-32 object-cover rounded-full mask mask-hexagon shadow-lg border-4 border-base-200">
+                </figure>
                 {% else %}
-                    <div class="w-32 h-32 bg-gray-300 rounded-full mb-4 flex items-center justify-center mask mask-hexagon">
-                        <span class="opacity-60 text-sm font-bold">Without Photo</span>
-                    </div>
+                <div class="w-32 h-32 bg-gray-300 rounded-full mb-4 flex items-center justify-center mask mask-hexagon">
+                    <span class="opacity-60 text-sm font-bold">Without Photo</span>
+                </div>
                 {% endif %}
 
                 <h2 class="card-title text-3xl font-bold text-gray-800">{{ clube.nome }}</h2>
@@ -34,13 +34,11 @@
                     <span class="text-xl text-gray-600 font-medium">{{ clube.pais }}</span>
 
                     {% if clube.pais_imagem %}
-                        <img src="{{ clube.pais_imagem }}" 
-                            alt="Bandeira de {{ clube.pais }}" 
-                            class="w-8 h-8 rounded-md shadow-sm border border-base-200 object-cover">
+                    <img src="{{ clube.pais_imagem }}" alt="Bandeira de {{ clube.pais }}"
+                        class="w-8 h-8 rounded-md shadow-sm border border-base-200 object-cover">
                     {% else %}
-                        <img src="/static/images/Image-not-found.png"
-                            alt="Sem imagem"
-                            class="w-8 h-8 rounded-md opacity-60">
+                    <img src="/static/images/Image-not-found.png" alt="Sem imagem"
+                        class="w-8 h-8 rounded-md opacity-60">
                     {% endif %}
                 </div>
 
@@ -63,18 +61,20 @@
                 </thead>
 
                 <tbody>
-                {% for jogador in clube.jogadores %}
+                    {% for jogador in clube.jogadores %}
                     <tr class="hover:bg-base-200 transition duration-150">
 
                         <td class="py-3 px-4 text-center">
                             <div class="flex justify-center">
-                                <img src="{{ jogador.imagem }}" 
-                                     alt="{{ jogador.nome }}" 
-                                     class="w-10 h-10 object-cover rounded-full mask mask-squircle">
+                                <img src="{{ jogador.imagem }}" alt="{{ jogador.nome }}"
+                                    class="w-10 h-10 object-cover rounded-full mask mask-squircle">
                             </div>
                         </td>
 
-                        <td class="py-3 px-4 font-semibold text-center">{{ jogador.nome }}</td>
+                        <td class="py-3 px-4 font-semibold text-center">
+                            <a href="/players/{{ jogador.id }}" class="text-primary hover:underline">{{ jogador.nome
+                                }}</a>
+                        </td>
                         <td class="py-3 px-4 text-primary font-medium text-center">{{ jogador.posicao }}</td>
                         <td class="py-3 px-4 font-mono text-center">{{ jogador.preco }} M€</td>
 
@@ -83,7 +83,7 @@
                         </td>
 
                     </tr>
-                {% endfor %}
+                    {% endfor %}
                 </tbody>
 
             </table>
@@ -96,4 +96,5 @@
     </div>
 
 </body>
+
 </html>

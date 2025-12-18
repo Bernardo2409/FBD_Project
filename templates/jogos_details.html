@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <title>Match Details - {{ match.clube1.nome }} vs {{ match.clube2.nome }}</title>
@@ -17,17 +18,19 @@
         <!-- MATCH RESULT CARD -->
         <div class="card bg-white shadow-xl max-w-4xl mx-auto mb-12 p-8 border-t-4 border-primary">
             <div class="grid grid-cols-3 gap-8 items-center">
-                
+
                 <!-- Home Team -->
                 <div class="text-center">
-                    <img src="{{ match.clube1.imagem }}" 
-                         alt="{{ match.clube1.nome }}" 
-                         class="w-32 h-32 object-contain mx-auto mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800">{{ match.clube1.nome }}</h2>
+                    <a href="/clubs/{{ match.clube1.id }}" class="hover:opacity-80 transition">
+                        <img src="{{ match.clube1.imagem }}" alt="{{ match.clube1.nome }}"
+                            class="w-32 h-32 object-contain mx-auto mb-4">
+                    </a>
+                    <a href="/clubs/{{ match.clube1.id }}" class="hover:underline">
+                        <h2 class="text-2xl font-bold text-gray-800">{{ match.clube1.nome }}</h2>
+                    </a>
                     <div class="flex items-center justify-center gap-2 mt-2">
-                        <img src="{{ match.clube1.pais_imagem }}" 
-                             alt="{{ match.clube1.pais }}" 
-                             class="w-6 h-6 rounded-sm object-cover">
+                        <img src="{{ match.clube1.pais_imagem }}" alt="{{ match.clube1.pais }}"
+                            class="w-6 h-6 rounded-sm object-cover">
                         <span class="text-sm text-gray-600">{{ match.clube1.pais }}</span>
                     </div>
                 </div>
@@ -37,19 +40,21 @@
                     <div class="text-6xl font-extrabold text-primary">
                         {{ match.golos_casa }} - {{ match.golos_fora }}
                     </div>
-                    
+
                 </div>
 
                 <!-- Away Team -->
                 <div class="text-center">
-                    <img src="{{ match.clube2.imagem }}" 
-                         alt="{{ match.clube2.nome }}" 
-                         class="w-32 h-32 object-contain mx-auto mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800">{{ match.clube2.nome }}</h2>
+                    <a href="/clubs/{{ match.clube2.id }}" class="hover:opacity-80 transition">
+                        <img src="{{ match.clube2.imagem }}" alt="{{ match.clube2.nome }}"
+                            class="w-32 h-32 object-contain mx-auto mb-4">
+                    </a>
+                    <a href="/clubs/{{ match.clube2.id }}" class="hover:underline">
+                        <h2 class="text-2xl font-bold text-gray-800">{{ match.clube2.nome }}</h2>
+                    </a>
                     <div class="flex items-center justify-center gap-2 mt-2">
-                        <img src="{{ match.clube2.pais_imagem }}" 
-                             alt="{{ match.clube2.pais }}" 
-                             class="w-6 h-6 rounded-sm object-cover">
+                        <img src="{{ match.clube2.pais_imagem }}" alt="{{ match.clube2.pais }}"
+                            class="w-6 h-6 rounded-sm object-cover">
                         <span class="text-sm text-gray-600">{{ match.clube2.pais }}</span>
                     </div>
                 </div>
@@ -59,7 +64,7 @@
 
         <!-- PLAYER STATISTICS -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            
+
             <!-- Home Team Players -->
             <div>
                 <h2 class="text-2xl font-bold mb-4 text-center text-secondary">
@@ -79,19 +84,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% if match.jogadores_casa %}
+                            {% if match.jogadores_casa %}
                             {% for jogador in match.jogadores_casa %}
                             <tr class="hover:bg-base-200 transition duration-150">
                                 <td class="py-2 px-2">
-                                    <div class="flex items-center gap-2">
-                                        <img src="{{ jogador.imagem }}" 
-                                             alt="{{ jogador.nome }}" 
-                                             class="w-8 h-8 object-cover rounded-full">
+                                    <a href="/players/{{ jogador.id }}"
+                                        class="flex items-center gap-2 hover:bg-gray-50 p-1 rounded transition">
+                                        <img src="{{ jogador.imagem }}" alt="{{ jogador.nome }}"
+                                            class="w-8 h-8 object-cover rounded-full">
                                         <div>
-                                            <div class="font-semibold text-sm">{{ jogador.nome }}</div>
+                                            <div class="font-semibold text-sm text-primary hover:underline">{{
+                                                jogador.nome }}</div>
                                             <div class="text-xs text-gray-500">{{ jogador.posicao }}</div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </td>
                                 <td class="py-2 px-2 text-center font-bold">{{ jogador.golos }}</td>
                                 <td class="py-2 px-2 text-center font-bold">{{ jogador.assistencias }}</td>
@@ -101,13 +107,13 @@
                                 <td class="py-2 px-2 text-center font-bold text-primary">{{ jogador.pontuacao }}</td>
                             </tr>
                             {% endfor %}
-                        {% else %}
+                            {% else %}
                             <tr>
                                 <td colspan="7" class="text-center py-4 text-gray-500">
                                     No player statistics available
                                 </td>
                             </tr>
-                        {% endif %}
+                            {% endif %}
                         </tbody>
                     </table>
                 </div>
@@ -132,19 +138,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% if match.jogadores_fora %}
+                            {% if match.jogadores_fora %}
                             {% for jogador in match.jogadores_fora %}
                             <tr class="hover:bg-base-200 transition duration-150">
                                 <td class="py-2 px-2">
-                                    <div class="flex items-center gap-2">
-                                        <img src="{{ jogador.imagem }}" 
-                                             alt="{{ jogador.nome }}" 
-                                             class="w-8 h-8 object-cover rounded-full">
+                                    <a href="/players/{{ jogador.id }}"
+                                        class="flex items-center gap-2 hover:bg-gray-50 p-1 rounded transition">
+                                        <img src="{{ jogador.imagem }}" alt="{{ jogador.nome }}"
+                                            class="w-8 h-8 object-cover rounded-full">
                                         <div>
-                                            <div class="font-semibold text-sm">{{ jogador.nome }}</div>
+                                            <div class="font-semibold text-sm text-primary hover:underline">{{
+                                                jogador.nome }}</div>
                                             <div class="text-xs text-gray-500">{{ jogador.posicao }}</div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </td>
                                 <td class="py-2 px-2 text-center font-bold">{{ jogador.golos }}</td>
                                 <td class="py-2 px-2 text-center font-bold">{{ jogador.assistencias }}</td>
@@ -154,13 +161,13 @@
                                 <td class="py-2 px-2 text-center font-bold text-primary">{{ jogador.pontuacao }}</td>
                             </tr>
                             {% endfor %}
-                        {% else %}
+                            {% else %}
                             <tr>
                                 <td colspan="7" class="text-center py-4 text-gray-500">
                                     No player statistics available
                                 </td>
                             </tr>
-                        {% endif %}
+                            {% endif %}
                         </tbody>
                     </table>
                 </div>
@@ -206,4 +213,5 @@
     </div>
 
 </body>
+
 </html>
