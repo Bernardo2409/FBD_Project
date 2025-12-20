@@ -170,18 +170,3 @@ CREATE TABLE FantasyChamp.Participa (
     FOREIGN KEY (ID_Liga) 
 		REFERENCES FantasyChamp.Liga(ID)
 );
-
-
-CREATE TABLE FantasyChamp.Enfrenta (
-    ID_Jogo UNIQUEIDENTIFIER NOT NULL,
-    ID_Clube1 VARCHAR(16) NOT NULL,
-    ID_Clube2 VARCHAR(16) NOT NULL,
-    PRIMARY KEY (ID_Jogo, ID_Clube1, ID_Clube2),
-
-    FOREIGN KEY (ID_Jogo) 
-		REFERENCES FantasyChamp.Jogo(ID),
-    FOREIGN KEY (ID_Clube1) 
-		REFERENCES FantasyChamp.Clube(ID),
-    FOREIGN KEY (ID_Clube2) 
-		REFERENCES FantasyChamp.Clube(ID)
-);
