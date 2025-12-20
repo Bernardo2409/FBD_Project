@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE sp_CriarUtilizadorComLigas
+CREATE OR ALTER PROCEDURE FantasyChamp.sp_CriarUtilizadorComLigas
     @PrimeiroNome NVARCHAR(100),
     @Apelido NVARCHAR(100),
     @Email NVARCHAR(255),
@@ -19,12 +19,7 @@ BEGIN
     SET @Sucesso = 0;
     SET @Mensagem = '';
 
-    DECLARE @LigaMundialID UNIQUEIDENTIFIER;
-    DECLARE @LigaPaisID UNIQUEIDENTIFIER;
-    DECLARE @LigaTipoPublica VARCHAR(16) = 'LT01';
-
-    -- VALIDAÇÕES ANTES DE ABRIR TRANSAÇÃO (evita transaction mismatch)
-    
+    -- VALIDAÇÕES ANTES DE ABRIR TRANSAÇÃO
     -- Verificar email duplicado
     IF EXISTS (SELECT 1 FROM FantasyChamp.Utilizador WHERE Email = @Email)
     BEGIN
@@ -39,9 +34,8 @@ BEGIN
         RETURN;
     END
 
-
     -- Verificar se o país existe na tabela de países
-    IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Pais WHERE Pais.nome = @Pais OR ID = @Pais)
+    IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Pais WHERE nome = @Pais OR ID = @Pais)
     BEGIN
         SET @Mensagem = 'Invalid Country';
         RETURN;
@@ -52,65 +46,10 @@ BEGIN
 
         -- Criar utilizador
         SET @UserID = NEWID();
-
         INSERT INTO FantasyChamp.Utilizador
             (ID, PrimeiroNome, Apelido, Email, Senha, País, Nacionalidade, DataDeNascimento)
         VALUES
             (@UserID, @PrimeiroNome, @Apelido, @Email, @Senha, @Pais, @Nacionalidade, @DataNascimento);
-
-        -- 1) LIGA MUNDIAL
-        -- Verificar se já existe liga Mundial
-        SELECT @LigaMundialID = ID
-        FROM FantasyChamp.Liga
-        WHERE Nome = 'Mundial' AND ID_tipoLiga = @LigaTipoPublica;
-
-        -- Se não existe, criar
-        IF @LigaMundialID IS NULL
-        BEGIN
-            SET @LigaMundialID = NEWID();
-
-            INSERT INTO FantasyChamp.Liga
-                (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
-            VALUES
-                (@LigaMundialID, 'Mundial', GETDATE(),
-                CONVERT(DATE, '2026-05-30', 23),
-                @LigaTipoPublica, '00000000-0000-0000-0000-000000000000', NULL);
-        END
-
-        -- Adicionar utilizador à Liga Mundial
-        IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Participa
-                      WHERE ID_Utilizador = @UserID AND ID_Liga = @LigaMundialID)
-        BEGIN
-            INSERT INTO FantasyChamp.Participa (ID_Utilizador, ID_Liga)
-            VALUES (@UserID, @LigaMundialID);
-        END
-
-        -- 2) LIGA DO PAÍS
-        -- Verificar se já existe liga do país
-        SELECT @LigaPaisID = ID
-        FROM FantasyChamp.Liga
-        WHERE Nome = @Pais AND ID_tipoLiga = @LigaTipoPublica;
-
-        -- Se não existe, criar
-        IF @LigaPaisID IS NULL
-        BEGIN
-            SET @LigaPaisID = NEWID();
-
-            INSERT INTO FantasyChamp.Liga
-                (ID, Nome, Data_Inicio, Data_Fim, ID_tipoLiga, ID_criador, Código_Convite)
-            VALUES
-                (@LigaPaisID, @Pais, GETDATE(),
-                CONVERT(DATE, '2026-05-30', 23),
-                @LigaTipoPublica, '00000000-0000-0000-0000-000000000000', null);
-        END
-
-        -- Adicionar utilizador à Liga do País
-        IF NOT EXISTS (SELECT 1 FROM FantasyChamp.Participa
-                      WHERE ID_Utilizador = @UserID AND ID_Liga = @LigaPaisID)
-        BEGIN
-            INSERT INTO FantasyChamp.Participa (ID_Utilizador, ID_Liga)
-            VALUES (@UserID, @LigaPaisID);
-        END
 
         SET @Sucesso = 1;
         SET @Mensagem = 'Account created successfully';
@@ -127,3 +66,4 @@ BEGIN
         SET @UserID = NULL;
     END CATCH
 END;
+GO
