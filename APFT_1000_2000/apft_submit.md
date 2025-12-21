@@ -53,7 +53,7 @@ Se um destes jogadores estiver na equipa do utilizador a equipa também ganha po
 - Adição do atributo Pontuação_Total à relação **Pontuacao_Jogador** para tornar possível a soma da pontuação de um determinado jogador ao longo de várias jornadas;
 - A adição do atributo pontuacao_acumulada à entidade de **Pontuacao_Equipa** também para tornar possível a soma da pontuação de uma determinada equipa ao longo de várias jornadas;
 - A alteração da localização do atributo Código_convite de uma Liga, agora em vez de pertencer à entidade **Tipo_Liga** passará a pertencer à entidade **Liga** para simplificação de dados;
-- A adição de atributos de imagem às entidades de **Clube** e **Jogador** para tornar a front-end do projeto mais intuitiva, e melhorar a experiência visual do cliente(utilizador da aplicação).
+- A adição de atributos de imagem às entidades de **Clube** e **Jogador** para tornar a front-end do projeto mais intuitiva, e melhorar a experiência visual do cliente (utilizador da aplicação).
 
 
 ## ER - Esquema Relacional/Relational Schema
