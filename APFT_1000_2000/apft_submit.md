@@ -28,8 +28,13 @@ Please remove this section before submitting.
 
 ## Introdução / Introduction
  
-Escreva uma pequena introdução sobre o trabalho.
-Write a simple introduction about your project.
+Com este projeto, pretendemos melhorar a experiência dos adeptos de futebol, proporcionando uma dinâmica interativa, divertida e competitiva de acompanhar o desempenho dos jogadores favoritos de cada utilizador. Tudo isto, através da criação de uma fantasy, a FantasyChamp.
+
+A FantasyChamp é um sistema que permite a cada utilizador criar uma equipa virtual, composta por jogadores da realidade que participam nos clubes em competição na Liga dos Campeões (UEFA Champions League). 
+
+A cada jornada, os jogadores acumulam pontos com base no seu desempenho de um jogo oficial na vida real.
+Se um destes jogadores estiver na equipa do utilizador a equipa também ganha pontos. A soma das pontuações obtidas pelos jogadores numa jornada determina a pontuação da equipa nessa jornada, enquanto a soma de todas as jornadas corresponde à pontuação total da equipa ao longo da competição. Esta pontuação total define a classificação da Liga. E no fim há um vencedor.
+
 
 ## ​Análise de Requisitos / Requirements
 
@@ -43,12 +48,13 @@ Write a simple introduction about your project.
 
 - Na relação **Pertence** entre Equipa e Jogador, verificamos a necessidade de acrescentar um atributo binário benched, para averiguar se um jogador da equipa de um determinado utilizador estaria no banco ou não;
 - Decidimos criar uma nova entidade **Posição**, para assim como no **Estado Jogador** obtermos uma "lista" de posições que um jogador pode tomar;
-- A criação de uma entidade **País**, relacionada com o **Clube** para indicar-mos a que país um determinado clube pertence;
-- Adicionamos novos atributos à entidade **Jogo** (Golos_club1, Golos_club2) para determinação da quantidade de golos de cada uma das equipas que se encararam;
-- Adição do atributo Pontuação_Total à relação **Pontuacao_Jogador** para tornar possivel a soma da pontuação de um determinado jogador ao longo de várias jornadas;
-- A adição do atributo pontuacao_acumulada à entidade de **Pontuacao_Equipa** também para tornar possivel a soma da pontuação de uma determinada equipa ao longo de várias jornadas;
+- A criação de uma entidade **País**, relacionada com o **Clube** para indicarmos a que país um determinado clube pertence;
+- Adicionamos novos atributos à entidade **Jogo** (Golos_club1, Golos_club2) para determinar a quantidade de golos de cada uma das equipas num jogo;
+- Adição do atributo Pontuação_Total à relação **Pontuacao_Jogador** para tornar possível a soma da pontuação de um determinado jogador ao longo de várias jornadas;
+- A adição do atributo pontuacao_acumulada à entidade de **Pontuacao_Equipa** também para tornar possível a soma da pontuação de uma determinada equipa ao longo de várias jornadas;
 - A alteração da localização do atributo Código_convite de uma Liga, agora em vez de pertencer à entidade **Tipo_Liga** passará a pertencer à entidade **Liga** para simplificação de dados;
-- A adição de atributos de imagem às entidades de **Clube** e **Jogador** para tornar a front-end do projeto mais intuitiva, e melhorar a experiência visual do utilizador.
+- A adição de atributos de imagem às entidades de **Clube** e **Jogador** para tornar a front-end do projeto mais intuitiva, e melhorar a experiência visual do cliente(utilizador da aplicação).
+
 
 ## ER - Esquema Relacional/Relational Schema
 
@@ -59,13 +65,13 @@ Write a simple introduction about your project.
 ### Melhorias/Improvements
 
 - Criação da tabela **País** que tem como Primary Key um ID único e como atributos a sua imagem e um Nome;
-- Adicionamos uma Foreign Key à relação **Clube** no atributo ID_País que referência o ID da nova relação **País**;
+- Adicionamos uma Foreign Key à relação **Clube** no atributo ID_País que referencia o ID da nova relação **País**;
 - Adição do atributo Pontuação Acumulada a **Pontuação_Equipa (jornada)** e Pontuação Total a **Pontuação_Jogador (jornada)**, respetivamente, como esclarecido anteriormente;
 - Remoção total da relação de **Enfrenta** devido ao facto do seu uso ser nulo e ser pouco redundante uma vez que a relação **Jogo** já tinha todos os atributos necessários para o objetivo final;
-- Adição de atributos à relação de **Jogo** Golos_clube1 e Golos_clube2 assim como as Foreign Keys ID_Clube1 e ID_Clube2 que ambas referênciam o ID da relação **Jogador**;
+- Adição de atributos à relação de **Jogo** Golos_clube1 e Golos_clube2 assim como as Foreign Keys ID_Clube1 e ID_Clube2 que ambas referenciam o ID da relação **Clube**;
 - Adição do atributo "benched" a **Pertence**, como esclarecido anteriormente;
 - Código de convite movido de **TipoLiga** para **Liga** como esclarecido anteriormente;
-- Criação de uma relação **Posição** que contém um ID único, assim como as posições possíveis que um jogador pode tomar, desta forma, criámos, também, uma Foreign Key em ID_Posição na relação **Jogador** que referência o ID da nova relação;
+- Criação de uma relação **Posição** que contém um ID único, assim como as posições possíveis que um jogador pode tomar, desta forma, criámos, também, uma Foreign Key em ID_Posição na relação **Jogador** que referencia o ID da nova relação;
 - Criação de atributos imagem para as relações **Clube** e **Jogador**, (esclarecido anteriormente).
 
 ## ​SQL DDL - Data Definition Language
@@ -74,7 +80,7 @@ Write a simple introduction about your project.
 
 ## SQL DML - Data Manipulation Language
 
-### Formulario exemplo/Example Form
+### Formulário exemplo/Example Form
 
 ![Exemplo Participantes da Liga Mundial!](screenshots/league_participants.png "AnImage")
 
@@ -191,15 +197,51 @@ SELECT * FROM FantasyChamp.EstatisticasJogadoresJornada
 
 -- Inserir dados
 INSERT INTO FantasyChamp.Jogo(ID, Data, ID_Clube1, ID_Clube2, ID_jornada, golos_clube1, golos_clube2)
-VALUES (00000000-0000-0000-0000-000000000001, 2024-12-12, 5,6,'JOO01',2,3) -- clubes ficticios de um jogo ficticio
+VALUES (00000000-0000-0000-0000-000000000001, 2024-12-12, 5,6,'JOO01',2,3) -- clubes fictícios de um jogo fictício
 ```
 
 ## Normalização/Normalization
 
-Descreva os passos utilizados para minimizar a duplicação de dados / redução de espaço.
-Justifique as opções tomadas.
-Describe the steps used to minimize data duplication / space reduction.
-Justify the choices made.
+O esquema relacional da FantasyChamp foi projetado seguindo os princípios de normalização até à **Terceira Forma Normal (3NF)** e, em muitos casos, até à **Forma Normal de Boyce-Codd (BCNF)**, garantindo a minimização de redundância de dados e a integridade referencial.
+
+### 1ª Forma Normal (1NF)
+Todas as tabelas do esquema satisfazem a 1NF porque:
+- **Atomicidade dos valores**: Todos os atributos contêm valores atómicos. Por exemplo, na tabela **Utilizador**, os atributos `PrimeiroNome` e `Apelido` são separados em vez de um único campo "Nome Completo".
+- **Não existem grupos repetitivos**: Cada coluna contém um único valor por linha.
+- **Chaves primárias únicas**: Todas as tabelas possuem chaves primárias que identificam univocamente cada registo.
+
+**Exemplo**: Na tabela **Jogador**, os atributos são atómicos (Nome, Preço, etc.) e não existem coleções ou listas armazenadas numa única coluna.
+
+### 2ª Forma Normal (2NF)
+O esquema está na 2NF porque:
+- **Está na 1NF** (condição prévia).
+- **Não existem dependências parciais**: Todos os atributos não-chave dependem totalmente da chave primária completa, e não apenas de parte dela.
+
+**Exemplo**: Na tabela **Pontuação_Jogador**, a chave primária é composta por `(ID_jogador, ID_jornada)`. Todos os atributos como `TempoJogo`, `GolosMarcados`, `Assistencias` dependem da combinação completa de jogador E jornada, não apenas de um deles isoladamente.
+
+### 3ª Forma Normal (3NF) e BCNF
+O esquema está na 3NF e maioritariamente na BCNF porque:
+- **Está na 2NF** (condição prévia).
+- **Não existem dependências transitivas**: Nenhum atributo não-chave depende de outro atributo não-chave.
+
+**Exemplos de eliminação de dependências transitivas**:
+
+#### Tabela **País** (criada para eliminar redundância)
+Antes da normalização, o país poderia estar duplicado em múltiplos clubes. Criámos a tabela **País** para:
+- Armazenar `Nome` e `Imagem` do país apenas uma vez.
+- A tabela **Clube** referencia o país através de `ID_País` (chave estrangeira).
+- **Benefício**: Evita repetição de dados (nome do país, imagem) para cada clube.
+
+#### Tabela **Posição** e **Estado_Jogador**
+Criámos tabelas separadas para:
+- **Posição**: Armazena as posições possíveis (Guarda-Redes, Defesa, Médio, Avançado).
+- **Estado_Jogador**: Armazena os estados possíveis (Disponível, Lesionado, Suspenso).
+- **Benefício**: Evita duplicação de strings descritivas e permite validação centralizada.
+
+#### Tabela **Tipo_Liga**
+A tabela **Liga** referencia o tipo através de `ID_tipoLiga` em vez de armazenar o tipo textual diretamente.
+- **Benefício**: Consistência nos tipos de liga (Global, Privada) e facilita alterações futuras.
+
 
 ## Índices/Indexes
 
@@ -207,29 +249,29 @@ Justify the choices made.
 - IX_Clube_ID_Pais: Índice non-clustered na coluna **ID_País** da relação **Clube**, usado para otimizar a busca de clubes por país;
 - IX_Jogador_ID_clube: Índice non-clustered na coluna ID_clube da relação **Jogador**, melhorando a performance das consultas que filtram jogadores por clube;
 - IX_Jogador_ID_Posicao: Índice non-clustered na coluna ID_Posição da relação **Jogador**, utilizado para buscas eficientes de jogadores por posição;  
-- IX_Jogador_ID_Estado: Índice non-clustered na coluna ID_Estado_Jogador da relação **Jogador**, utilizado para buscas eficientes de jogadores por posição;
+- IX_Jogador_ID_Estado: Índice non-clustered na coluna ID_Estado_Jogador da relação **Jogador**, utilizado para buscas eficientes de jogadores por estado;
 - IX_Jogo_ID_Clube1: Índice non-clustered na coluna ID_Clube1 da relação **Jogo**, para melhorar a consulta de jogos por clube1;
 - IX_Jogo_ID_Clube2: Índice non-clustered na coluna ID_Clube2 da relação **Jogo**, para melhorar a consulta de jogos por clube2;
-- IX_Jogo_ID_jornada: Índice non-clustered na coluna ID_jornada da tabela **Jogo**, usado para buscas de jogos por clube2;
+- IX_Jogo_ID_jornada: Índice non-clustered na coluna ID_jornada da tabela **Jogo**, usado para buscas de jogos por jornada;
 - IX_Equipa_ID_utilizador: Índice non-clustered na coluna ID_utilizador da tabela **Equipa**, otimizando as buscas por utilizador em equipas;
 - IX_Liga_ID_tipoLiga: Índice non-clustered na coluna ID_tipoLiga da tabela **Liga**, para melhorar a performance de consultas por tipo de liga;
-- IX_Liga_ID_criador: Índice non-clustered na coluna ID_criador da relação **Liga**, utilizado para pesquisas sobre ligas criadas por utilizadores específicps.
+- IX_Liga_ID_criador: Índice non-clustered na coluna ID_criador da relação **Liga**, utilizado para pesquisas sobre ligas criadas por utilizadores específicos.
 
 ##### 2. Join Tables 
 - IX_Participa_ID_Liga: Índice non_clustered na coluna ID_Liga da relação **Participa**, utilizado para otimizar buscas sobre a participação em ligas;
-- IX_Pertence_ID_Equipa: Índice non_clustered na coluna ID_Equipa da relação **Pertence**, facilitando as consultas sobrea a equipa à qual um determinado jogador pertence.
+- IX_Pertence_ID_Equipa: Índice non_clustered na coluna ID_Equipa da relação **Pertence**, facilitando as consultas sobre a equipa à qual um determinado jogador pertence.
 
-##### 3. Filstros em Stored Procedures e Views
+##### 3. Filtros em Stored Procedures e Views
 - IX_Pertence_benched: Índice non_clustered na tabela **Pertence**, a usar as colunas ID_Equipa e benched. Inclui a coluna ID_Jogador, a otimizar filtros que envolvem a condição de estar "benched" (no banco de reservas).
 
 ##### 4. Índices para DATES em filtros de jogos
-- IX_Jornada_Datas: Índice non_clustered nas colunas Data_Inicio e Data_Fim da relação **Jornada**, incluindo a coluna Numero, otimizado para consultas que envolvem datas de inicio e fim das jornadas;
-- IX_Jogo_Data: Índice non_clustered na coluna Data da relação **Jogo** com inclusão das colunas ID_Clube1 e ID_Clube2, permitindo buscas ráidas por data dos Jogos.
+- IX_Jornada_Datas: Índice non_clustered nas colunas Data_Inicio e Data_Fim da relação **Jornada**, incluindo a coluna Numero, otimizado para consultas que envolvem datas de início e fim das jornadas;
+- IX_Jogo_Data: Índice non_clustered na coluna Data da relação **Jogo** com inclusão das colunas ID_Clube1 e ID_Clube2, permitindo buscas rápidas por data dos Jogos.
 - IX_Liga_Datas: Índice non_clustered nas colunas Data_Fim e ID_tipoLiga da relação **Liga**, incluindo as colunas Nome e ID_criador, usado para otimizar consultas que envolvem datas de fim das ligas.
 
 ##### 5. Índices para queries pesadas (pontuações)
-- IX_Pontuacao_Jogador_Lookup: Índice non_clustered nas colunas ID_jornada e ID_jogador da relação Pontuação_Jogador, inlcuindo as colunas pontuação_total, GolosMarcados e Assistencias, para otimizar consultas sobre as pontuações dos jogadores.
-- IX_Pontuacao_Equipa_Lookup: Índice non_clustered nas colunas ID_jornada e ID_Equipa da tabela Pontuação_Equipa, incuindo as colunas pontuação_jornada e pontuação_acumulada, melhorando, assim, a performance de consultas sobre a pontuação das equipas.
+- IX_Pontuacao_Jogador_Lookup: Índice non_clustered nas colunas ID_jornada e ID_jogador da relação Pontuação_Jogador, incluindo as colunas pontuação_total, GolosMarcados e Assistencias, para otimizar consultas sobre as pontuações dos jogadores.
+- IX_Pontuacao_Equipa_Lookup: Índice non_clustered nas colunas ID_jornada e ID_Equipa da tabela Pontuação_Equipa, incluindo as colunas pontuação_jornada e pontuação_acumulada, melhorando, assim, a performance de consultas sobre a pontuação das equipas.
 
 ```sql
 -- 1. Foreign keys
@@ -290,13 +332,13 @@ CREATE NONCLUSTERED INDEX IX_Pontuacao_Equipa_Lookup
 
 ## Outras notas/Other notes
 
-### Dados iniciais da dabase de dados/Database init data
+### Dados iniciais da base de dados/Database init data
 
 [SQL DB Init File](sql/04_db_init.sql "SQLFileQuestion")
 
 ### Apresentação
 
-[Slides](slides.pdf "Sildes")
+[Slides](slides.pdf "Slides")
 
 [Video](https://elearning.ua.pt/pluginfile.php/55992/mod_label/intro/VideoTrabalho2013.mp4)
 
