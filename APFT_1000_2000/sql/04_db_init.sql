@@ -135,7 +135,12 @@ GO
 --
 -- FlagCDN API:
 --   URL: https://flagcdn.com/
---   Dados: Bandeiras dos países (formato SVG/PNG)
+--   Dados: Bandeiras dos países (formato PNG)
+--   Autenticação: Não requerida (API pública)
+--
+-- Flagpedia API:
+--   URL: https://flagpedia.net/download/api
+--   Dados: Bandeiras alternativas para correção de erros
 --   Autenticação: Não requerida (API pública)
 --
 -- ============================================================================
