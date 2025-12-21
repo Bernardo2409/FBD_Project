@@ -517,10 +517,6 @@ def abandonar_liga_route(liga_id):
     return redirect("/ligas")
 
 
-def obter_jornada_atual():
-    return 'jornada_1'
-
-
 @app.route("/atualizar_pontuacao")
 def atualizar_pontuacao():
     if 'user_id' not in session:
@@ -661,46 +657,6 @@ def equipa_jornada(id_equipa, id_jornada):
         return render_template("error.html", 
                              message="Erro ao carregar dados da equipa",
                              details=str(e)), 500
-
-
-@app.route("/equipa/banco/adicionar/<id_jogador>", methods=["POST"])
-def adicionar_jogador_ao_banco_route(id_jogador):
-    if 'user_id' not in session:
-        return redirect("/")
-    
-    user_id = session['user_id']
-    equipa_user = obter_equipa_por_utilizador(user_id)
-    
-    if equipa_user:
-        from persistence.equipa import adicionar_jogador_ao_banco
-        sucesso, mensagem = adicionar_jogador_ao_banco(equipa_user.id, id_jogador)
-        
-        if sucesso:
-            session['message'] = mensagem
-        else:
-            session['error'] = mensagem
-    
-    return redirect("/equipa")
-
-
-@app.route("/equipa/banco/remover/<id_jogador>", methods=["POST"])
-def remover_jogador_do_banco_route(id_jogador):
-    if 'user_id' not in session:
-        return redirect("/")
-    
-    user_id = session['user_id']
-    equipa_user = obter_equipa_por_utilizador(user_id)
-    
-    if equipa_user:
-        from persistence.equipa import remover_jogador_do_banco
-        sucesso, mensagem = remover_jogador_do_banco(equipa_user.id, id_jogador)
-        
-        if sucesso:
-            session['message'] = mensagem
-        else:
-            session['error'] = mensagem
-    
-    return redirect("/equipa")
 
 
 @app.route("/equipa/trocar/<id_jogador_campo>/<id_jogador_banco>", methods=["POST"])

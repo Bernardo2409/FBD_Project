@@ -29,7 +29,9 @@ def obter_jornada_info(id_jornada: str):
             return None
 
 def obter_jornada_atual() -> dict:
-
+    """
+    Obtém a jornada atual usando a stored procedure.
+    """
     with create_connection() as conn:
         cursor = conn.cursor()
         

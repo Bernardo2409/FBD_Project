@@ -8,9 +8,6 @@ CREATE NONCLUSTERED INDEX IX_Jogo_ID_Clube1 ON FantasyChamp.Jogo(ID_Clube1);
 CREATE NONCLUSTERED INDEX IX_Jogo_ID_Clube2 ON FantasyChamp.Jogo(ID_Clube2);
 CREATE NONCLUSTERED INDEX IX_Jogo_ID_jornada ON FantasyChamp.Jogo(ID_jornada);
 
-CREATE NONCLUSTERED INDEX IX_Enfrenta_ID_Clube1 ON FantasyChamp.Enfrenta(ID_Clube1);
-CREATE NONCLUSTERED INDEX IX_Enfrenta_ID_Clube2 ON FantasyChamp.Enfrenta(ID_Clube2);
-
 CREATE NONCLUSTERED INDEX IX_Equipa_ID_utilizador ON FantasyChamp.Equipa(ID_utilizador);
 
 CREATE NONCLUSTERED INDEX IX_Liga_ID_tipoLiga ON FantasyChamp.Liga(ID_tipoLiga);

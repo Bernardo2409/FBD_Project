@@ -342,31 +342,3 @@ def obter_equipa_com_pontuacoes_jornada(id_equipa: str, id_jornada: str):
             raise Exception(f"Erro de banco de dados: {str(e)}")
         except Exception as e:
             raise e
-
-def obter_jornada_info(id_jornada: str):
-
-    with create_connection() as conn:
-        cursor = conn.cursor()
-        
-        try:
-            cursor.execute("""
-                SELECT ID, Numero, Data_Inicio, Data_Fim
-                FROM FantasyChamp.Jornada
-                WHERE ID = ?
-            """, id_jornada)
-            
-            row = cursor.fetchone()
-            
-            if row:
-                return {
-                    'id': row[0],
-                    'numero': row[1],
-                    'data_inicio': row[2],
-                    'data_fim': row[3]
-                }
-            else:
-                return None
-                
-        except pyodbc.Error as e:
-            print(f"Erro ao obter jornada info: {e}")
-            return None

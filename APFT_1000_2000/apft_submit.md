@@ -336,6 +336,22 @@ CREATE NONCLUSTERED INDEX IX_Pontuacao_Equipa_Lookup
 
 [SQL DB Init File](sql/04_db_init.sql "SQLFileQuestion")
 
+[Documentação Detalhada da Inicialização](sql/04_db_init_info.md "InitDocumentation")
+
+O script de inicialização da base de dados (`populate_db.py`) contém os dados essenciais para o funcionamento da aplicação FantasyChamp, incluindo:
+
+- **Liga Global**: Criação automática da liga mundial onde todos os utilizadores participam;
+- **Países**: Inserção dos países participantes através da [RestCountries API](https://restcountries.com/v3.1);
+- **Clubes**: Dados dos clubes qualificados para a competição (nome, país, emblema);
+- **Jogadores**: Lista de jogadores com as suas respetivas posições, preços, clubes e estados;
+- **Jornadas**: Definição das 4 primeiras jornadas da competição com as datas de início e fim;
+- **Jogos**: Calendário de 16 jogos fictícios (4 por jornada) com resultados aleatórios;
+- **Estatísticas de Jogadores**: Pontuações geradas realisticamente com base em golos, assistências, tempo de jogo e cartões.
+
+Os dados dos jogadores e clubes são obtidos através da [Football-Data.org API](https://www.football-data.org/), garantindo informação atualizada da época 2025/2026 da UEFA Champions League.
+
+**Sistema de Pontuação**: A pontuação dos jogadores é calculada automaticamente através da fórmula: `+1 ponto/30min jogados`, `+5 pontos/golo`, `+3 pontos/assistência`, `-1 ponto/cartão amarelo`, `-3 pontos/cartão vermelho`. A pontuação da equipa corresponde à soma dos 11 titulares em campo.
+
 ### Apresentação
 
 [Slides](slides.pdf "Slides")

@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS FantasyChamp.Enfrenta;
 DROP TABLE IF EXISTS FantasyChamp.Participa;
 DROP TABLE IF EXISTS FantasyChamp.Pertence;
 DROP TABLE IF EXISTS FantasyChamp.Jogo;

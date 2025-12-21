@@ -105,8 +105,6 @@ AS
     JOIN FantasyChamp.Estado_Jogador E ON J.ID_Estado_Jogador = E.ID
     JOIN FantasyChamp.Clube C ON J.ID_Clube = C.ID;
 
-    FROM FantasyChamp.Jogo J
-
 CREATE VIEW FantasyChamp.JogosCompletos
 AS
     SELECT
