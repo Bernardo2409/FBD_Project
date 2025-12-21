@@ -3,7 +3,7 @@ import secrets
 import uuid
 from datetime import datetime
 
-from flask import Flask, render_template, request, redirect, jsonify, session, url_for
+from flask import Flask, render_template, request, redirect, session
 
 from persistence.equipa import (
     adicionar_jogador_equipa, 
@@ -17,31 +17,24 @@ from persistence.equipa import (
 from persistence.leagues import (
     abandonar_liga,
     criar_liga,
-    criar_liga_publica,
     juntar_liga,
-    juntar_liga_automatico,
     obter_liga_por_id,
     obter_ligas_por_utilizador,
     obter_participantes_liga,
-    obter_tipos_liga,
-    obter_liga_pelo_pais,
     obter_ligas_publicas_para_utilizador,
     obter_liga_id_por_codigo,
     obter_ranking_liga,
     verificar_participacao_liga,
 )
 from persistence.jornadas import obter_jornada_info, obter_jornada_atual, obter_todas_jornadas
-from persistence.players import list_all, list_paginated, read
-from persistence.clubs import list_all_clubs, list_paginated_clubs, read_club
-from persistence.users import create_user, login_user, get_users, get_user_by_id
+from persistence.players import list_all, list_paginated
+from persistence.clubs import list_paginated_clubs, read_club
+from persistence.users import create_user, login_user, get_user_by_id
 from persistence.countries import get_pais
 
 from persistence.pontuacoes import calcular_pontuacao_equipa, calcular_pontuacao_jogador, obter_pontuacoes_jornadas, obter_equipa_com_pontuacoes_jornada
 from persistence import players
 from persistence.match import list_paginated_matches, read_match
-
-
-import random
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY') or 'chave-temporaria-para-desenvolvimento' 
