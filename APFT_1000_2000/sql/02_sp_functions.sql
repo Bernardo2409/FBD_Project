@@ -111,71 +111,71 @@ BEGIN
     -- NOVA LÓGICA CORRETA: Primeiro preenche o CAMPO, depois o BANCO
     SET @BenchedStatus = 0; -- Default: vai para CAMPO (invertido!)
     
-    DECLARE @ContadorGR_Total INT;
-    DECLARE @ContadorDefesas_Total INT;
-    DECLARE @ContadorMedios_Total INT;
-    DECLARE @ContadorAvancados_Total INT;
+    DECLARE @ContadorGR_Campo INT;
+    DECLARE @ContadorDefesas_Campo INT;
+    DECLARE @ContadorMedios_Campo INT;
+    DECLARE @ContadorAvancados_Campo INT;
     
-    -- Contar totais de cada posição
-    SELECT @ContadorGR_Total = COUNT(*)
+    -- Contar jogadores NO CAMPO (benched=0) de cada posição
+    SELECT @ContadorGR_Campo = COUNT(*)
     FROM FantasyChamp.Pertence PE
     JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
     JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Goalkeeper';
+    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Goalkeeper' AND PE.benched = 0;
     
-    SELECT @ContadorDefesas_Total = COUNT(*)
+    SELECT @ContadorDefesas_Campo = COUNT(*)
     FROM FantasyChamp.Pertence PE
     JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
     JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Defender';
+    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Defender' AND PE.benched = 0;
     
-    SELECT @ContadorMedios_Total = COUNT(*)
+    SELECT @ContadorMedios_Campo = COUNT(*)
     FROM FantasyChamp.Pertence PE
     JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
     JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Midfielder';
+    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Midfielder' AND PE.benched = 0;
     
-    SELECT @ContadorAvancados_Total = COUNT(*)
+    SELECT @ContadorAvancados_Campo = COUNT(*)
     FROM FantasyChamp.Pertence PE
     JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
     JOIN FantasyChamp.Posição P ON J.ID_Posição = P.ID
-    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Forward';
+    WHERE PE.ID_Equipa = @ID_Equipa AND P.Posição = 'Forward' AND PE.benched = 0;
     
-    -- REGRAS CORRETAS: O último de cada posição vai para o banco
-    -- GR: 2 total (1º campo, 2º banco)
+    -- REGRAS: Verificar se há vaga NO CAMPO para a posição
+    -- GR: 1 no campo, 1 no banco
     IF @Posicao = 'Goalkeeper'
     BEGIN
-        IF @ContadorGR_Total >= 1  -- Já tem 1 GR (no campo)
-            SET @BenchedStatus = 1; -- 2º GR vai para o banco
+        IF @ContadorGR_Campo >= 1  -- Já tem 1 GR no campo
+            SET @BenchedStatus = 1; -- Vai para o banco
         ELSE
-            SET @BenchedStatus = 0; -- 1º GR vai para o campo
+            SET @BenchedStatus = 0; -- Vai para o campo
     END
     
-    -- Defesas: 5 total (primeiros 4 campototal, 5º banco)
+    -- Defesas: 4 no campo, 1 no banco
     ELSE IF @Posicao = 'Defender'
     BEGIN
-        IF @ContadorDefesas_Total >= 4  -- Já tem 4 defesas (no campo)
-            SET @BenchedStatus = 1; -- 5º defesa vai para o banco
+        IF @ContadorDefesas_Campo >= 4  -- Já tem 4 defesas no campo
+            SET @BenchedStatus = 1; -- Vai para o banco
         ELSE
-            SET @BenchedStatus = 0; -- Primeiros 4 vão para o campo
+            SET @BenchedStatus = 0; -- Vai para o campo
     END
     
-    -- Médios: 5 total (primeiros 4 campo, 5º banco)
+    -- Médios: 4 no campo, 1 no banco
     ELSE IF @Posicao = 'Midfielder'
     BEGIN
-        IF @ContadorMedios_Total >= 4  -- Já tem 4 médios (no campo)
-            SET @BenchedStatus = 1; -- 5º médio vai para o banco
+        IF @ContadorMedios_Campo >= 4  -- Já tem 4 médios no campo
+            SET @BenchedStatus = 1; -- Vai para o banco
         ELSE
-            SET @BenchedStatus = 0; -- Primeiros 4 vão para o campo
+            SET @BenchedStatus = 0; -- Vai para o campo
     END
     
-    -- Avançados: 3 total (primeiros 2 campo, 3º banco)
+    -- Avançados: 2 no campo, 1 no banco
     ELSE IF @Posicao = 'Forward'
     BEGIN
-        IF @ContadorAvancados_Total >= 2  -- Já tem 2 avançados (no campo)
-            SET @BenchedStatus = 1; -- 3º avançado vai para o banco
+        IF @ContadorAvancados_Campo >= 2  -- Já tem 2 avançados no campo
+            SET @BenchedStatus = 1; -- Vai para o banco
         ELSE
-            SET @BenchedStatus = 0; -- Primeiros 2 vão para o campo
+            SET @BenchedStatus = 0; -- Vai para o campo
     END
 
     -- Inserir jogador
@@ -1384,13 +1384,19 @@ BEGIN
     SET NOCOUNT ON;
 
     DECLARE @Preco_Jogador DECIMAL(10,2);
+    DECLARE @EstavaNoCampo BIT;
+    DECLARE @Posicao NVARCHAR(50);
+    DECLARE @JogadorBancoPromover VARCHAR(16);
 
     BEGIN TRANSACTION;
 
-    -- Obter preço do jogador
-    SELECT @Preco_Jogador = J.Preço
+    -- Obter preço, posição e status do jogador
+    SELECT @Preco_Jogador = J.Preço,
+           @Posicao = POS.Posição,
+           @EstavaNoCampo = CASE WHEN P.benched = 0 THEN 1 ELSE 0 END
     FROM FantasyChamp.Jogador J
     INNER JOIN FantasyChamp.Pertence P ON J.ID = P.ID_Jogador
+    INNER JOIN FantasyChamp.Posição POS ON J.ID_Posição = POS.ID
     WHERE P.ID_Equipa = @ID_Equipa
       AND P.ID_Jogador = @ID_Jogador;
 
@@ -1406,10 +1412,33 @@ BEGIN
         UPDATE FantasyChamp.Equipa
         SET Orçamento = Orçamento + @Preco_Jogador
         WHERE ID = @ID_Equipa;
+
+        -- Se o jogador removido estava no campo, promover um do banco da mesma posição
+        IF @EstavaNoCampo = 1
+        BEGIN
+            -- Encontrar um jogador do banco da mesma posição
+            SELECT TOP 1 @JogadorBancoPromover = PE.ID_Jogador
+            FROM FantasyChamp.Pertence PE
+            INNER JOIN FantasyChamp.Jogador J ON PE.ID_Jogador = J.ID
+            INNER JOIN FantasyChamp.Posição POS ON J.ID_Posição = POS.ID
+            WHERE PE.ID_Equipa = @ID_Equipa
+              AND PE.benched = 1
+              AND POS.Posição = @Posicao;
+
+            -- Se encontrou, promover para o campo
+            IF @JogadorBancoPromover IS NOT NULL
+            BEGIN
+                UPDATE FantasyChamp.Pertence
+                SET benched = 0
+                WHERE ID_Equipa = @ID_Equipa
+                  AND ID_Jogador = @JogadorBancoPromover;
+            END
+        END
     END
 
     COMMIT TRANSACTION;
 END;
+
 
 CREATE PROCEDURE sp_TrocarJogadorBancoCampo
     @ID_Equipa UNIQUEIDENTIFIER,
