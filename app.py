@@ -58,7 +58,7 @@ def login_submit():
         session['user_name'] = user["first"]
         return redirect("/index")
 
-    return render_template("login.html", error="Email ou palavra-passe incorretos")
+    return render_template("login.html", error="Incorrect email or password")
 
 
 @app.route("/signup", methods=["GET"])
@@ -82,7 +82,7 @@ def signup_submit():
         pais = get_pais()
         return render_template("signup.html", 
                              pais=pais, 
-                             error="Primeiro nome é obrigatório.",
+                             error="First name is required.",
                              form_data={
                                  "first": first,
                                  "last": last,
@@ -96,7 +96,7 @@ def signup_submit():
         pais = get_pais()
         return render_template("signup.html", 
                              pais=pais, 
-                             error="Apelido é obrigatório.",
+                             error="Surname is required.",
                              form_data={
                                  "first": first,
                                  "last": last,
@@ -110,7 +110,7 @@ def signup_submit():
         pais = get_pais()
         return render_template("signup.html", 
                              pais=pais, 
-                             error="Email é obrigatório.",
+                             error="Email is required.",
                              form_data={
                                  "first": first,
                                  "last": last,
@@ -124,7 +124,7 @@ def signup_submit():
         pais = get_pais()
         return render_template("signup.html", 
                              pais=pais, 
-                             error="Senha é obrigatória.",
+                             error="Password is required.",
                              form_data={
                                  "first": first,
                                  "last": last,
@@ -138,7 +138,7 @@ def signup_submit():
         pais = get_pais()
         return render_template("signup.html", 
                              pais=pais, 
-                             error="País é obrigatório.",
+                             error="Country is required.",
                              form_data={
                                  "first": first,
                                  "last": last,
@@ -152,7 +152,7 @@ def signup_submit():
         pais = get_pais()
         return render_template("signup.html", 
                              pais=pais, 
-                             error="Nacionalidade é obrigatória.",
+                             error="Nationality is required.",
                              form_data={
                                  "first": first,
                                  "last": last,
@@ -166,7 +166,7 @@ def signup_submit():
         pais = get_pais()
         return render_template("signup.html", 
                              pais=pais, 
-                             error="Data de nascimento é obrigatória.",
+                             error="Birth date is required.",
                              form_data={
                                  "first": first,
                                  "last": last,
@@ -180,10 +180,10 @@ def signup_submit():
         user_id = create_user(first, last, email, password, country, nationality, birthdate)
         
         if not user_id:
-            raise Exception("Erro ao criar utilizador")
+            raise Exception("Error creating user")
 
         # Redirecionar para login após registo bem-sucedido
-        session['message'] = "Registo efetuado com sucesso! Por favor, faça login."
+        session['message'] = "Registration successful! Please log in."
         return redirect("/")
 
     except Exception as e:
@@ -192,10 +192,10 @@ def signup_submit():
         pais = get_pais()
         
         mensagem_erro = str(e)
-        if "email já está registado" in str(e).lower():
-            mensagem_erro = "Este email já está registado."
-        elif "país inválido" in str(e).lower():
-            mensagem_erro = "País selecionado é inválido."
+        if "email already exists" in str(e).lower():
+            mensagem_erro = "This email is already registered."
+        elif "invalid country" in str(e).lower():
+            mensagem_erro = "Selected country is invalid."
         
         return render_template("signup.html", 
                              pais=pais, 
@@ -350,16 +350,16 @@ def adicionar_jogador_equipa_route(posicao, jogador_id):
             limites = verificar_limites_equipa(equipa_user.id)
 
             if posicao == 'gr' and not limites['pode_adicionar_gr']:
-                session['error'] = "Já tens 2 guarda-redes! Remove um primeiro."
+                session['error'] = "You already have 2 goalkeepers! Remove one first."
             elif posicao == 'defesas' and not limites['pode_adicionar_defesa']:
-                session['error'] = "Já tens 5 defesas! Remove um primeiro."
+                session['error'] = "You already have 5 defenders! Remove one first."
             elif posicao == 'medios' and not limites['pode_adicionar_medio']:
-                session['error'] = "Já tens 5 médios! Remove um primeiro."
+                session['error'] = "You already have 5 midfielders! Remove one first."
             elif posicao == 'avancados' and not limites['pode_adicionar_avancado']:
-                session['error'] = "Já tens 3 avançados! Remove um primeiro."
+                session['error'] = "You already have 3 forwards! Remove one first."
             else:
                 adicionar_jogador_equipa(equipa_user.id, jogador_id)
-                session['message'] = "Jogador adicionado com sucesso!"
+                session['message'] = "Player added successfully!"
 
         except Exception as e:
             session['error'] = str(e)
@@ -378,9 +378,9 @@ def remover_jogador_equipa_route(jogador_id):
     if equipa_user:
         try:
             remover_jogador_equipa(equipa_user.id, jogador_id)
-            session['message'] = "Jogador removido com sucesso!"
+            session['message'] = "Player removed successfully!"
         except Exception as e:
-            session['error'] = f"Erro ao remover jogador: {str(e)}"
+            session['error'] = f"Error removing player: {str(e)}"
 
     return redirect("/equipa")
 
@@ -421,7 +421,7 @@ def criar_liga_route():
             codigo_convite = request.form.get('codigo_convite') or None
 
             liga_id = criar_liga(nome, data_inicio, data_fim, tipo_liga, id_criador, codigo_convite)
-            session['message'] = "Liga criada com sucesso!"
+            session['message'] = "League created successfully!"
             return redirect("/ligas")
 
     return render_template("criar_liga.html")
@@ -439,9 +439,9 @@ def juntar_liga_route(liga_id):
         sucesso = juntar_liga(user_id, liga_id, codigo)
 
         if sucesso:
-            session['message'] = "Juntaste-te à liga com sucesso!"
+            session['message'] = "You joined the league successfully!"
         else:
-            session['error'] = "Erro ao juntar-se à liga. Verifica o código ou se já estás na liga."
+            session['error'] = "Error joining league. Check the code or if you're already in the league."
 
     return redirect("/ligas")
 
@@ -480,15 +480,15 @@ def juntar_liga_codigo():
     liga_id = obter_liga_id_por_codigo(codigo)
 
     if not liga_id:
-        session['error'] = "Código inválido"
+        session['error'] = "Invalid code"
         return redirect("/ligas")
 
     sucesso = juntar_liga(user_id, liga_id, codigo)
 
     if sucesso:
-        session['message'] = "Você entrou na liga com sucesso!"
+        session['message'] = "You joined the league successfully!"
     else:
-        session['error'] = "Falha ao entrar na liga"
+        session['error'] = "Failed to join league"
 
     return redirect("/ligas")
 
@@ -503,9 +503,9 @@ def abandonar_liga_route(liga_id):
     sucesso = abandonar_liga(user_id, liga_id)
 
     if sucesso:
-        session['message'] = "Você saiu da liga com sucesso!"
+        session['message'] = "You left the league successfully!"
     else:
-        session['error'] = "Você não está nessa liga."
+        session['error'] = "You are not in this league."
 
     return redirect("/ligas")
 

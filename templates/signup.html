@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <title>Create Account</title>
@@ -14,7 +15,11 @@
 
         {% if error %}
         <div role="alert" class="alert alert-error mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             <span>{{ error }}</span>
         </div>
         {% endif %}
@@ -30,28 +35,31 @@
 
             <!-- Email e Password -->
             <input type="email" name="email" placeholder="E-mail" required class="input input-bordered w-full">
-            <input type="password" name="password" placeholder="Palavra-passe" required class="input input-bordered w-full">
+            <input type="password" name="password" placeholder="Password" required class="input input-bordered w-full">
 
             <!-- Dropdown para Seleção de País -->
             <div class="dropdown w-full">
-                <button type="button" class="input input-bordered w-full text-left flex items-center justify-between gap-2">
+                <button type="button"
+                    class="input input-bordered w-full text-left flex items-center justify-between gap-2">
                     <span class="country-label">Select Country</span>
                     <span class="ml-auto">▼</span>
                 </button>
-                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto">
+                <ul tabindex="0"
+                    class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full max-h-60 overflow-y-auto">
                     {% for country in pais %}
-                        <li>
-                            <button type="button" class="flex items-center gap-2" required onclick="setCountry('{{ country.nome }}')">
-                                <img src="{{ country.imagem }}" alt="{{ country.nome }}" class="w-6 h-6 object-cover">
-                                <span>{{ country.nome }}</span>
-                            </button>
-                        </li>
+                    <li>
+                        <button type="button" class="flex items-center gap-2" required
+                            onclick="setCountry('{{ country.nome }}')">
+                            <img src="{{ country.imagem }}" alt="{{ country.nome }}" class="w-6 h-6 object-cover">
+                            <span>{{ country.nome }}</span>
+                        </button>
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
-              <input name="nationality" placeholder="Nacionality" required class="input input-bordered w-full">
-              <!-- Campo oculto para guardar o país selecionado-->
-              <input type="hidden" name="country" id="country-input">
+            <input name="nationality" placeholder="Nacionality" required class="input input-bordered w-full">
+            <!-- Campo oculto para guardar o país selecionado-->
+            <input type="hidden" name="country" id="country-input">
 
             <!-- Data de Nascimento -->
             <label class="font-semibold">Born date</label>
@@ -100,4 +108,5 @@
     </script>
 
 </body>
+
 </html>
