@@ -3,7 +3,7 @@ ALTER PROCEDURE FantasyChamp.CalcularPontuacaoJogador
     @ID_Jornada VARCHAR(16),
     @Pontuacao INT OUTPUT,
     @Resultado BIT OUTPUT,
-    @Mensagem NVARCHAR(200) OUTPUT
+    @Mensagem NVARCHAR(200) OUTPUT  
 AS
 BEGIN
     SET NOCOUNT ON;
