@@ -357,7 +357,7 @@ Os dados dos jogadores e clubes são obtidos através da [Football-Data.org API]
 
 [Slides](slides.pdf "Slides")
 
-[Video](demo/demoFantasyChamp.mp4)
+[Video](https://drive.google.com/file/d/1Z6NAD8FGleeVSnZedcmzFTiHdCEmXHds/view "Video")
 
 
 
