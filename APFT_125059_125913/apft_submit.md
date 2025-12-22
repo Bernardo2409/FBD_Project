@@ -35,6 +35,7 @@ A FantasyChamp é um sistema que permite a cada utilizador criar uma equipa virt
 A cada jornada, os jogadores acumulam pontos com base no seu desempenho de um jogo oficial na vida real.
 Se um destes jogadores estiver na equipa do utilizador a equipa também ganha pontos. A soma das pontuações obtidas pelos jogadores numa jornada determina a pontuação da equipa nessa jornada, enquanto a soma de todas as jornadas corresponde à pontuação total da equipa ao longo da competição. Esta pontuação total define a classificação da Liga. E no fim há um vencedor.
 
+*As instruções para o uso da aplicação encontra-se disponivel no documento [*README.md*](README.md "md")*
 
 ## ​Análise de Requisitos / Requirements
 
